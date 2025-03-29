@@ -1,11 +1,11 @@
 # 실행법 : streamlit run Home.py
 # 서버 주소 : https://main-project-codeworks.streamlit.app/
-
+# https://m.ddaily.co.kr/2022/07/28/2022072820411931122_l.png
 
 import streamlit as st
 import os
 
-st.set_page_config(page_title="Hyundai & Kia ERP", layout="wide")
+st.set_page_config(page_title="Hyundai & Kia ERP", layout="wide", page_icon="https://i.namu.wiki/i/uNKzeN4J5LmcBr_4EbF2D6ObllziCSQWNo8inXP6F2vS1zIb1UtVws-7AzkP0qOUrm40Um6xekuoFUYDMtFT3w.webp")
 
 
 # 페이지 초기화
