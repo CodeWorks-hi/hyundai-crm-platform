@@ -1638,3 +1638,47 @@ ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
     df_employees = load_employees()
 IndentationError: expected an indented block after 'with' statement on line 179
 
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 191, in app
+    st.experimental_rerun()
+AttributeError: module 'streamlit' has no attribute 'experimental_rerun'
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 191, in app
+    st.experimental_rerun()
+AttributeError: module 'streamlit' has no attribute 'experimental_rerun'
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 289
+    if st.button("고객 정보 등록"):
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 143
+    고객ID = str(uuid.uuid4())
+IndentationError: expected an indented block after 'if' statement on line 142
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 12
+    EMPLOYEE_CSV_PATH = "data/employee.csv
+                        ^
+SyntaxError: unterminated string literal (detected at line 12)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 114
+    st.subheader("고객 정보 등록 + 설문")
+    ^^
+IndentationError: expected an indented block after 'with' statement on line 113
+

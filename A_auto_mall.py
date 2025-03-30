@@ -2,18 +2,46 @@
 
 import streamlit as st
 import pandas as pd
+import uuid
+import datetime
 import os
 
-df = pd.read_csv("data/casper_final.csv")
+df = pd.read_csv("data/casper_final.csv") # 캐스퍼 정보 불러오기
 
-EMPLOYEE_CSV_PATH = "data/employee.csv"
+CUSTOMER_CSV_PATH = "data/customers.csv" # 고객정보
+EMPLOYEE_CSV_PATH = "data/employee.csv" # 직원정보
+os.makedirs("data", exist_ok=True)
 
+# 고객 CSV 불러오기 또는 생성
+def load_customers():
+    columns = [
+        "고객ID", "상담자ID", "상담자명", "등록일", "이름", "연락처", "성별", "생년월일", "연령대",
+        "거주지역", "관심차종", "방문목적", "월주행거리_km", "주요용도", "예상예산_만원", "선호색상",
+        "동승인원구성", "중요요소1", "중요요소2", "중요요소3", "최근보유차종", "기타요청사항"
+    ]
+    if os.path.exists(CUSTOMER_CSV_PATH):
+        return pd.read_csv(CUSTOMER_CSV_PATH)
+    else:
+        return pd.DataFrame(columns=columns)
+
+# 고객 저장
+def save_customer(info):
+    df = load_customers()
+    df.loc[len(df)] = info
+    df.to_csv(CUSTOMER_CSV_PATH, index=False)
+
+
+
+
+# 직원 데이터 로드 
 @st.cache_data
 def load_employees():
     if os.path.exists(EMPLOYEE_CSV_PATH):
         return pd.read_csv(EMPLOYEE_CSV_PATH)
     else:
         return pd.DataFrame(columns=["고유ID", "직원이름", "사진경로"])
+
+df_employees = load_employees()
 
 def generate_html_table(df: pd.DataFrame) -> str:
     html = """
@@ -67,7 +95,7 @@ def app():
     tabs = st.tabs([
         "차량 추천", 
         "차량 비교", 
-        "고객 정보 입력", 
+        "방문고객 설문조사", 
         "판매 등록",
         "AI 수요 예측",
         "고객 맞춤 추천",
@@ -83,8 +111,63 @@ def app():
         st.write("차량 비교 기능 예정. (판매 실적 현황)")
 
     with tabs[2]:
-        st.write("고객 정보 입력 예정. (차량 재고 현황)")
+        st.subheader("설문조사")
 
+        if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
+            st.warning("상담자 정보를 먼저 등록하세요 (사이드바에서)")
+        else:
+            with st.form("고객등록"):
+                이름 = st.text_input("이름")
+                연락처 = st.text_input("연락처 (숫자만)", max_chars=11)
+                성별 = st.radio("성별", ["남성", "여성"], horizontal=True)
+                생년월일 = st.date_input("생년월일")
+                거주지역 = st.selectbox("거주 지역", [
+                    "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시", "대전광역시",
+                    "울산광역시", "세종특별자치시", "경기도", "강원도", "충청북도", "충청남도",
+                    "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"])
+                관심차종 = st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
+                방문목적 = st.selectbox("방문 목적", ["차량 상담", "구매 의사 있음", "시승 희망", "기타"])
+
+                st.markdown("---")
+                st.markdown("#### 추가 설문")
+                월주행거리 = st.selectbox("월 주행거리(km)", ["500", "1000", "1500", "2000 이상"])
+                주요용도 = st.multiselect("주요 운전 용도", ["출퇴근", "아이 통학", "주말여행", "레저활동", "업무차량"])
+                예산 = st.selectbox("예상 예산 (만원)", ["1500", "2000", "2500", "3000", "3500 이상"])
+                선호색상 = st.selectbox("선호 색상", ["흰색", "검정", "회색", "은색", "파랑", "빨강", "기타"])
+                동승구성 = st.selectbox("동승 인원 구성", ["1인", "부부", "자녀1명", "자녀2명 이상", "부모님 동승"])
+                중요1 = st.selectbox("가장 중요한 요소", ["연비", "가격", "디자인", "성능", "안전", "공간"])
+                중요2 = st.selectbox("두번째로 중요한 요소", ["연비", "가격", "디자인", "성능", "안전", "공간"])
+                중요3 = st.selectbox("세번째로 중요한 요소", ["연비", "가격", "디자인", "성능", "안전", "공간"])
+                보유차종 = st.text_input("최근 보유 차량")
+                기타 = st.text_area("기타 요청사항")
+
+                submitted = st.form_submit_button("설문조사 완료")
+                if submitted:
+                    고객ID = str(uuid.uuid4())
+                    today = datetime.date.today().isoformat()
+                    연령대 = f"{(datetime.date.today().year - 생년월일.year) // 10 * 10}대"
+                    상담자명 = st.session_state["직원이름"]
+                    상담자ID = df_employees[df_employees["직원이름"] == 상담자명].iloc[0]["고유ID"]
+
+                    customer_info = [
+                        고객ID, 상담자ID, 상담자명, today, 이름, 연락처, 성별,
+                        생년월일.isoformat(), 연령대, 거주지역, ", ".join(관심차종), 방문목적,
+                        월주행거리, ", ".join(주요용도), 예산, 선호색상, 동승구성,
+                        중요1, 중요2, 중요3, 보유차종, 기타
+                    ]
+                    save_customer(customer_info)
+
+                    st.session_state["고객정보"] = {
+                        "이름": 이름,
+                        "관심차종": ", ".join(관심차종),
+                        "예상예산_만원": 예산,
+                        "주요용도": ", ".join(주요용도)
+                    }
+
+                    st.success(f"{이름}님 설문조사가 완료되었습니다.")
+
+
+                    
     with tabs[3]:
         st.write("00 화면입니다. (생산 계획 관리)")
 
@@ -188,7 +271,7 @@ def app():
                     matched = df_employees[df_employees["직원이름"] == 입력이름]
                     if not matched.empty:
                         st.session_state["직원이름"] = 입력이름
-                        st.experimental_rerun()
+                        st.rerun()
                     else:
                         st.warning("등록된 직원이 아닙니다.")
             else:
@@ -205,23 +288,16 @@ def app():
                     unsafe_allow_html=True
                 )
 
-            st.markdown("### 고객 정보 입력")
+            st.markdown("### 오늘의 고객님 ")
 
-            이름 = st.text_input("이름")
-            연락처 = st.text_input("연락처 (숫자만 입력)", max_chars=11)
-            성별 = st.radio("성별", ["남성", "여성"], horizontal=True)
-            생년월일 = st.date_input("생년월일")
+            # 고객 등록 후 정보 표시
+            if "고객정보" in st.session_state:
+                고객 = st.session_state["고객정보"]
+                st.markdown("---")
+                st.markdown("#### 🧾 등록된 고객 정보")
+                st.markdown(f"**이름**: {고객['이름']} 고객님")
+                st.markdown(f"**관심 차종**: {고객['관심차종']}")
+                st.markdown(f"**예산**: {고객['예상예산_만원']}만원")
+                st.markdown(f"**용도**: {고객['주요용도']}")
 
-            거주지역 = st.selectbox("거주 지역", [
-                "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시", "대전광역시", "울산광역시", "세종특별자치시",
-                "경기도", "강원도", "충청북도", "충청남도", "전라북도", "전라남도", "경상북도", "경상남도", "제주특별자치도"
-            ])
-            관심차종 = st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
-
-            방문목적 = st.selectbox("방문 목적", ["차량 상담", "구매 의사 있음", "시승 희망", "기타"])
-
-            메모 = st.text_area("상담 메모")
-
-            if st.button("고객 정보 등록"):
-                st.success(f"{이름} 고객님의 정보가 등록되었습니다.")
     
