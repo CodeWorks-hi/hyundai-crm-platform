@@ -652,3 +652,186 @@ ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
     ^^
 IndentationError: expected an indented block after 'with' statement on line 94
 
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 104
+    st.markdown(f: {item['트림명']}")
+                                ^
+SyntaxError: unterminated string literal (detected at line 104)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 104
+    st.markdown(f"": {item['트림명']}")
+                                  ^
+SyntaxError: unterminated string literal (detected at line 104)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 104
+    st.markdown(f: {item['트림명']}")
+                                ^
+SyntaxError: unterminated string literal (detected at line 104)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 104
+    st.markdown(f"": {item['트림명']}")
+                                  ^
+SyntaxError: unterminated string literal (detected at line 104)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 132
+    if st.button("← 메인으로 돌아가기"):
+    ^^
+IndentationError: expected an indented block after 'with' statement on line 130
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 131
+    
+    ^
+IndentationError: expected an indented block after 'with' statement on line 130
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 131, in app
+    paxs
+NameError: name 'paxs' is not defined
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 63
+    if st.button("← 메인으로 돌아가기"):
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 64
+    st.session_state.current_page = "home"
+    ^^
+IndentationError: expected an indented block after 'if' statement on line 63
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 54
+    if st.button("← 메인으로 돌아가기"):
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 53
+    if st.button("← H):
+                 ^
+SyntaxError: unterminated string literal (detected at line 53)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 53
+    if st.button("← HO):
+                 ^
+SyntaxError: unterminated string literal (detected at line 53)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 136
+    이름 = st.text_input("이름")
+                            ^
+IndentationError: unindent does not match any outer indentation level
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 96
+    car = st.session_state["선택차량"]
+IndentationError: expected an indented block after 'if' statement on line 95
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 96
+    car = st.session_state["선택차량"]
+    ^^^
+IndentationError: expected an indented block after 'if' statement on line 95
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 96
+    car = st.session_state["선택차량"]
+    ^^^
+IndentationError: expected an indented block after 'if' statement on line 95
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 107
+    with col2:
+IndentationError: expected an indented block after 'with' statement on line 106
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 107
+    with col2:
+IndentationError: expected an indented block after 'with' statement on line 106
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 107
+    with col2:
+    ^^^^
+IndentationError: expected an indented block after 'with' statement on line 106
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 95
+    if "선택차량" in st.session_state:
+IndentationError: expected an indented block after 'with' statement on line 94
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 95
+    if "선택차량" in st.session_state:
+    ^^
+IndentationError: expected an indented block after 'with' statement on line 94
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 114
+    st.markdown(f"- {col}: {value}")current_page = "판매 등록"
+                                    ^^^^^^^^^^^^
+SyntaxError: invalid syntax
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 95
+    if "선택차량" in st.session_state:
+IndentationError: expected an indented block after 'with' statement on line 94
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 95, in <module>
+    with col1:
+NameError: name 'col1' is not defined
+
