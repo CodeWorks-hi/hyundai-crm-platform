@@ -2,8 +2,18 @@
 
 import streamlit as st
 import pandas as pd
+import os
 
 df = pd.read_csv("data/casper_final.csv")
+
+EMPLOYEE_CSV_PATH = "data/employee.csv"
+
+@st.cache_data
+def load_employees():
+    if os.path.exists(EMPLOYEE_CSV_PATH):
+        return pd.read_csv(EMPLOYEE_CSV_PATH)
+    else:
+        return pd.DataFrame(columns=["고유ID", "직원이름", "사진경로"])
 
 def generate_html_table(df: pd.DataFrame) -> str:
     html = """
@@ -91,29 +101,8 @@ def app():
         # 캐스퍼 모델 분리
         casper = df[df["차종"].str.contains("캐스퍼", na=False) & ~df["차종"].str.contains("일렉트", na=False)]
         electric = df[df["차종"].str.contains("일렉트", na=False)]
-        col1, col2, col3 = st.columns([1,3,1])
-
-        with col1:
-            st.markdown("### 차량 정보")
-
-            if "선택차량" in st.session_state:
-                car = st.session_state["선택차량"]
-                st.image(car["img_url"], width=200)
-                st.markdown(f"**{car['차종']} {car['트림명']}**")
-                st.markdown(f"가격: {car['기본가격(원)']:,}원")
-
-                if st.button("판매 등록으로 이동"):
-                    st.session_state.current_page = "판매 등록"
-                    st.rerun()
-
-                st.markdown("---")
-                st.markdown("**세부 정보**")
-                for col in ['연료', '배기량(cc)', '최고출력(PS)', '공차중량(kg)', '전비_복합(km/kWh)', '주행거리_복합(km)']:
-                    value = car.get(col)
-                    if pd.notna(value):
-                        st.markdown(f"- {col}: {value}")
-            else:
-                st.info("선택된 차량이 없습니다.")
+        col2, col3 = st.columns([3,1])
+            
         # 캐스퍼 카드 출력
         with col2:
             st.markdown("### 캐스퍼")
@@ -164,6 +153,58 @@ def app():
                 st.markdown(electric_html, unsafe_allow_html=True)
 
         with col3:
+            st.markdown("### 차량 정보")
+
+            if "선택차량" in st.session_state:
+                car = st.session_state["선택차량"]
+                st.image(car["img_url"], width=200)
+                st.markdown(f"**{car['차종']} {car['트림명']}**")
+                st.markdown(f"가격: {car['기본가격(원)']:,}원")
+
+                if st.button("판매 등록으로 이동"):
+                    st.session_state.current_page = "판매 등록"
+                    st.rerun()
+
+                st.markdown("---")
+                st.markdown("**세부 정보**")
+                for col in ['연료', '배기량(cc)', '최고출력(PS)', '공차중량(kg)', '전비_복합(km/kWh)', '주행거리_복합(km)']:
+                    value = car.get(col)
+                    if pd.notna(value):
+                        st.markdown(f"- {col}: {value}")
+            else:
+                st.info("선택된 차량이 없습니다.")
+            
+        
+        # 고객 입력 폼은 사이드바로 이동
+        with st.sidebar:
+            df_employees = load_employees()
+
+            if "직원이름" not in st.session_state:
+                st.session_state["직원이름"] = ""
+
+            if st.session_state["직원이름"] == "":
+                입력이름 = st.text_input("상담자 이름을 입력하세요")
+                if st.button("상담자 등록"):
+                    matched = df_employees[df_employees["직원이름"] == 입력이름]
+                    if not matched.empty:
+                        st.session_state["직원이름"] = 입력이름
+                        st.experimental_rerun()
+                    else:
+                        st.warning("등록된 직원이 아닙니다.")
+            else:
+                직원정보 = df_employees[df_employees["직원이름"] == st.session_state["직원이름"]].iloc[0]
+
+                # 이미지 중앙 정렬을 위해 컬럼 사용
+                col_center = st.columns([1, 2, 1])[1]
+                with col_center:
+                    st.image(직원정보["사진경로"], width=150)
+
+                # 텍스트 중앙 정렬
+                st.markdown(
+                    f"<div style='text-align: center; font-size: 18px; margin-top: 5px;'><strong>{직원정보['직원이름']} 매니저</strong></div>",
+                    unsafe_allow_html=True
+                )
+
             st.markdown("### 고객 정보 입력")
 
             이름 = st.text_input("이름")

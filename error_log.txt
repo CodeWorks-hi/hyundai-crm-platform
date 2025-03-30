@@ -1578,3 +1578,63 @@ ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
     raise StreamlitAPIException(
 streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
 
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 168
+    
+    ^
+IndentationError: expected an indented block after 'with' statement on line 166
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 170
+    with st.sidebar:
+    ^^^^
+IndentationError: expected an indented block after 'with' statement on line 166
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171
+    with st.sidebar:
+    ^^^^
+IndentationError: expected an indented block after 'with' statement on line 167
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 152
+    with st.sidebar:
+    ^^^^
+IndentationError: expected an indented block after 'with' statement on line 148
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 94
+    col2, col3 = st.columns([3,1])
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 198
+    st.markdown("### 고객 정보 입력")
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 186
+    입력이름 = st.text_input("상담자 이름을 입력하세요")
+IndentationError: expected an indented block after 'if' statement on line 185
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 180
+    df_employees = load_employees()
+IndentationError: expected an indented block after 'with' statement on line 179
+
