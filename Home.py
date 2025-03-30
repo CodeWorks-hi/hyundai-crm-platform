@@ -4,8 +4,9 @@
 
 import streamlit as st
 import os
-
-st.set_page_config(page_title="Hyundai & Kia ERP", layout="wide", page_icon="https://i.namu.wiki/i/uNKzeN4J5LmcBr_4EbF2D6ObllziCSQWNo8inXP6F2vS1zIb1UtVws-7AzkP0qOUrm40Um6xekuoFUYDMtFT3w.webp")
+# 파피콘 이랑 인터넷 텝 글씨 
+st.set_page_config(page_title="Hyundai & Kia ERP", layout="wide", 
+                   page_icon="https://i.namu.wiki/i/uNKzeN4J5LmcBr_4EbF2D6ObllziCSQWNo8inXP6F2vS1zIb1UtVws-7AzkP0qOUrm40Um6xekuoFUYDMtFT3w.webp")
 
 
 # 페이지 초기화
@@ -19,10 +20,16 @@ def switch_page(page):
 
 # 페이지 분기
 if st.session_state.current_page == "home":
-    st.markdown("""
-        <h1 style='text-align: center; margin-bottom: 40px;'>Hyundai & Kia ERP</h1>
-    """, unsafe_allow_html=True)
+    # 로고 이미지 표시 (로컬 이미지)
+    st.image("images/hyundae_kia_logo.png", width=100)
 
+    # 제목 표시
+    st.markdown(
+        "<h1 style='text-align: center; margin-bottom: 40px;'>Hyundai & Kia ERP</h1>",
+        unsafe_allow_html=True
+    )
+
+    # 컬럼 구분 4는 여백 1 2 3 버튼 있는 이미지 5 여백
     col4, col1, col2, col3,col5= st.columns([1.5,1,1,1,1])
 
     with col4:
