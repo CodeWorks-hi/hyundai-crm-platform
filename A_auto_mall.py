@@ -50,6 +50,7 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 def app():
     st.title("딜러가 고객이 왔을때 차량 목록 보여주기, 고객정보입력하기, 차량 선택 해서 판매 할 경우 판매 등록, 상담내용등록, 고객 성향 파악 , 고객에게 맞춤 차량 추천 ")
+    
     if st.button("← Home"):
         st.session_state.current_page = "home"
         st.rerun()
@@ -130,6 +131,7 @@ def app():
                         # 차량 선택 버튼
                         if st.button("이 차량 선택", key=f"선택_{item['트림명']}"):
                             st.session_state["선택차량"] = item.to_dict()
+                            st.rerun()
 
             # 캐스퍼 비교 테이블
             with st.expander("캐스퍼 비교하기"):
@@ -153,6 +155,7 @@ def app():
                         # 차량 선택 버튼
                         if st.button("이 차량 선택", key=f"선택_{item['트림명']}_elec"):
                             st.session_state["선택차량"] = item.to_dict()
+                            st.rerun()
 
             # 일렉트릭 비교 테이블
             with st.expander("캐스퍼 일렉트릭 비교하기"):
@@ -180,3 +183,4 @@ def app():
 
             if st.button("고객 정보 등록"):
                 st.success(f"{이름} 고객님의 정보가 등록되었습니다.")
+    

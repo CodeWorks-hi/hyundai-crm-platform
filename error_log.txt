@@ -835,3 +835,746 @@ ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
     with col1:
 NameError: name 'col1' is not defined
 
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 96, in app
+    with col1:
+NameError: name 'col1' is not defined
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 94
+    col1, col2, col3 = st.columns([1,3,1])
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 53, in app
+    col1, col2, col3 = st.columns([41])
+ValueError: not enough values to unpack (expected 3, got 1)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 53, in app
+    col1, col2, col3 = st.columns([4,1])
+ValueError: not enough values to unpack (expected 3, got 2)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55
+    col1:
+         ^
+SyntaxError: invalid syntax
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55
+    col1:
+         ^
+SyntaxError: invalid syntax
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55
+    wcol1:
+          ^
+SyntaxError: invalid syntax
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 125, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55, in app
+    with col1:
+UnboundLocalError: local variable 'col1' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55, in app
+    with col1:
+UnboundLocalError: local variable 'col1' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55, in app
+    with col1:
+UnboundLocalError: local variable 'col1' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55, in app
+    with col1:
+UnboundLocalError: local variable 'col1' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55, in app
+    with col1:
+UnboundLocalError: local variable 'col1' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55, in app
+    with col1:
+UnboundLocalError: local variable 'col1' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55, in app
+    with col1:
+UnboundLocalError: local variable 'col1' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55, in app
+    with col1:
+UnboundLocalError: local variable 'col1' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55, in app
+    with col1:
+UnboundLocalError: local variable 'col1' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 125, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 186
+    with col_Auro_mall_1:
+                         ^
+IndentationError: expected an indented block after 'with' statement on line 186
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 186
+    with col_Auro_mall_2:
+                         ^
+IndentationError: expected an indented block after 'with' statement on line 186
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 168
+    with col_Auro_mall_2:
+                         ^
+IndentationError: expected an indented block after 'with' statement on line 168
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171
+    이름 = st.text_input("이름")
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171
+    이름 = st.text_input("이름")
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 125, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 125, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 173
+    이름 = st.text_input("이름")
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 125, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 126, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 123, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171
+    st.session_state.current_page = "home"
+                                          ^
+IndentationError: unindent does not match any outer indentation level
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171
+    st.session_state.current_page = "home"
+                                          ^
+IndentationError: unindent does not match any outer indentation level
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171
+    st.session_state.current_page = "home"
+    ^^
+IndentationError: expected an indented block after 'if' statement on line 170
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 123, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 123, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 122, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 121, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 136, in app
+    display_car_section(casper, "캐스퍼", "선택")
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 56, in display_car_section
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 136, in app
+    display_car_section(casper, "캐스퍼", "선택")
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 56, in display_car_section
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 136, in app
+    display_car_section(casper, "캐스퍼", "선택")
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 56, in display_car_section
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 121, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 145, in app
+    st.experimental_rerun()
+AttributeError: module 'streamlit' has no attribute 'experimental_rerun'
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 145, in app
+    st.experimental_rerun()
+AttributeError: module 'streamlit' has no attribute 'experimental_rerun'
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 121, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 121, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 161
+    관심차종 = st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트
+                                           ^
+SyntaxError: unterminated string literal (detected at line 161)
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 121, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 49
+    else:
+    ^^^^
+SyntaxError: invalid syntax
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 126, in app
+    st.experimental_rerun()
+AttributeError: module 'streamlit' has no attribute 'experimental_rerun'
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 121, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 121, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 122, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 123, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 123, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171
+    st.session_state.current_page = "home"
+    ^^
+IndentationError: expected an indented block after 'if' statement on line 170
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171
+    st.session_state.current_page = "home"
+                                          ^
+IndentationError: unindent does not match any outer indentation level
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 125, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171
+    이름 = st.text_input("이름")
+IndentationError: unexpected indent
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 186
+    with col_Auro_mall_2:
+                         ^
+IndentationError: expected an indented block after 'with' statement on line 186
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55
+    with :
+         ^
+SyntaxError: invalid syntax
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55
+    withcol1:
+             ^
+SyntaxError: invalid syntax
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 55
+    col1:
+         ^
+SyntaxError: invalid syntax
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 172, in <module>
+    with col_side:
+NameError: name 'col_side' is not defined
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 59
+    tabs = st.tabs([
+    ^^^^
+IndentationError: expected an indented block after 'with' statement on line 58
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171, in <module>
+    with col_side:
+NameError: name 'col_side' is not defined
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 67, in <module>
+    import A_auto_mall as auto
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 171, in <module>
+    with col_side:
+NameError: name 'col_side' is not defined
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 186, in app
+    with col_side:
+NameError: name 'col_side' is not defined
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 113, in app
+    cols = st.columns(3)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in columns
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/elements/layouts.py", line 383, in <listcomp>
+    return [row._block(column_proto(w / total_weight)) for w in weights]
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 518, in _block
+    _check_nested_element_violation(self, block_type, ancestor_block_types)
+  File "/Users/choenamho/hi/lib/python3.10/site-packages/streamlit/delta_generator.py", line 590, in _check_nested_element_violation
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Columns can only be placed inside other columns up to one level of nesting.
+
