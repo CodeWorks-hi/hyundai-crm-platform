@@ -4,6 +4,12 @@
 
 import streamlit as st
 import os
+import logging
+import traceback
+
+# 로그 설정 (에러 발생 시 파일에 기록)
+logging.basicConfig(filename='error_log.txt', level=logging.ERROR)
+
 # 파피콘 이랑 인터넷 텝 글씨 
 st.set_page_config(page_title="Hyundai & Kia ERP", layout="wide", 
                    page_icon="https://i.namu.wiki/i/uNKzeN4J5LmcBr_4EbF2D6ObllziCSQWNo8inXP6F2vS1zIb1UtVws-7AzkP0qOUrm40Um6xekuoFUYDMtFT3w.webp")
@@ -57,13 +63,25 @@ if st.session_state.current_page == "home":
 
 # 다른 페이지 연결
 elif st.session_state.current_page == "auto_mall":
-    import A_auto_mall as auto
-    auto.app()
+    try:
+        import A_auto_mall as auto
+        auto.app()
+    except Exception as e:
+        st.error("❗ [Auto Mall] 실행 중 오류 발생")
+        logging.error(f"[auto_mall] 오류: {traceback.format_exc()}")
 
 elif st.session_state.current_page == "dealer_hub":
-    import B_dealer_hub as dealer
-    dealer.app()
+    try:
+        import B_dealer_hub as dealer
+        dealer.app()
+    except Exception as e:
+        st.error("❗ [Dealer Hub] 실행 중 오류 발생")
+        logging.error(f"[dealer_hub] 오류: {traceback.format_exc()}")
 
 elif st.session_state.current_page == "admin_console":
-    import C_admin_console as admin
-    admin.app()
+    try:
+        import C_admin_console as admin
+        admin.app()
+    except Exception as e:
+        st.error("❗ [Admin Console] 실행 중 오류 발생")
+        logging.error(f"[admin_console] 오류: {traceback.format_exc()}")
