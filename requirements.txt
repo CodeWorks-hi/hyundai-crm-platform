@@ -4,3 +4,10 @@ numpy
 altair
 pydeck
 requests
+openpyxl
+uuid
+Pillow
+python-dateutil
+matplotlib
+scikit-learn
+xlsxwriter
