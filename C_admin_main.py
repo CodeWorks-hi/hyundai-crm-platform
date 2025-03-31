@@ -111,25 +111,7 @@ def app():
         st.subheader("⚙️ 시스템 설정")
 
         st.markdown("#### 🔧 환경 설정 항목")
-        # 예: 테마 설정, 언어 설정 등 위치
 
-        st.markdown("---")
-        st.markdown("#### 🧾 에러 로그 보기")
-
-        log_file_path = "error_log.txt"
-
-        if os.path.exists(log_file_path):
-            with open(log_file_path, "r", encoding="utf-8") as f:
-                log_content = f.read()
-
-            if log_content.strip():
-                st.text_area("최근 에러 로그", log_content, height=300, disabled=True)
-                st.download_button("📥 로그 파일 다운로드", log_content, file_name="error_log.txt")
-            else:
-                st.info("현재 에러 로그가 비어 있습니다.")
-        else:
-            st.warning("⚠️ error_log.txt 파일이 아직 생성되지 않았습니다.")
-
-    if st.button("← 메인으로 돌아가기"):
-        st.session_state.current_page = "home"
-        st.rerun()
+        if st.button("← 메인으로 돌아가기"):
+                st.session_state.current_page = "home"
+                st.rerun()
