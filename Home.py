@@ -82,3 +82,11 @@ elif st.session_state.current_page == "admin_main":
     except Exception as e:
         st.error("❗ [Admin_main] 실행 중 오류 발생")
         logging.error(f"[admin_main] 오류: {traceback.format_exc()}")
+
+
+st.markdown("---")
+st.markdown("""
+    <div style='text-align: center; color: gray; font-size: 0.9rem; margin-top: 30px;'>
+        © 2025 Hyundai & Kia Export Dashboard. All rights reserved.
+    </div>
+    """, unsafe_allow_html=True)
