@@ -20,7 +20,7 @@ def app():
     ]
 
     with tabs[0]:
-        st.write("고객 360도 뷰")
+        st.write("가안.")
 
     with tabs[1]:
         st.write("재고 현황")

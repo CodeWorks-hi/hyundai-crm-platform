@@ -196,8 +196,7 @@ def app():
                 for col, (_, item) in zip(cols, row.iterrows()):
                     with col:
                         st.image(item["img_url"], width=260)
-                        st.markdown(f"**{item['차종']}**")
-                        st.markdown(f"{item['트림명']}")
+                        st.markdown(f"**{item['차종']}** {item['트림명']}")
                         st.markdown(f"{item['기본가격(원)']:,}원")
                         
                         # 차량 선택 버튼
@@ -220,8 +219,7 @@ def app():
                 for col, (_, item) in zip(cols, row.iterrows()):
                     with col:
                         st.image(item["img_url"], width=260)
-                        st.markdown(f"**{item['차종']}**")
-                        st.markdown(f"{item['트림명']}")
+                        st.markdown(f"**{item['차종']}** {item['트림명']}")
                         st.markdown(f"{item['기본가격(원)']:,}원")
                         
                         # 차량 선택 버튼
