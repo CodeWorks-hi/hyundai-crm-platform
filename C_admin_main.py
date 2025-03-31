@@ -24,14 +24,16 @@ def save_employees(df):
 
 
 def app():
-    st.title("관리자 콘솔")
+    st.title("본사 관리자 포털")
     tabs = st.tabs([
-        "사용자 권한 관리",
+        "사용자 관리",
         "데이터 동기화 상태",
         "판매·수출 모니터링",
+        "마케팅 캠페인",
         "생산·제조 현황 분석",
         "재고 자동 경고",
         "수출입 국가별 분석",
+        "탄소 배출량 모니터링"
         "설정 및 환경 관리"
     ])
 
@@ -111,7 +113,5 @@ def app():
         st.subheader("⚙️ 시스템 설정")
 
         st.markdown("#### 🔧 환경 설정 항목")
+        # 예: 테마 설정, 언어 설정 등 위치
 
-    if st.button("← 메인으로 돌아가기"):
-            st.session_state.current_page = "home"
-            st.rerun()
