@@ -1813,3 +1813,17 @@ ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
     상담자ID = df_employees[df_employees["직원이름"] == 상담자명].iloc[0]["고유ID"]
 UnboundLocalError: local variable 'df_employees' referenced before assignment
 
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 150, in app
+    상담자ID = df_employees[df_employees["직원이름"] == 상담자명].iloc[0]["고유ID"]
+UnboundLocalError: local variable 'df_employees' referenced before assignment
+
+ERROR:root:[auto_mall] 오류: Traceback (most recent call last):
+  File "/Users/choenamho/Documents/GitHub/main-project/Home.py", line 68, in <module>
+    auto.app()
+  File "/Users/choenamho/Documents/GitHub/main-project/A_auto_mall.py", line 150, in app
+    상담자ID = df_employees[df_employees["직원이름"] == 상담자명].iloc[0]["고유ID"]
+UnboundLocalError: local variable 'df_employees' referenced before assignment
+
