@@ -87,7 +87,7 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 
 def app():
-    st.title("딜러가 고객이 왔을때 차량 목록 보여주기, 고객정보입력하기, 차량 선택 해서 판매 할 경우 판매 등록, 상담내용등록, 고객 성향 파악 , 고객에게 맞춤 차량 추천 ")
+    st.title("설문조사 항목은 머신러닝 학습 및 추천 데이터로 구성, 딜러가 고객이 왔을때 차량 목록 보여주기, 고객정보입력하기, 차량 선택 해서 판매 할 경우 판매 등록, 상담내용등록, 고객 성향 파악 , 고객에게 맞춤 차량 추천 ")
     
     if st.button("← Home"):
         st.session_state.current_page = "home"
@@ -267,34 +267,47 @@ def app():
 
             if st.session_state["직원이름"] == "":
                 입력이름 = st.text_input("상담자 이름을 입력하세요")
-                if st.button("상담자 등록"):
+
+                if st.button("메니져 로그인"):
                     matched = df_employees[df_employees["직원이름"] == 입력이름]
                     if not matched.empty:
                         st.session_state["직원이름"] = 입력이름
                         st.rerun()
                     else:
                         st.warning("등록된 직원이 아닙니다.")
+
             else:
-                직원정보 = df_employees[df_employees["직원이름"] == st.session_state["직원이름"]].iloc[0]
+                matched = df_employees[df_employees["직원이름"] == st.session_state["직원이름"]]
 
-                # 이미지 중앙 정렬을 위해 컬럼 사용
-                col_center = st.columns([1, 2, 1])[1]
-                with col_center:
-                    st.image(직원정보["사진경로"], width=150)
+                if matched.empty:
+                    st.warning("등록된 직원이 아닙니다.")
+                    if st.button("로그아웃"):
+                        st.session_state["직원이름"] = ""
+                        st.rerun()
+                else:
+                    직원정보 = matched.iloc[0]
 
-                # 텍스트 중앙 정렬
-                st.markdown(
-                    f"<div style='text-align: center; font-size: 18px; margin-top: 5px;'><strong>{직원정보['직원이름']} 매니저</strong></div>",
-                    unsafe_allow_html=True
-                )
+                    # 이미지 중앙 정렬을 위해 컬럼 사용
+                    col_center = st.columns([1, 2, 1])[1]
+                    with col_center:
+                        st.image(직원정보["사진경로"], width=150)
+
+                    # 텍스트 중앙 정렬
+                    st.markdown(
+                        f"<div style='text-align: center; font-size: 18px; margin-top: 5px;'><strong>{직원정보['직원이름']} 매니저</strong></div>",
+                        unsafe_allow_html=True
+                    )
+
+                    if st.button("로그아웃"):
+                        st.session_state["직원이름"] = ""
+                        st.rerun()
 
             st.markdown("### 오늘의 고객님 ")
 
-            # 고객 등록 후 정보 표시
+            # 고객 정보 출력
             if "고객정보" in st.session_state:
                 고객 = st.session_state["고객정보"]
-                st.markdown("---")
-                st.markdown("#### 🧾 등록된 고객 정보")
+                st.markdown("### 오늘의 고객님")
                 st.markdown(f"**이름**: {고객['이름']} 고객님")
                 st.markdown(f"**관심 차종**: {고객['관심차종']}")
                 st.markdown(f"**예산**: {고객['예상예산_만원']}만원")
