@@ -112,6 +112,6 @@ def app():
 
         st.markdown("#### 🔧 환경 설정 항목")
 
-        if st.button("← 메인으로 돌아가기"):
-                st.session_state.current_page = "home"
-                st.rerun()
+    if st.button("← 메인으로 돌아가기"):
+            st.session_state.current_page = "home"
+            st.rerun()

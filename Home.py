@@ -7,9 +7,6 @@ import os
 import logging
 import traceback
 
-# 로그 설정 (에러 발생 시 파일에 기록)
-logging.basicConfig(filename='error_log.txt', level=logging.ERROR)
-
 # 파피콘 이랑 인터넷 텝 글씨 
 st.set_page_config(page_title="Hyundai & Kia ERP", layout="wide", 
                    page_icon="https://i.namu.wiki/i/uNKzeN4J5LmcBr_4EbF2D6ObllziCSQWNo8inXP6F2vS1zIb1UtVws-7AzkP0qOUrm40Um6xekuoFUYDMtFT3w.webp")
