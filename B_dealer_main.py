@@ -2,7 +2,7 @@
 import streamlit as st
 
 def app():
-    st.title("딜러 허브")
+    st.title("딜러 페이지")
     tabs = st.tabs([
         "고객 360도 뷰", 
         "재고 현황", 
