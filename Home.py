@@ -7,7 +7,6 @@ import os
 import logging
 import traceback
 import datetime
-import sys
 
 # 접속 로그 기록
 logging.basicConfig(level=logging.INFO)
@@ -37,8 +36,6 @@ if st.session_state.current_page == "home":
         "<h1 style='text-align: center; margin-bottom: 40px;'>Hyundai & Kia ERP</h1>",
         unsafe_allow_html=True
     )
-
-    st.write("Python 버전 :" + sys.version)
 
     col4, col1, col2, col3, col5 = st.columns([1.5, 1, 1, 1, 1])
 
