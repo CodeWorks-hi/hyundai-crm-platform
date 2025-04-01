@@ -9,7 +9,7 @@ from .C_admin_inventory_turnover import turnover_ui
 from .C_admin_inventory_warning import warning_ui
 
 
-def admin_inventory_ui():
+def inventory_ui():
     # 탭 스타일 커스터마이징
     st.markdown("""
         <style>

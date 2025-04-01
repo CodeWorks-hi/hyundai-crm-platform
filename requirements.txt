@@ -11,3 +11,7 @@ python-dateutil
 matplotlib
 scikit-learn
 xlsxwriter
+cmake
+forge 
+dlib
+face_recognition
