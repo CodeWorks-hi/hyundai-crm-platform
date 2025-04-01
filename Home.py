@@ -7,6 +7,10 @@ import os
 import logging
 import traceback
 import datetime
+import sys
+import streamlit as st
+
+st.write("현재 사용 중인 Python 버전:", sys.version)
 
 # 접속 로그 기록
 logging.basicConfig(level=logging.INFO)
