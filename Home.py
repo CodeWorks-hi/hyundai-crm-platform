@@ -37,6 +37,10 @@ if st.session_state.current_page == "home":
         unsafe_allow_html=True
     )
 
+    import sys
+    import streamlit as st
+    st.write("현재 사용 중인 Python 버전:", sys.version)
+
     col4, col1, col2, col3, col5 = st.columns([1.5, 1, 1, 1, 1])
 
     with col1:
