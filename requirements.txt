@@ -20,4 +20,3 @@ uuid
 datetime
 streamlit_javascript
 folium
-streamlit.components.v1
