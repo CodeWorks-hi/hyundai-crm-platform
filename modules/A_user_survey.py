@@ -28,7 +28,7 @@ def save_customer(info):
     df.to_csv(CUSTOMER_CSV_PATH, index=False)
 
 # ▶️ 설문조사 메인 함수
-def survey_ui(df_employees, save_customer):
+def survey_ui(df_employees, generate_html_table):
     st.subheader("📋 방문고객 설문조사")
 
     if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":

@@ -38,8 +38,8 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 # ▶️ 캐스퍼 페이지 렌더링
 
-def casper_ui():
-    st.subheader("🚙 캐스퍼 모델 비교 및 선택")
+def casper_ui(df_employees, generate_html_table):
+    st.subheader("🚙 캐스퍼 비교 및 선택")
     df = load_car_data()
 
     if df.empty:
