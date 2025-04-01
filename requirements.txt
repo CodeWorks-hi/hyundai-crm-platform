@@ -16,7 +16,6 @@ forge
 dlib
 face_recognition
 requests
-json
 uuid
 datetime
 streamlit_javascript
