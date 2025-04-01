@@ -1,9 +1,12 @@
 # 예: B_dealer_hub.py
 import streamlit as st
 
+from modules.B_dealer_dashboard import dashboard_ui
+
 def app():
     st.title("딜러 페이지")
     tabs = st.tabs([
+        "딜러 대시보드",
         "고객 360도 뷰", 
         "재고 현황", 
         "리드 관리", 
@@ -14,6 +17,7 @@ def app():
     ])
 
     tab_modules = [
+        ("modules.B_dealer_dashboard", "dashboard_ui"),
         ("modules.B_dealer_customers", "customers_ui"),                     # 고객 360도 뷰, LTV 점수, 추천 액션
         ("modules.B_dealer_inventory", "inventory_ui"),                     # 재고 현황, 발주 추천, 마진 분석
         ("modules.B_dealer_leads", "leads_ui"),                             # 리드 퍼널, 스코어링, 자동 팔로업
@@ -24,24 +28,27 @@ def app():
     ]
 
     with tabs[0]:
-        st.write("가안.")
+        dashboard_ui()
 
     with tabs[1]:
-        st.write("재고 현황")
+        st.write("가안.")
 
     with tabs[2]:
-        st.write("리드 관리")
+        st.write("재고 현황")
 
     with tabs[3]:
-        st.write("판매 등록")
+        st.write("리드 관리")
 
     with tabs[4]:
-        st.write("AI 수요 예측")
+        st.write("판매 등록")
 
     with tabs[5]:
-        st.write("서비스 일정")
+        st.write("AI 수요 예측")
 
     with tabs[6]:
+        st.write("서비스 일정")
+
+    with tabs[7]:
         st.write("판매 인텔리전스")
 
 
