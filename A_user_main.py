@@ -69,10 +69,10 @@ def app():
     # ▶️ 탭별 연결할 모듈과 함수 정의
     tab_modules = [
         (None, None),                                                                       # 차량 추천은 구현 예정
-        ("modules.A_user_comparison", "comparison_ui"),                                     # 차량 비교
-        ("modules.A_user_survey", "survey_ui"),                                             # 방문고객 설문조사
+        ("modules.A_user_comparison", "comparison_ui"),                                   # 차량 비교
+        ("modules.A_user_survey", "survey_ui"),                                          # 방문고객 설문조사
         ("modules.A_user_personalized_recommend", "personalized_recommend_ui"),             # 고객 맞춤 추천
-        ("modules.A_user_casper", "casper_ui")                                              # 캐스퍼 비교 및 선택
+        ("modules.A_user_casper", "casper_ui")                                            # 캐스퍼 비교 및 선택
     ]
 
 
@@ -86,14 +86,6 @@ def app():
                     getattr(module, function_name)(df_employees, generate_html_table)
                 except Exception as e:
                     st.error(f"모듈 로딩 오류: `{module_path}.{function_name}`\n\n**{e}**")
-                    
-    st.markdown("---")
-
-    if st.button("← 메인으로 돌아가기", key="bottom_back_button"):
-        st.session_state.current_page = "home"
-        st.rerun()
-
-
 
     # ▶️ 사이드바 고객 입력 및 로그인 폼
     with st.sidebar:
@@ -161,4 +153,10 @@ def app():
                     st.rerun()
 
         st.markdown("### 로그인 해주세요 ")
+
+    st.markdown("---")
+
+    if st.button("← 메인으로 돌아가기", key="bottom_back_button"):
+        st.session_state.current_page = "home"
+        st.rerun()
 
