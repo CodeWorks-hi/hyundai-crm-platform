@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import os
 
+
 def get_api_key():
     return st.secrets["AIR_QUALITY_API_KEY"]
 
