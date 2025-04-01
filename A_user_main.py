@@ -179,7 +179,7 @@ def app():
 
     with tabs[6]:
         # 데이터 불러오기
-        df = pd.read_csv("data/casper_final.csv")
+        df = pd.read_csv("data/car_type.csv")
 
         # 캐스퍼 모델 분리
         casper = df[df["차종"].str.contains("캐스퍼", na=False) & ~df["차종"].str.contains("일렉트", na=False)]
