@@ -6,7 +6,7 @@ import uuid
 import datetime
 import os
 
-df = pd.read_csv("data/casper_final.csv") # 캐스퍼 정보 불러오기
+df = pd.read_csv("data/car_type.csv") # 캐스퍼 정보 불러오기
 
 CUSTOMER_CSV_PATH = "data/customers.csv" # 고객정보
 EMPLOYEE_CSV_PATH = "data/employee.csv" # 직원정보
