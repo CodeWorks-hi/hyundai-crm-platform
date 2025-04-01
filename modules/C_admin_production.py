@@ -5,7 +5,7 @@
 import streamlit as st
 
 st.set_page_config(page_title="생산·제조 현황 분석", layout="wide")
-st.title("🏭 생산·제조 현황 분석")
+st.title("생산·제조 현황 분석")
 
 st.write("생산 및 제조 현황을 분석하는 페이지입니다.")
 

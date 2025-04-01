@@ -5,7 +5,7 @@
 import streamlit as st
 
 st.set_page_config(page_title="설정 및 환경 관리", layout="wide")
-st.title("⚙️ 설정 및 환경 관리")
+st.title("설정 및 환경 관리")
 
 st.write("시스템 환경 설정 및 관리 페이지입니다.")
 

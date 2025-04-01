@@ -5,7 +5,7 @@
 import streamlit as st
 
 st.set_page_config(page_title="마케팅 캠페인 관리", layout="wide")
-st.title("📈 마케팅 캠페인 관리")
+st.title(" 마케팅 캠페인 관리")
 
 st.write("마케팅 캠페인의 성과 분석 및 관리 페이지입니다.")
 
