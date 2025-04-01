@@ -18,13 +18,13 @@ import pandas as pd
 import numpy as np
 import face_recognition
 
-# 📁 경로 설정
+# 경로 설정
 EMPLOYEE_CSV_PATH = "data/employee.csv"
 EMPLOYEE_PHOTO_DIR = "data/employee_photos"
 os.makedirs("data", exist_ok=True)
 os.makedirs(EMPLOYEE_PHOTO_DIR, exist_ok=True)
 
-# 📄 직원 데이터 로드 및 저장
+#  직원 데이터 로드 및 저장
 def load_employees():
     if os.path.exists(EMPLOYEE_CSV_PATH):
         df = pd.read_csv(EMPLOYEE_CSV_PATH)
@@ -39,13 +39,13 @@ def load_employees():
 def save_employees(df):
     df.to_csv(EMPLOYEE_CSV_PATH, index=False)
 
-# 🧠 얼굴 인코딩 함수
+#  얼굴 인코딩 함수
 def encode_face(img_path):
     image = face_recognition.load_image_file(img_path)
     encodings = face_recognition.face_encodings(image)
     return encodings[0] if encodings else None
 
-# 👥 얼굴 비교 함수
+#  얼굴 비교 함수
 def is_same_person(new_encoding, stored_encodings, names, tolerance=0.45):
     results = face_recognition.compare_faces(stored_encodings, new_encoding, tolerance)
     if True in results:
@@ -53,7 +53,7 @@ def is_same_person(new_encoding, stored_encodings, names, tolerance=0.45):
         return names[idx]
     return None
 
-# 🖥️ Streamlit 메인 UI
+# Streamlit 메인 UI
 def settings_users_ui():
     st.markdown("## 👤 사용자 관리")
     st.markdown("### 직원 등록")

@@ -47,34 +47,28 @@ def generate_html_table(df: pd.DataFrame) -> str:
     html += "</table></div>"
     return html
 
-
 # ▶️ 메인 앱
 
 def app():
     st.title("고객 페이지")
 
-    # 상단 버튼에 고유 키 추가
-    if st.button("← 메인으로 돌아가기", key="top_back_button"):
-        st.session_state.current_page = "home"
-        st.rerun()
 
     tabs = st.tabs([
-        "차량 추천", 
-        "차량 비교", 
+
         "방문고객 설문조사", 
-        "고객 맞춤 추천",
-        "casper"
+        "차량 비교", 
+        "casper",
+        "고객 맞춤 추천"
     ])
 
     # ▶️ 탭별 연결할 모듈과 함수 정의
     tab_modules = [
-        (None, None),                                                                       # 차량 추천은 구현 예정
-        ("modules.A_user_comparison", "comparison_ui"),                                   # 차량 비교
-        ("modules.A_user_survey", "survey_ui"),                                          # 방문고객 설문조사
-        ("modules.A_user_personalized_recommend", "personalized_recommend_ui"),             # 고객 맞춤 추천
-        ("modules.A_user_casper", "casper_ui")                                            # 캐스퍼 비교 및 선택
-    ]
 
+        ("modules.A_user_survey", "survey_ui"),
+        ("modules.A_user_comparison", "comparison_ui"),
+        ("modules.A_user_casper", "casper_ui"),
+        ("modules.A_user_recommend", "recommend_ui")
+    ]
 
     for i, (module_path, function_name) in enumerate(tab_modules):
         with tabs[i]:
@@ -89,7 +83,7 @@ def app():
 
     # ▶️ 사이드바 고객 입력 및 로그인 폼
     with st.sidebar:
-        df_employees = load_employees()
+
 
         if "직원이름" not in st.session_state:
             st.session_state["직원이름"] = ""
@@ -159,4 +153,3 @@ def app():
     if st.button("← 메인으로 돌아가기", key="bottom_back_button"):
         st.session_state.current_page = "home"
         st.rerun()
-

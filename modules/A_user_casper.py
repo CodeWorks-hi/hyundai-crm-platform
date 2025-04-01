@@ -6,7 +6,9 @@ import streamlit as st
 import pandas as pd
 import os
 
-# ▶️ 캐스퍼 데이터 불러오기 (앱 실행 시 로드)
+# ▶️ 캐스퍼 데이터 불러오기
+df = pd.read_csv("data/car_type.csv")
+
 @st.cache_data
 def load_car_data():
     df_path = "data/car_type.csv"
@@ -38,14 +40,13 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 # ▶️ 캐스퍼 페이지 렌더링
 
-def casper_ui(df_employees, generate_html_table):
-    st.subheader("🚙 캐스퍼 비교 및 선택")
+def casper_ui(df_employees, generate_html_table):  # 인자 추가
     df = load_car_data()
 
     if df.empty:
         st.error("차량 데이터를 불러올 수 없습니다.")
         return
-
+    
     # 모델 분리
     casper = df[df["차종"].str.contains("캐스퍼", na=False) & ~df["차종"].str.contains("일렉트", na=False)]
     electric = df[df["차종"].str.contains("일렉트", na=False)]
