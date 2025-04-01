@@ -19,4 +19,3 @@ requests
 uuid
 datetime
 streamlit_javascript
-sys
