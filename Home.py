@@ -60,28 +60,19 @@ if st.session_state.current_page == "home":
 
 # 다른 페이지 연결
 elif st.session_state.current_page == "user_main":
-    try:
-        import A_user_main as auto
-        auto.app()
-    except Exception as e:
-        st.error("❗ [User_main] 실행 중 오류 발생")
-        logging.error(f"[user_main] 오류: {traceback.format_exc()}")
+    import A_user_main as auto
+    auto.app()
+
 
 elif st.session_state.current_page == "dealer_main":
-    try:
-        import B_dealer_main as dealer
-        dealer.app()
-    except Exception as e:
-        st.error("❗ [Dealer_main] 실행 중 오류 발생")
-        logging.error(f"[dealer_main] 오류: {traceback.format_exc()}")
+    import B_dealer_main as dealer
+    dealer.app()
+
 
 elif st.session_state.current_page == "admin_main":
-    try:
-        import C_admin_main as admin
-        admin.app()
-    except Exception as e:
-        st.error("❗ [Admin_main] 실행 중 오류 발생")
-        logging.error(f"[admin_main] 오류: {traceback.format_exc()}")
+    import C_admin_main as admin
+    admin.app()
+
 
 
 st.markdown("---")
