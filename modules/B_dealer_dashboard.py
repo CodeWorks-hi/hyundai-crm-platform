@@ -5,8 +5,12 @@ import json
 from datetime import datetime
 import uuid
 from streamlit_javascript import st_javascript  # 👈 꼭 설치 필요!
+import sys
+import streamlit as st
+
 
 def dashboard_ui():
+    st.write("현재 사용 중인 Python 버전:", sys.version)
     st.markdown("### 📅 일정 관리 캘린더")
 
     # 상담 내역 데이터 로드
