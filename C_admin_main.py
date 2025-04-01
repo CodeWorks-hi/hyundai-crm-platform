@@ -30,7 +30,7 @@ def app():
 
     st.markdown("---")
 
-    # 고유 키 추가
-    if st.button("← 메인으로 돌아가기", key="admin_main_back_button"):
+    # ✔ 안전한 방식: 세션 상태로 페이지 전환
+    if st.button("← 메인으로 돌아가기"):
         st.session_state.current_page = "home"
         st.rerun()

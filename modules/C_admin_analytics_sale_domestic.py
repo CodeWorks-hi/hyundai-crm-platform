@@ -7,13 +7,12 @@
 import pandas as pd
 import streamlit as st
 
-def analytics_domestic_ui():
+def domestic_ui():
 
-    st.write("현대/기아의 국내 판매 실적을 분석하는 페이지입니다.")
+    # 탭 구성
+    tab1, tab2, tab3, tab4= st.tabs([
+          "국내실적","지역별 비교", "목표 달성률", "성장률 분석"
+    ])
 
-    df = pd.read_csv("data/domestic_sales.csv")
-    st.dataframe(df)
-
-    st.write("국내 판매 실적을 분석한 결과입니다.")
 
 

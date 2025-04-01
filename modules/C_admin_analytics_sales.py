@@ -8,8 +8,8 @@
 
 
 import streamlit as st
-from .C_admin_analytics_sale_domestic import analytics_domestic_ui
-from .C_admin_analytics_sale_export import analytics_export_ui
+from .C_admin_analytics_sale_domestic import domestic_ui
+from .C_admin_analytics_sale_export import export_ui
 
 def analytics_sales_ui():
 
@@ -19,9 +19,9 @@ def analytics_sales_ui():
     ])
 
     with tab1:
-        analytics_domestic_ui()
+        domestic_ui()
 
     with tab2:
-        analytics_export_ui()
+        export_ui()
 
 

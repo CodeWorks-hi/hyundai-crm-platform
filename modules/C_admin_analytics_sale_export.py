@@ -5,8 +5,10 @@
 
 import streamlit as st
 
-def analytics_export_ui():
+def export_ui():
 
-    st.write("해외 판매(수출 관리)수출입 국가별 분석 페이지입니다.")
-    
+    # 탭 구성
+    tab1, tab2, tab3, tab4= st.tabs([
+          "수출실적","국가별 비교", "목표 달성률", "성장률 분석"
+    ])
 

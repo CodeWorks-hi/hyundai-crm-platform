@@ -24,10 +24,10 @@ def admin_analytics_ui():
     """, unsafe_allow_html=True)
 
     tab_names = [
-        "판매 및 수출 관리",
+        "국내/해외 판매 관리",
         "LTV 및 시장 예측 분석",
         "마케팅 캠페인 성과",
-        "글로벌 경제 인사이트"
+        "글로벌 경제 인사이트내"
     ]
 
     selected_tab = st.tabs(tab_names)
