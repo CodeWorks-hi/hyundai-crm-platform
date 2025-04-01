@@ -2,14 +2,17 @@
 # 딜러 성과, KPI 설정, 인센티브 관리
 
 
-
 import streamlit as st
-from C_admin_settings_users import settings_users_ui
+from .C_admin_settings_users import settings_users_ui
+from .C_admin_settings_sync import settings_sync_ui
 
 def admin_settings_ui():
-    st.title("설정 및 환경 관리")
+    st.subheader(" 설정 및 환경 관리")
 
-    st.write("시스템 환경 설정 및 관리 페이지입니다.")
+    tab1, tab2 = st.tabs(["사용자 관리", "데이터 동기화 상태"])
 
-    if st.button("← 관리자 포털로 돌아가기"):
-        st.switch_page("C_admin_main.py")
+    with tab1:
+        settings_users_ui()
+
+    with tab2:
+        settings_sync_ui()

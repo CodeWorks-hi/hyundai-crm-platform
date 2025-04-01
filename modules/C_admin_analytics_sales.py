@@ -1,14 +1,27 @@
 # 판매·수출 관리
-    # 판매 관리 (차종/지역별 등),수출입 국가별 분석
+    # 판매·수출 관리 - 국내/해외 실적 분석 대시보드 코드 템플릿 생성
+    # 판매·수출 데이터 분석 대시보드
+    # 목표 달성률, 성장률 분석
+    # 시각화 대시보드
+
 
 
 
 import streamlit as st
+from .C_admin_analytics_sale_domestic import analytics_domestic_ui
+from .C_admin_analytics_sale_export import analytics_export_ui
 
 def analytics_sales_ui():
-    st.title("수출입 국가별 분석")
 
-    st.write("국가별 수출입 데이터를 분석하고 시각화하는 페이지입니다.")
+    tab1, tab2 = st.tabs([
+        "국내 판매 실적", 
+        "해외 수출입 실적"
+    ])
 
-    if st.button("← 관리자 포털로 돌아가기"):
-        st.switch_page("C_admin_main.py")
+    with tab1:
+        analytics_domestic_ui()
+
+    with tab2:
+        analytics_export_ui()
+
+
