@@ -2,6 +2,7 @@
 import streamlit as st
 
 from modules.B_dealer_dashboard import dashboard_ui
+from modules.B_dealer_eco import eco_ui
 
 def app():
     st.title("딜러 페이지")
@@ -50,6 +51,7 @@ def app():
 
     with tabs[7]:
         st.write("판매 인텔리전스")
+        eco_ui()
 
 
     # ✔ 안전한 방식: 세션 상태로 페이지 전환
