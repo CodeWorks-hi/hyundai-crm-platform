@@ -1,10 +1,12 @@
 # 예: B_dealer_hub.py
+import importlib
 import streamlit as st
 import os
 import pandas as pd
 
 from modules.B_dealer_dashboard import dashboard_ui
 from modules.B_dealer_eco import eco_ui
+from modules.B_dealer_survey import survey_ui
 
 
 # ▶️ 경로 설정
@@ -54,7 +56,6 @@ def app():
         "딜러 대시보드",
         "방문고객 설문조사",
         "고객 맞춤 추천",
-        "고객 360도 뷰", 
         "재고 현황", 
         "리드 관리", 
         "판매 등록",
@@ -65,9 +66,8 @@ def app():
 
     tab_modules = [
         ("modules.B_dealer_dashboard", "dashboard_ui"),
-        ("modules.A_user_survey", "survey_ui"),
-        ("modules.A_user_recommend", "recommend_ui"),
-        ("modules.B_dealer_customers", "customers_ui"),                     # 고객 360도 뷰, LTV 점수, 추천 액션
+        ("modules.B_dealer_survey", "survey_ui"),
+        ("modules.B_dealer_recommend", "recommend_ui"),                     # 고객 360도 뷰, LTV 점수, 추천 액션
         ("modules.B_dealer_inventory", "inventory_ui"),                     # 재고 현황, 발주 추천, 마진 분석
         ("modules.B_dealer_leads", "leads_ui"),                             # 리드 퍼널, 스코어링, 자동 팔로업
         ("modules.B_dealer_registration", "sales_registration_ui"),         # 판매 등록
@@ -80,24 +80,27 @@ def app():
         dashboard_ui()
 
     with tabs[1]:
-        st.write("가안.")
+        survey_ui()
 
     with tabs[2]:
-        st.write("재고 현황")
+        st.write("가안.")
 
     with tabs[3]:
-        st.write("리드 관리")
+        st.write("재고 현황")
 
     with tabs[4]:
-        st.write("판매 등록")
+        st.write("리드 관리")
 
     with tabs[5]:
-        st.write("AI 수요 예측")
+        st.write("판매 등록")
 
     with tabs[6]:
-        st.write("서비스 일정")
+        st.write("AI 수요 예측")
 
     with tabs[7]:
+        st.write("서비스 일정")
+
+    with tabs[8]:
         st.write("판매 인텔리전스")
         eco_ui()
 
