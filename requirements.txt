@@ -2,7 +2,7 @@
 # requirements.txt 의 파일 한번에 설치가 가능한 코드 입니다. 
 
 streamlit==1.43.0
-pandas fredapi==0.4.0
+pandas
 numpy
 altair
 pydeck
@@ -21,6 +21,7 @@ face_recognition
 streamlit-javascript
 folium
 kafka-python==2.0.2
+fredapi==0.4.0
 eodhd==1.0.32
 plotly==5.18.0
 geopy
