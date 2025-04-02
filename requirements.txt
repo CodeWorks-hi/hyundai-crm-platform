@@ -1,8 +1,8 @@
 # pip install -r requirements.txt
 # requirements.txt 의 파일 한번에 설치가 가능한 코드 입니다. 
 
-streamlit==1.43.0
 pandas
+streamlit==1.43.0
 numpy
 altair
 pydeck
