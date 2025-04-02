@@ -2,7 +2,7 @@
     # 마케팅 캠페인/ # 캠페인 성과 측정
 
 import streamlit as st
-from .C_A_nalytics_marketing_strategies import marketing_strategies_ui
+from .C_A_analytics_marketing_strategies import marketing_strategies_ui
 from .C_A_analytics_marketing_campaign import marketing_campaign_ui
 from .C_A_analytics_marketing_realtime import marketing_realtime_ui
 
