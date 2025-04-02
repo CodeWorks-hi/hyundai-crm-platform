@@ -1,5 +1,11 @@
 import streamlit as st
 
+
+# +-------------+
+# | 카카오 상담채널 |
+# +-------------+
+
+
 def render_kakao_buttons(channel_public_id="_xfxhjXn"):
     kakao_buttons = f"""
     <style>

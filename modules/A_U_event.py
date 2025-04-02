@@ -7,6 +7,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+
+# +---------+
+# | 이벤트    |
+# +---------+
+
+
 def event_ui():
     if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
         st.session_state.current_page = "user_main"

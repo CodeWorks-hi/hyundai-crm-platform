@@ -1,6 +1,8 @@
 import streamlit as st
 
-
+# +-----------+
+# | 캐라셀 함수  |
+# +-----------+
 
 def render_carousel(car_data: list, height: int = 400):
     names = [car["name"] for car in car_data]

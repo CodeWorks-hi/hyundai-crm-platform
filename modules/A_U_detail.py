@@ -1,5 +1,9 @@
 import streamlit as st
 
+# +------------+
+# | 모델 상세보기 |
+# +------------+
+
 def detail_ui():
     st.title("차량 상세정보")
 

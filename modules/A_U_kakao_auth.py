@@ -7,7 +7,9 @@ from urllib.parse import urlencode, urlparse, parse_qs
 KAKAO_REST_API_KEY = st.secrets["KAKAO_REST_API_KEY"]
 REDIRECT_URI = st.secrets["REDIRECT_URI"]
 USER_DB = "data/kakao_users.csv"
-
+# +------------+
+# | 카카오 로그인 |
+# +------------+
 # 로그인 버튼 출력
 def render_kakao_login_button():
     auth_url = (
@@ -73,7 +75,7 @@ def render_logout_button():
         if st.button("로그아웃"):
             del st.session_state["kakao_user"]
             st.experimental_rerun()
-            
+
 # 사용자 정보 CSV에 저장
 def save_user_info(user_data):
     os.makedirs("data", exist_ok=True)

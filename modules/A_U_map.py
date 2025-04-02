@@ -8,6 +8,11 @@ import folium
 import os
 import streamlit.components.v1 as components
 
+# +-------------+
+# | 대리점 지도보기 |
+# +-------------+
+
+
 # 초기 상태값
 if "search_query" not in st.session_state:
     st.session_state["search_query"] = ""
