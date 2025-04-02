@@ -6,8 +6,13 @@ def recommend_ui(df_employees):
     st.subheader("🚘 고객 맞춤 차량 추천")
 
     # 설문 데이터가 없을 경우 안내
-    if "고객정보" not in st.session_state:
-        st.warning("먼저 설문조사를 완료해주세요.")
+    if "고객정보" not in st.session_state or not isinstance(st.session_state["고객정보"], dict):
+        st.warning("❗ 먼저 설문조사를 완료해주세요.")
+        return
+
+    필수필드 = ["이름", "관심차종", "예상예산_만원", "주요용도"]
+    if not all(field in st.session_state["고객정보"] for field in 필수필드):
+        st.warning("❗ 설문 항목이 누락되었습니다. 설문조사를 먼저 완료해주세요.")
         return
 
     # 고객 정보 불러오기

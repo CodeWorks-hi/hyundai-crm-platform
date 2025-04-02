@@ -184,7 +184,7 @@ def dashboard_ui():
         fig_gauge = go.Figure(go.Indicator(
             mode="gauge+number+delta",
             value=rate,
-            title={'text': f"{st.session_state["직원이름"]} 매니저님의 {selected} 목표 달성률 (%)"},
+            title={'text': f"{st.session_state['직원이름']} 매니저님의 {selected} 목표 달성률 (%)"},
             delta={'reference': 100},
             gauge={
                 'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
