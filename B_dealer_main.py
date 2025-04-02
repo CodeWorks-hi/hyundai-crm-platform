@@ -77,35 +77,6 @@ def app():
         ("modules.B_dealer_eco", "dealer_eco_ui")                           # 경제 지표 기반 판매 인텔리전스, 금융 상품 최적화
     ]
 
-    with tabs[0]:
-        dashboard_ui()
-
-    with tabs[1]:
-        survey_ui()
-
-    with tabs[2]:
-        recommend_ui()
-
-    with tabs[3]:
-        st.write("재고 현황")
-
-    with tabs[4]:
-        st.write("리드 관리")
-
-    with tabs[5]:
-        st.write("판매 등록")
-
-    with tabs[6]:
-        st.write("AI 수요 예측")
-
-    with tabs[7]:
-        st.write("서비스 일정")
-
-    with tabs[8]:
-        st.write("판매 인텔리전스")
-        eco_ui()
-
-
 # 각 탭에 대응하는 함수 실행
     for i, (module_path, function_name) in enumerate(tab_modules):
         with tabs[i]:
