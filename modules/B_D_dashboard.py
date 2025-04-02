@@ -12,6 +12,10 @@ def dashboard_ui():
     df = pd.read_csv("data/consult_log.csv")
     new_df = df.loc[df["담당직원"] == "홍길동", :]
 
+    title = ""
+    pnum = ""
+    date = ""
+
     col1, col2, col3 = st.columns([1.1, 0.2, 1.5])
 
     with col1:
@@ -139,6 +143,8 @@ def dashboard_ui():
         });
         """)
 
+        st.dataframe(df)
+
         if isinstance(clicked, dict) and 'event_id' in clicked:
             for e in st.session_state.events:
                 if e.get('id') == clicked['event_id']:
@@ -152,6 +158,8 @@ def dashboard_ui():
                         ):
                             df.at[i, "완료여부"] = 1 if clicked.get("done", False) else 0
                             break
+                st.dataframe(df)
+            df.to_csv("data/consult_log.csv", index=False)
             st.rerun()
 
     with col3:
