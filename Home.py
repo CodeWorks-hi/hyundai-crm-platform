@@ -95,7 +95,7 @@ else:
             auto.app()
 
     except Exception as e:
-        st.error("⚠️ 페이지 로딩 중 오류가 발생했습니다.")
+        st.error("페이지 로딩 중 오류가 발생했습니다.")
         st.exception(e)
 
 # ✅ 푸터
