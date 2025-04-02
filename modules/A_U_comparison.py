@@ -57,8 +57,13 @@ def comparison_ui():
             for col, (_, item) in zip(cols, row.iterrows()):
                 with col:
                     st.image(item["img_url"], width=260)
+
                     st.markdown(f"**{item['모델명']}** {item['트림명']}")
-                    st.markdown(f"{item['기본가격']:,}원")
+
+                    가격 = item.get("기본가격")
+                    가격표시 = f"{int(가격):,}원" if pd.notna(가격) else ""
+                    st.markdown(가격표시)
+
                     if st.button("이 차량 선택", key=f"선택_{item['모델명']}_{item['트림명']}"):
                         st.session_state["선택차량"] = item.to_dict()
                         st.rerun()
@@ -71,9 +76,12 @@ def comparison_ui():
         st.markdown("### 차량 정보")
         if "선택차량" in st.session_state:
             car = st.session_state["선택차량"]
-            st.image(car["img_url"], width=200)
-            st.markdown(f"**{car['모델명']} {car['트림명']}**")
-            st.markdown(f"가격: {car['기본가격']:,}원")
+            st.image(car.get("img_url", ""), width=200)
+            st.markdown(f"**{car.get('모델명', '')} {car.get('트림명', '')}**")
+
+            가격 = car.get("기본가격")
+            가격표시 = f"{int(가격):,}원" if pd.notna(가격) else ""
+            st.markdown(f"가격: {가격표시}")
 
             if st.button("판매 등록으로 이동"):
                 st.session_state.current_page = "판매 등록"
@@ -81,11 +89,8 @@ def comparison_ui():
 
             st.markdown("---")
             st.markdown("**세부 정보**")
-            for col in ['연료구분', '배기량', '공차중량(kg)', '연비', '차량형태', '차량구분']:
+            for col in ['연료구분', '배기량', '공차중량', '연비', '차량형태', '차량구분']:
                 value = car.get(col)
-                if pd.notna(value):
-                    st.markdown(f"- {col}: {value}")
+                st.markdown(f"- {col}: {value if pd.notna(value) else ''}")
         else:
             st.info("선택된 차량이 없습니다.")
-    
-
