@@ -7,7 +7,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-def event_ui(df_employees, generate_html_table):
+def event_ui():
     st.subheader("📣 이벤트 및 공지사항")
 
     st.markdown("#### 📌 최근 공지사항")
