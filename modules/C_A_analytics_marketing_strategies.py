@@ -20,7 +20,6 @@ df_news = pd.read_csv(news_path)
 
 #  Streamlit UI 구성
 def marketing_strategies_ui():
-    st.title("경제 지표 기반 마케팅 전략 대시보드")
 
     # 캠페인 전략 Top 5
     st.header(" 캠페인 전략 Top 5")
@@ -48,7 +47,7 @@ def marketing_strategies_ui():
         st.success("ROI 4.8배 달성")
 
     #  확장 캠페인 전략
-    st.header("🚀 추가 전략 제안")
+    st.header("추가 전략 제안")
 
     with st.expander("⑥ 제조업 회복 → B2B 캠페인"):
         st.write("제조업 실질 GDP 상승 시 법인 고객 대상 프로모션")
