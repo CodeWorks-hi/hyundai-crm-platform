@@ -2,6 +2,7 @@ import streamlit as st
 import uuid
 import datetime
 import pandas as pd
+import numpy as np
 import os
 import re
 
@@ -10,7 +11,10 @@ CUSTOMER_CSV_PATH = "data/customers.csv"
 
 def load_employees():
     if os.path.exists("data/employee.csv"):
-        return pd.read_csv("data/employee.csv")
+        df = pd.read_csv("data/employee.csv")
+        df["사번"] = df["사번"].astype(str).str.replace(",", "").str.strip()
+        df["직원이름"] = df["직원이름"].astype(str).str.strip()
+        return df
     else:
         return pd.DataFrame()
 
@@ -51,8 +55,7 @@ def survey_ui(df_employees, generate_html_table):
         with name : 
             이름 = st.text_input("성명")
         with phon :
-            연락처 = st.text_input("연락처 (숫자만)", max_chars=13)
-            연락처 = normalize_phone(연락처)
+            연락처 = st.text_input("연락처")
         with birth :
             today = datetime.date.today()
             생년월일 = st.date_input(
@@ -87,13 +90,25 @@ def survey_ui(df_employees, generate_html_table):
         if st.form_submit_button("설문조사 완료"):
 
             df_employees = load_employees()
+            d_name = str(st.session_state["직원이름"]).strip()
+            d_id = str(st.session_state["사번"]).replace(",", "").strip()
 
             today = datetime.date.today().isoformat()
             연령대 = f"{(datetime.date.today().year - 생년월일.year) // 10 * 10}대"
-            상담자ID = df_employees[
-                (df_employees["직원이름"] == st.session_state["직원이름"]) &
-                (df_employees["사번"] == st.session_state.get("사번"))
-            ].iloc[0]["고유ID"]
+
+            matched = df_employees.loc[
+                (df_employees["직원이름"] == d_name) &
+                (df_employees["사번"] == d_id), :]
+
+            if matched.empty:
+                st.error("상담자 정보를 찾을 수 없습니다. 로그인 정보를 확인해 주세요.")
+                return
+            
+            상담자ID = matched.iloc[0]["고유ID"]
+
+            if 보유차종 == np.nan:
+                보유차종 = "-"
+            
 
             customer_info = [
                 str(uuid.uuid4()), 상담자ID, st.session_state["직원이름"], today,
