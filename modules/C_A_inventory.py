@@ -31,8 +31,8 @@ def inventory_ui():
 
     # 탭 구성
     tab_names = [
-        "차종별 재고 현황",
         "공장/지역별 재고 분포",
+        "차종별 재고 현황",
         "재고 회전율 분석",
         "자동 재고 경고 시스템"
     ]
@@ -41,10 +41,10 @@ def inventory_ui():
 
     # 각 탭별 UI 호출
     with selected_tab[0]:
-        status_ui()  # 차종별 재고 현황
+        distribution_ui()  # 공장/지역별 재고 분포
 
     with selected_tab[1]:
-        distribution_ui()  # 공장/지역별 재고 분포
+        status_ui()  # 차종별 재고 현황
 
     with selected_tab[2]:
         turnover_ui()  # 재고 회전율 분석
