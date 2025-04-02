@@ -1,6 +1,7 @@
 # 예: B_dealer_hub.py
 import streamlit as st
 import os
+import pandas as pd
 
 from modules.B_dealer_dashboard import dashboard_ui
 from modules.B_dealer_eco import eco_ui
