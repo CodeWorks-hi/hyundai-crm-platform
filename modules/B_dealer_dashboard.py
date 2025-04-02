@@ -14,6 +14,8 @@ def dashboard_ui():
     col1, col2, col3 = st.columns([1.1, 0.2, 1.5])
 
     with col1:
+        st.warning("##### * 로그인 시 해당 매니저에 대한 데이터만 가져오도록 해야 합니다.")
+
         # 세션 초기화
         if "events" not in st.session_state or not isinstance(st.session_state.events, list):
             st.session_state.events = []
