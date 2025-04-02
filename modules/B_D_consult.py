@@ -15,17 +15,19 @@ def consult_ui():
 
     with col1:
         st.warning("##### * 고객 기초정보 확인 페이지인데, 여기서 전화번호로 고객 선택하는 것도 가능하지만, 가급적이면 대시보드 창에서 버튼 클릭해서 넘어가고 싶어요.")
-        selected_customer = st.selectbox("고객 선택", customer_df["연락처"].unique())
-        customer_info = customer_df[customer_df["연락처"] == selected_customer].iloc[0]
-        st.write("**이름:**", customer_info["이름"])
-        st.write("**성별:**", customer_info["성별"])
-        st.write("**연령:**", customer_info["생년월일"])
-        st.write("**전화번호:**", customer_info["연락처"])
+        selected_name = st.text_input("고객 성명")
+        selected_contact = st.text_input("고객 연락처")
+        if selected_name and selected_contact:
+            customer_info = customer_df.loc[(customer_df["상담자명"] == selected_name) & (customer_df["연락처"] == selected_contact), :]
+            st.write("**이름:**", customer_info["이름"])
+            st.write("**성별:**", customer_info["성별"])
+            st.write("**연령:**", customer_info["생년월일"])
+            st.write("**전화번호:**", customer_info["연락처"])
 
     with col3:
         st.warning("##### * 자동차 추천 입력 정보 창입니다. 여기는 기본적으로 설문조사 결과 기반으로 채워놓고, 추가 입력할 항목 있으면 그것만 선택하게 할까 고민중입니다.")
         # 하드 코딩 부분은 나중에 [survey_result["성별"]] 등으로 변경 예정
-        survey_result = customer_df.loc[customer_df["연락처"] == selected_customer]
+        survey_result = customer_df[(customer_df["상담자명"] == selected_name) & (customer_df["연락처"] == selected_contact)].iloc[0]
 
         colA, colB = st.columns(2)
         with colA:
