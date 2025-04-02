@@ -13,11 +13,11 @@ def app():
     ])
 
     tab_modules = [
-        ("modules.A_user_comparison", "comparison_ui"),
-        ("modules.A_user_casper", "casper_ui"),
-        ("modules.A_user_dealer", "dealer_ui"),
-        ("modules.A_user_event", "event_ui"),
-        ("modules.A_user_support", "support_ui")
+        ("modules.A_U_comparison", "comparison_ui"),
+        ("modules.A_U_casper", "casper_ui"),
+        ("modules.A_U_dealer", "dealer_ui"),
+        ("modules.A_U_event", "event_ui"),
+        ("modules.A_U_support", "support_ui")
     ]
     
     for i, (module_path, function_name) in enumerate(tab_modules):
