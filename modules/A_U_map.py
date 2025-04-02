@@ -8,15 +8,20 @@ import folium
 import os
 import streamlit.components.v1 as components
 
+# +-------------+
+# | 대리점 지도보기 |
+# +-------------+
+
+
 # 초기 상태값
 if "search_query" not in st.session_state:
     st.session_state["search_query"] = ""
 
 # 카카오 API 키 가져오기
 def get_api_key():
-    key = os.environ.get('KAKAO_API_KEY')
+    key = st.secrets.get('KAKAO_API_KEY', None)
     if key is None:
-        key = st.secrets.get('KAKAO_API_KEY')
+        key = os.environ.get('KAKAO_API_KEY')
     return key
 
 KAKAO_API_KEY = get_api_key()
@@ -61,7 +66,10 @@ def create_popup_html(place):
 # --------------------------
 # 메인 함수 (탭 UI 렌더링)
 # --------------------------
-def dealer_ui():
+def map_ui():
+    if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
+        st.session_state.current_page = "user_main"
+        st.rerun()
     st.title(" 대리점 및 정비소 찾기")
 
     tab1, tab2 = st.tabs([' 지점 찾기', ' 정비소 찾기'])

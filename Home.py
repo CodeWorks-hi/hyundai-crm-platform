@@ -70,32 +70,43 @@ else:
             import A_U_main as auto
             auto.app()
 
-        elif page == "A_U_comparison":
+        elif page == "A_U_comparison": #모델
             import A_U_main as auto
             auto.app()
 
-        elif page == "A_U_event":
+        elif page == "A_U_map":  #유저 대리점 찾기 
             import A_U_main as auto
             auto.app()
 
-        elif page == "A_U_support":
+        elif page == "A_U_consult":  #상담 예약 
+            import A_U_main as auto
+            auto.app()
+        
+        elif page == "A_U_test_drive":  #시승 신청  
             import A_U_main as auto
             auto.app()
 
-        elif page == "A_U_detail":
-            import A_U_detail as detail
-            detail.detail_ui()
+        elif page == "A_U_event": #이벤트
+            import A_U_main as auto
+            auto.app()
 
-        elif page == "dealer_main":
+        elif page == "A_U_support": # 고객센터
+            import A_U_main as auto
+            auto.app()
+
+        
+        
+        # 딜러 페이지 전환 ( 수정하면 안됩니다.) - 수정시 페이지 전환 안됨
+        elif page == "dealer_main":  
             import B_D_main as dealer
             dealer.app()
-
-        elif page == "admin_main":
+        # 어드민 페이지 전환 ( 수정하면 안됩니다.) - 수정시 페이지 전환 안됨
+        elif page == "admin_main":  
             import C_A_main as admin
             admin.app()
 
     except Exception as e:
-        st.error("⚠️ 페이지 로딩 중 오류가 발생했습니다.")
+        st.error("페이지 로딩 중 오류가 발생했습니다.")
         st.exception(e)
 
 # ✅ 푸터

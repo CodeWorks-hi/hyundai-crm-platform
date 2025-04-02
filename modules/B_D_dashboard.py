@@ -7,20 +7,43 @@ import uuid
 from streamlit_javascript import st_javascript  # 👈 꼭 설치 필요!
 import plotly.graph_objects as go
 
+
 def dashboard_ui():
+    # 상담자 및 사번 세션 상태 초기화
+    if "직원이름" not in st.session_state:
+        st.session_state["직원이름"] = ""
+    if "사번" not in st.session_state:
+        st.session_state["사번"] = ""
+
     # 상담 내역 데이터 로드
     df = pd.read_csv("data/consult_log.csv")
     new_df = df.loc[df["담당직원"] == st.session_state["직원이름"], :]
 
-    if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
-        st.warning("상담자 정보를 먼저 등록하세요.")
+    st.session_state.events = []
+    for _, row in new_df.iterrows():
+        if row.get("완료여부", 0) != 0:
+            continue
+        try:
+            full_datetime_str = f"{row.get('상담날짜')} {row.get('상담시간')}"
+            start_time = pd.to_datetime(full_datetime_str).isoformat()
+        except Exception:
+            start_time = datetime.now().isoformat()
+
+        st.session_state.events.append({
+            'id': str(uuid.uuid4()),
+            'title': f"{row.get('이름', '이름 없음')} 고객님",
+            'start': start_time,
+            'description': row.get("상담내용", ""),
+            '완료여부': row.get("완료여부", 0)
+        })
+
+    if st.session_state["직원이름"] == "":
+        st.warning("딜러 정보를 먼저 등록하세요.")
         return
     
-    col1, col2, col3 = st.columns([1, 0.2, 1.5])
+    col1, col2, col3 = st.columns([1.2, 0.2, 1.5])
 
     with col1:
-        st.warning("##### * 로그인 시 해당 매니저에 대한 데이터만 가져오도록 해야 합니다.")
-
         # 세션 초기화
         if "events" not in st.session_state or not isinstance(st.session_state.events, list):
             st.session_state.events = []
@@ -31,41 +54,25 @@ def dashboard_ui():
         if "confirm_delete_index" not in st.session_state:
             st.session_state.confirm_delete_index = None
 
-        # CSV 기반 일정 항상 갱신
-        st.session_state.events.clear()
-        for _, row in new_df.iterrows():
-            status = row.get('완료여부', '미정')
-            try:
-                start_time = pd.to_datetime(row.get("상담시간", datetime.now())).isoformat()
-            except Exception:
-                start_time = datetime.now().isoformat()
-
-            st.session_state.events.append({
-                'id': str(uuid.uuid4()),
-                'title': f"{row.get('이름', '이름 없음')} 고객님",
-                'start': start_time,
-                'description': row.get("상담내용", "")
-            })
-
         # ✅ FullCalendar with checkbox + style
         calendar_html = f"""
         <!DOCTYPE html>
         <html>
         <head>
-          <meta charset="utf-8" />
-          <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
-          <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-          <style>
-              body {{
-                  margin: 0;
-                  padding: 0;
-                  font-family: Arial, sans-serif;
-              }}
-              #calendar {{
-                  max-width: 800px;
-                  margin: 40px auto;
-              }}
-          </style>
+        <meta charset="utf-8" />
+        <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+        <style>
+            body {{
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+            }}
+            #calendar {{
+                max-width: 800px;
+                margin: 40px auto;
+            }}
+        </style>
         </head>
         <body>
         <div id='calendar'></div>
@@ -79,11 +86,14 @@ def dashboard_ui():
                     events: {json.dumps([
                         {
                             'id': e['id'],
-                            'title': e['title'],
+                            'title': f"<b>{e['title']}</b><br><span style='font-size: 12px; color: #666;'>{e.get('description', '')}</span>",
                             'start': e['start'],
                             'description': e.get('description', '')
                         } for e in st.session_state.events
-                    ])}
+                    ])},
+                    eventContent: function(arg) {{
+                        return {{ html: arg.event.title }};
+                    }},
                 }});
                 calendar.render();
             }});
@@ -94,72 +104,70 @@ def dashboard_ui():
 
         components.html(calendar_html, height=600)
 
-        # ✅ 체크박스 상태 수신 및 반영
-        # Removed checkbox event listener block
-
     with col3:
-        st.warning("##### * 추후 유저 페이지 구축되면 '상담 추가/수정' 삭제 예정, 딜러는 상담 신청 내역 받아와서 확인만 하면 됩니다.")
         # 일정 목록
-        st.warning("##### * 일정 시간 순 정렬, 각 일정별 우측 끝 버튼 클릭하면 해당 '상담 정보' 창으로 이동")
-        st.markdown("#### 📋 등록된 일정 목록")
-        if not st.session_state.events:
-            st.info("현재 등록된 일정이 없습니다.")
+        st.markdown("######")
+        st.markdown("### 📋 예정된 상담 목록")
+        
+        upcoming_events = sorted(
+            [e for e in st.session_state.events if pd.to_datetime(e["start"]) >= datetime.now() and e.get("완료여부", 0) == 0],
+            key=lambda x: pd.to_datetime(x["start"])
+        )[:4]
+
+        if not upcoming_events:
+            st.info("앞으로 예정된 상담이 없습니다.")
         else:
-            for i, event in enumerate(st.session_state.events):
-                col1, col2, col3, col4 = st.columns([1.7, 4, 1.5, 1])
-                with col1:
-                    st.write(f"📌 {event['title']}")
-                with col2:
-                    st.text(f"📝 {event.get('description', '상담내용 없음')}")
-                with col3:
-                    st.write(event['start'].replace("T", " ")[:16])
-                with col4:
+            if "confirm_finish_index" not in st.session_state:
+                st.session_state.confirm_finish_index = None
+
+            for i, event in enumerate(upcoming_events):
+                col_event, col_button = st.columns([4, 1])
+                with col_event:
+                    st.markdown(f"""
+                    <div style="background-color: #f9f9f9; border: 1px solid #ccc; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px;">
+                        <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 4px;">📌 {event['title']}</div>
+                        <div style="font-size: 13.5px; color: #555; margin-bottom: 6px;">📝 {event.get('description', '상담내용 없음')}</div>
+                        <div style="font-size: 13px; color: #777;">{event['start'].replace("T", " ")[:16]}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col_button:
+                    st.write("")  # vertical spacing
+                    st.write("")  # vertical spacing
                     if st.button("완료", key=f"complete_{i}"):
-                        st.session_state.confirm_finish_index = i
-                        st.rerun()
-            if "confirm_finish_index" in st.session_state:
-                idx = st.session_state.confirm_finish_index
-                target = st.session_state.events[idx]
-                st.warning(f"⚠️ '{target['title']}' 일정을 완료 처리하시겠습니까?")
-                col_ok, col_cancel = st.columns(2)
-                with col_ok:
-                    if st.button("✅ 예, 완료합니다"):
-                        for j, row in df.iterrows():
-                            name_match = row.get("이름", "") in target["title"]
-                            time_match = pd.to_datetime(row.get("상담시간", "")).strftime("%H:%M") in target["start"]
-                            if name_match and time_match:
-                                df.at[j, "완료여부"] = 1
-                                break
+                        # Find the matching event in the original df
+                        match_condition = (
+                            (df["이름"] == event['title'].replace(" 고객님", "")) &
+                            (df["상담날짜"] + " " + df["상담시간"] == pd.to_datetime(event["start"]).strftime("%Y-%m-%d %H:%M"))
+                        )
+                        df.loc[match_condition, "완료여부"] = 1
                         df.to_csv("data/consult_log.csv", index=False)
-                        del st.session_state.confirm_finish_index
-                        st.success("✅ 완료 처리되었습니다.")
-                        st.rerun()
-                with col_cancel:
-                    if st.button("❌ 아니요, 유지합니다"):
-                        del st.session_state.confirm_finish_index
-                        st.info("처리가 취소되었습니다.")
+                        st.success("상담 완료 처리되었습니다.")
                         st.rerun()
 
-    
-
-    col_left, col_mid, col_right = st.columns([1, 1, 1])
+    col_left, col_midleft, col_mid, col_midright, col_right = st.columns([0.9, 0.1, 0.8, 0.1, 1])
     with col_left:
-        st.subheader("🎯 목표 달성률 (개인/기업)")
-        st.warning("##### * 선택한 기간(월/연/주)에 대한 현재 판매 달성률을 보여줍니다. 기준은 딜러 개인이 될 수도, 기업 전체가 될 수도 있습니다.")
+        st.subheader("🎯 개인 목표 달성률")
 
-        view_option = st.selectbox("기간 선택", ["월간", "연간", "주간"])
+        view_option = st.selectbox("기간 선택", ["주간", "월간", "연간"])
         target_sales = {
+            "주간": 25,
             "월간": 150,
-            "연간": 1000,
-            "주간": 25
+            "연간": 1000
         }
         current_sales = {
+            "주간": 18,
             "월간": 69,
-            "연간": 840,
-            "주간": 21
+            "연간": 840
         }
         selected = view_option
         rate = current_sales[selected] / target_sales[selected] * 100
+
+        st.markdown(f"""
+        <div style="background-color: #f0f2f6; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 16px;">
+            <b>🎯 목표량:</b> {target_sales[selected]}건 &nbsp;&nbsp;&nbsp;
+            <b>📊 실제 판매량:</b> {current_sales[selected]}건
+        </div>
+        """, unsafe_allow_html=True)
 
         # 동적 색상 설정
         if rate < 50:
@@ -176,7 +184,7 @@ def dashboard_ui():
         fig_gauge = go.Figure(go.Indicator(
             mode="gauge+number+delta",
             value=rate,
-            title={'text': f"{selected} 목표 달성률"},
+            title={'text': f"{st.session_state['직원이름']} 매니저님의 {selected} 목표 달성률 (%)"},
             delta={'reference': 100},
             gauge={
                 'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
@@ -208,16 +216,37 @@ def dashboard_ui():
 
     with col_mid:
         st.subheader("📢 회사 공지사항")
-        st.warning("##### * 실시간으로 갱신되는 공지사항을 카드 형식으로 제공합니다. 회사의 지침 및 공지사항을 실시간으로 받아올 수 있는 코드 구현이 필요합니다.")
-        notices = [
-            "🛠️ 4월 5일 서버 점검 예정입니다.",
-            "✅ 1분기 판매 보고서 제출 마감: 4월 7일",
-            "📈 이번 주 최우수 딜러는 홍길동 딜러입니다!",
-            "📌 4월 목표는 총 150건 달성입니다. 함께 힘냅시다!"
-        ]
-        for notice in notices:
-            st.info(notice)
+        st.write("")
+
+        info_df = pd.read_csv("data/information.csv")
+        info_df["게시일자"] = pd.to_datetime(info_df["게시일자"])
+        info_df = info_df.sort_values(by="게시일자", ascending=False).head(7)
+
+        for _, row in info_df.iterrows():
+            with st.expander(row["제목"]):
+                for col in ["내용1", "내용2", "내용3"]:
+                    if pd.notna(row[col]):
+                        st.markdown(f"""
+                        <div style="margin-bottom: 6px;">
+                            <span style="font-size: 15px; font-weight: 500; color: #333;">• {row[col]}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
 
     with col_right:
-        st.subheader("추가 기능 박스")
-        st.warning("##### * 이 부분에 어떤 내용 들어갈지 아직은 미정")
+        st.markdown("### ✅ 최근 완료 상담")
+        st.write("")
+
+        completed_df = df[(df["담당직원"] == st.session_state["직원이름"]) & (df["완료여부"] == 1)]
+        recent_done = completed_df.sort_values(by=["상담날짜", "상담시간"], ascending=False).head(3)
+
+        if recent_done.empty:
+            st.info("아직 완료된 상담이 없습니다.")
+        else:
+            for _, row in recent_done.iterrows():
+                st.markdown(f"""
+                <div style="background-color: #f4f4f4; border: 1px solid #ddd; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;">
+                    <div style="font-size: 15px; font-weight: 600; color: #333;">👤 {row['이름']} ({row['전화번호']})</div>
+                    <div style="font-size: 13px; color: #555;">📅 {row['상담날짜']} {row['상담시간']}</div>
+                    <div style="font-size: 13px; color: #777; margin-top: 4px;">📝 {row['상담내용']}</div>
+                </div>
+                """, unsafe_allow_html=True)
