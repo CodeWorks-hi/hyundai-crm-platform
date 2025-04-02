@@ -86,13 +86,13 @@ else:
             import A_U_main as auto
             auto.app()
 
-        elif page == "A_U_consult":
-            import A_U_main as auto
-            auto.app()
+        elif page == "dealer_main":
+            import B_D_main as dealer
+            dealer.app()
 
-        elif page == "A_U_test_drive":
-            import A_U_main as auto
-            auto.app()
+        elif page == "admin_main":
+            import C_A_main as admin
+            admin.app()
 
     except Exception as e:
         st.error("페이지 로딩 중 오류가 발생했습니다.")

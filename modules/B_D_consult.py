@@ -6,39 +6,58 @@ def consult_ui():
 
     if "show_recommendation" not in st.session_state:
         st.session_state["show_recommendation"] = False
+    if "고객정보" not in st.session_state or not isinstance(st.session_state["고객정보"], dict):
+        st.session_state["고객정보"] = {"이름": "", "연락처": ""}
+    else:
+        st.session_state["고객정보"].setdefault("이름", "")
+        st.session_state["고객정보"].setdefault("연락처", "")
 
     customer_df = pd.read_csv("data/customers.csv")
+    customer_df["이름"] = customer_df["이름"].astype(str).str.strip()
+    customer_df["연락처"] = customer_df["연락처"].astype(str).str.strip()
+
     consult_log_df = pd.read_csv("data/consult_log.csv")
 
     # 세로 3컬럼 상단: col1 - 고객 정보 / col2 - 추천 입력 / col3 - 추천 결과
     col1, col2, col3, col4, col5 = st.columns([0.8, 0.3, 1.5, 0.3, 2])
 
     with col1:
-        st.warning("##### * 고객 기초정보 확인 페이지인데, 여기서 전화번호로 고객 선택하는 것도 가능하지만, 가급적이면 대시보드 창에서 버튼 클릭해서 넘어가고 싶어요.")
-        selected_name = st.text_input("고객 성명")
-        selected_contact = st.text_input("고객 연락처")
+        default_name = st.session_state["고객정보"].get("이름", "")
+        default_contact = st.session_state["고객정보"].get("연락처", "")
+        selected_name = st.text_input("고객 성명", value=default_name)
+        selected_contact = st.text_input("고객 연락처", value=default_contact)
         if selected_name and selected_contact:
-            customer_info = customer_df.loc[(customer_df["상담자명"] == selected_name) & (customer_df["연락처"] == selected_contact), :]
-            st.write("**이름:**", customer_info["이름"])
-            st.write("**성별:**", customer_info["성별"])
-            st.write("**연령:**", customer_info["생년월일"])
-            st.write("**전화번호:**", customer_info["연락처"])
+            customer_info = customer_df.loc[(customer_df["이름"] == selected_name) & (customer_df["연락처"] == selected_contact), :]
+            if not customer_info.empty:
+                st.markdown(f"""
+                <div style="background-color: #f4f4f4; border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-top: 10px;">
+                    <div style="font-size: 16px; font-weight: 600; color: #333;">👤 {customer_info['이름'].values[0]}</div>
+                    <div style="font-size: 14px; color: #555;">성별: {customer_info['성별'].values[0]}</div>
+                    <div style="font-size: 14px; color: #555;">생년월일: {customer_info['생년월일'].values[0]}</div>
+                    <div style="font-size: 14px; color: #555;">전화번호: {customer_info['연락처'].values[0]}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else :
+                st.error("❗ 설문조사 결과를 찾을 수 없습니다. 이름과 연락처를 확인해주세요.")
 
     with col3:
-        st.warning("##### * 자동차 추천 입력 정보 창입니다. 여기는 기본적으로 설문조사 결과 기반으로 채워놓고, 추가 입력할 항목 있으면 그것만 선택하게 할까 고민중입니다.")
-        # 하드 코딩 부분은 나중에 [survey_result["성별"]] 등으로 변경 예정
-        survey_result = customer_df[(customer_df["상담자명"] == selected_name) & (customer_df["연락처"] == selected_contact)].iloc[0]
+        st.warning("##### * 기본적으로 설문조사 결과 기반으로 채워놓고, 추가 입력할 항목 있으면 그것만 선택하게 할 예정.")
+        matched_survey = customer_df[(customer_df["이름"] == selected_name) & (customer_df["연락처"] == selected_contact)]
+        if matched_survey.empty:
+            st.error("❗ 설문조사 결과를 찾을 수 없습니다. 이름과 연락처를 확인해주세요.")
+            return
+        survey_result = matched_survey.iloc[0]
 
         colA, colB = st.columns(2)
         with colA:
-            st.selectbox("성별", survey_result["성별"], disabled=True)
-            st.selectbox("예산 (만원)", survey_result["예상예산_만원"], disabled=True)
-            st.selectbox("동승자 유형", survey_result["동승인원구성"], disabled=True)
-            st.selectbox("최근 보유 차량", survey_result["최근보유차종"], disabled=True)
+            st.selectbox("성별", [survey_result["성별"]], disabled=True)
+            st.selectbox("예산 (만원)", [survey_result["예상예산_만원"]], disabled=True)
+            st.selectbox("동승자 유형", [survey_result["동승인원구성"]], disabled=True)
+            st.selectbox("최근 보유 차량", [survey_result["최근보유차종"]], disabled=True)
         with colB:
-            st.selectbox("연령", survey_result["연령대"], disabled=True)
-            st.selectbox("운전 용도", survey_result["주요용도"], disabled=True)
-            st.selectbox("관심 차종", survey_result["관심차종"], disabled=True)
+            st.selectbox("연령", [survey_result["연령대"]], disabled=True)
+            st.selectbox("운전 용도", [survey_result["주요용도"]], disabled=True)
+            st.selectbox("관심 차종", [survey_result["관심차종"]], disabled=True)
         if st.button("🚘 추천받기", use_container_width=True):
             st.session_state["show_recommendation"] = True
 

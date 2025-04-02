@@ -120,6 +120,7 @@ def survey_ui(df_employees, generate_html_table):
             if save_customer(customer_info):
                 st.session_state["고객정보"] = {
                     "이름": 이름,
+                    "연락처": 연락처,
                     "관심차종": ", ".join(관심차종),
                     "예상예산_만원": 예산,
                     "주요용도": ", ".join(주요용도)
