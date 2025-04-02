@@ -23,7 +23,7 @@ def app():
         ("modules.B_dealer_inventory", "inventory_ui"),                     # 재고 현황, 발주 추천, 마진 분석
         ("modules.B_dealer_leads", "leads_ui"),                             # 리드 퍼널, 스코어링, 자동 팔로업
         ("modules.B_dealer_registration", "sales_registration_ui"),         # 판매 등록
-        ("modules.B_ealer_demand_forecast", "demand_forecast_ui"),           # AI 수요 예측
+        ("modules.B_ealer_demand_forecast", "demand_forecast_ui"),          # AI 수요 예측
         ("modules.B_dealer_service", "demand_forecast_ui"),                 # 서비스 일정, 고객 충성도 관리
         ("modules.B_dealer_eco", "dealer_eco_ui")                           # 경제 지표 기반 판매 인텔리전스, 금융 상품 최적화
     ]
