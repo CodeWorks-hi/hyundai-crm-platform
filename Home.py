@@ -8,6 +8,7 @@ import logging
 import traceback
 import datetime
 
+
 # 접속 로그 기록
 logging.basicConfig(level=logging.INFO)
 logging.info(f"[접속 기록] 페이지 접속 시각: {datetime.datetime.now()}")
@@ -74,6 +75,7 @@ else:
     except Exception as e:
         st.error("⚠️ 페이지 로딩 중 오류가 발생했습니다.")
         st.exception(e)
+
 
 # 푸터
 st.markdown("---")

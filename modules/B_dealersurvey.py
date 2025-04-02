@@ -30,7 +30,7 @@ def save_customer(info):
     df = load_customers()
     # 중복 연락처 체크
     if info[5] in df["연락처"].astype(str).tolist():
-        st.warning("⚠️ 이미 등록된 연락처입니다.")
+        st.warning("이미 등록된 연락처입니다.")
         return False
     df.loc[len(df)] = info
     df.to_csv(CUSTOMER_CSV_PATH, index=False)
@@ -40,19 +40,30 @@ def normalize_phone(phone):
     return re.sub(r"[^\d]", "", phone.strip())
 
 def survey_ui(df_employees, generate_html_table):
-    st.subheader("📋 방문고객 설문조사")
+    st.subheader("방문고객 설문조사")
 
     if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
         st.warning("상담자 정보를 먼저 등록하세요.")
         return
 
     with st.form("고객등록"):
-        이름 = st.text_input("고객이름")
-        연락처 = st.text_input("연락처 (숫자만)", max_chars=13)
-        연락처 = normalize_phone(연락처)
+        name, phon, birth, gender = st.columns([2,2,2,1])
+        with name : 
+            이름 = st.text_input("성명")
+        with phon :
+            연락처 = st.text_input("연락처 (숫자만)", max_chars=13)
+            연락처 = normalize_phone(연락처)
+        with birth :
+            today = datetime.date.today()
+            생년월일 = st.date_input(
+                "생년월일",
+                min_value=datetime.date(1950, 1, 1),
+                max_value=today,
+                value=datetime.date(1990, 1, 1))
+        with gender :   
+            is_male = st.toggle("남성 / 여성", value=True)
+            성별 = "남성" if is_male else "여성"
 
-        성별 = st.radio("성별", ["남성", "여성"], horizontal=True)
-        생년월일 = st.date_input("생년월일")
         거주지역 = st.selectbox("거주 지역", [
             "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시", "대전광역시",
             "울산광역시", "세종특별자치시", "경기도", "강원도", "충청북도", "충청남도",
@@ -61,7 +72,7 @@ def survey_ui(df_employees, generate_html_table):
         관심차종 = st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
         방문목적 = st.selectbox("방문 목적", ["차량 상담", "구매 의사 있음", "시승 희망", "기타"])
 
-        st.markdown("#### 🚘 추가 설문")
+        st.markdown("#### 추가 설문")
         월주행거리 = st.selectbox("월 주행거리(km)", ["500", "1000", "1500", "2000 이상"])
         주요용도 = st.multiselect("주요 운전 용도", ["출퇴근", "아이 통학", "주말여행", "레저활동", "업무차량"])
         예산 = st.selectbox("예상 예산 (만원)", ["1500", "2000", "2500", "3000", "3500 이상"])
