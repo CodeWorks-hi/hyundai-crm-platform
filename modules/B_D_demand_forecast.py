@@ -1,8 +1,3 @@
-# 고객 메인 대시보드   
-    # AI 수요 예측
-
-
-
 import streamlit as st
 
 def demand_forecast_ui():
