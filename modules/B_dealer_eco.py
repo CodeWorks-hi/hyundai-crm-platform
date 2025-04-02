@@ -52,7 +52,7 @@ def eco_ui():
 
     if st.button("대기질 정보 확인하기") and region:
         stations = get_station_list(region, service_key)
-        st.write(f"📍 '{region}' 지역의 측정소 목록:", stations)
+        st.write(f"📍 '{region}' 지역의 측정소 목록:", stations) # 여기까지 이상 無
 
         if stations:
             st.write(f"📡 '{stations[0]}'의 대기질 측정값:")
