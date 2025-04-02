@@ -10,8 +10,12 @@ import plotly.graph_objects as go
 def dashboard_ui():
     # 상담 내역 데이터 로드
     df = pd.read_csv("data/consult_log.csv")
-    new_df = df.loc[df["담당직원"] == "홍길동", :]
+    new_df = df.loc[df["담당직원"] == st.session_state["직원이름"], :]
 
+    if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
+        st.warning("상담자 정보를 먼저 등록하세요.")
+        return
+    
     col1, col2, col3 = st.columns([1, 0.2, 1.5])
 
     with col1:
