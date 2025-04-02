@@ -12,7 +12,7 @@ def dashboard_ui():
     df = pd.read_csv("data/consult_log.csv")
     new_df = df.loc[df["담당직원"] == "홍길동", :]
 
-    col1, col2, col3 = st.columns([1.1, 0.2, 1.5])
+    col1, col2, col3 = st.columns([1, 0.2, 1.5])
 
     with col1:
         st.warning("##### * 로그인 시 해당 매니저에 대한 데이터만 가져오도록 해야 합니다.")
@@ -40,16 +40,8 @@ def dashboard_ui():
                 'id': str(uuid.uuid4()),
                 'title': f"{row.get('이름', '이름 없음')} 고객님",
                 'start': start_time,
-                'done': status,
                 'description': row.get("상담내용", "")
             })
-
-        # ID 및 done 필드 보장
-        for e in st.session_state.events:
-            if 'id' not in e:
-                e['id'] = str(uuid.uuid4())
-            if 'done' not in e:
-                e['done'] = False
 
         # ✅ FullCalendar with checkbox + style
         calendar_html = f"""
@@ -85,41 +77,11 @@ def dashboard_ui():
                             'id': e['id'],
                             'title': e['title'],
                             'start': e['start'],
-                            'done': e['done'],
                             'description': e.get('description', '')
                         } for e in st.session_state.events
-                    ])},
-                    eventContent: function(info) {{
-                        const done = info.event.extendedProps.done;
-                        const checkbox = `<input type='checkbox' data-id='${{info.event.id}}' ${{done ? "checked" : ""}} style='position:absolute; right:10px; top:50%; transform:translateY(-50%);'/>`;
-                        const titleStyle = done ? "color:#888;text-decoration:line-through;font-weight:normal;" : "font-weight:bold;";
-                        const title = `<span style='${{titleStyle}}'>${{info.event.title}}</span>`;
-                        return {{ html: `<div style='position:relative;'>${{title}}${{checkbox}}</div>` }};
-                    }},
-                    eventDidMount: function(info) {{
-                      const checkbox = info.el.querySelector('input[type="checkbox"]');
-                      if (checkbox) {{
-                        checkbox.checked = info.event.extendedProps.done;
-                      }}
-                    }}
+                    ])}
                 }});
                 calendar.render();
-
-                // ✅ 체크박스 이벤트 핸들러
-                document.addEventListener('change', function(e) {{
-                    if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {{
-                        const eventId = e.target.getAttribute('data-id');
-                        const checked = e.target.checked;
-
-                        // Update event extendedProps for immediate visual effect
-                        const event = calendar.getEventById(eventId);
-                        if (event) {{
-                            event.setExtendedProp('done', checked);
-                        }}
-
-                        window.parent.postMessage({{ event_id: eventId, done: checked }}, '*');
-                    }}
-                }});
             }});
         </script>
         </body>
@@ -129,30 +91,7 @@ def dashboard_ui():
         components.html(calendar_html, height=600)
 
         # ✅ 체크박스 상태 수신 및 반영
-        clicked = st_javascript("""
-        await new Promise((resolve) => {
-          window.addEventListener("message", (event) => {
-            if (event.data && event.data.event_id) {
-              resolve(event.data);
-            }
-          });
-        });
-        """)
-
-        if isinstance(clicked, dict) and 'event_id' in clicked:
-            for e in st.session_state.events:
-                if e.get('id') == clicked['event_id']:
-                    e['done'] = clicked.get('done', False)
-
-                    # 원본 df의 해당 상담내용 찾아서 완료여부 업데이트
-                    for i, row in df.iterrows():
-                        if (
-                            row.get("상담내용", "") == e.get("description", "") and
-                            str(pd.to_datetime(row.get("상담시간", "")).isoformat()) == e.get("start")
-                        ):
-                            df.at[i, "완료여부"] = 1 if clicked.get("done", False) else 0
-                            break
-            st.rerun()
+        # Removed checkbox event listener block
 
     with col3:
         st.warning("##### * 추후 유저 페이지 구축되면 '상담 추가/수정' 삭제 예정, 딜러는 상담 신청 내역 받아와서 확인만 하면 됩니다.")
@@ -163,14 +102,41 @@ def dashboard_ui():
             st.info("현재 등록된 일정이 없습니다.")
         else:
             for i, event in enumerate(st.session_state.events):
-                col1, col2, col3 = st.columns([2, 4, 2])
+                col1, col2, col3, col4 = st.columns([1.7, 4, 1.5, 1])
                 with col1:
                     st.write(f"📌 {event['title']}")
                 with col2:
                     st.text(f"📝 {event.get('description', '상담내용 없음')}")
                 with col3:
                     st.write(event['start'].replace("T", " ")[:16])
+                with col4:
+                    if st.button("완료", key=f"complete_{i}"):
+                        st.session_state.confirm_finish_index = i
+                        st.rerun()
+            if "confirm_finish_index" in st.session_state:
+                idx = st.session_state.confirm_finish_index
+                target = st.session_state.events[idx]
+                st.warning(f"⚠️ '{target['title']}' 일정을 완료 처리하시겠습니까?")
+                col_ok, col_cancel = st.columns(2)
+                with col_ok:
+                    if st.button("✅ 예, 완료합니다"):
+                        for j, row in df.iterrows():
+                            name_match = row.get("이름", "") in target["title"]
+                            time_match = pd.to_datetime(row.get("상담시간", "")).strftime("%H:%M") in target["start"]
+                            if name_match and time_match:
+                                df.at[j, "완료여부"] = 1
+                                break
+                        df.to_csv("data/consult_log.csv", index=False)
+                        del st.session_state.confirm_finish_index
+                        st.success("✅ 완료 처리되었습니다.")
+                        st.rerun()
+                with col_cancel:
+                    if st.button("❌ 아니요, 유지합니다"):
+                        del st.session_state.confirm_finish_index
+                        st.info("처리가 취소되었습니다.")
+                        st.rerun()
 
+    
 
     col_left, col_mid, col_right = st.columns([1, 1, 1])
     with col_left:
@@ -179,7 +145,7 @@ def dashboard_ui():
 
         view_option = st.selectbox("기간 선택", ["월간", "연간", "주간"])
         target_sales = {
-            "월간": 100,
+            "월간": 150,
             "연간": 1000,
             "주간": 25
         }
