@@ -74,6 +74,18 @@ else:
             import A_U_main as auto
             auto.app()
 
+        elif page == "A_U_map":  #유저 대리점 찾기 
+            import A_U_main as auto
+            auto.app()
+
+        elif page == "A_U_consult":  #상담 예약 
+            import A_U_main as auto
+            auto.app()
+        
+        elif page == "A_U_test_drive":  #시승 신청  
+            import A_U_main as auto
+            auto.app()
+
         elif page == "A_U_event": #이벤트
             import A_U_main as auto
             auto.app()
@@ -82,15 +94,14 @@ else:
             import A_U_main as auto
             auto.app()
 
-        elif page == "A_U_map":  #유저 대리점 찾기 
-            import A_U_main as auto
-            auto.app()
-
-        elif page == "dealer_main":  # 딜러 페이지 전환 ( 수정하면 안됩니다.)
+        
+        
+        # 딜러 페이지 전환 ( 수정하면 안됩니다.) - 수정시 페이지 전환 안됨
+        elif page == "dealer_main":  
             import B_D_main as dealer
             dealer.app()
-
-        elif page == "admin_main":  # 어드민 페이지 전환 ( 수정하면 안됩니다.)
+        # 어드민 페이지 전환 ( 수정하면 안됩니다.) - 수정시 페이지 전환 안됨
+        elif page == "admin_main":  
             import C_A_main as admin
             admin.app()
 

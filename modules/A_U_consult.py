@@ -3,6 +3,8 @@ import pandas as pd
 import os
 from datetime import datetime
 
+
+ # ====== 상담 예약 =========
 def consult_ui():
     if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
         st.session_state.current_page = "user_main"
