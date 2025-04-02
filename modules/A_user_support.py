@@ -6,7 +6,7 @@
 import streamlit as st
 
 
-def support_ui(df_employees, generate_html_table):
+def support_ui():
     
 
     # 자주 묻는 질문

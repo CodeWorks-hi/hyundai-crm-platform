@@ -9,22 +9,22 @@ import folium
 import os
 import streamlit.components.v1 as components
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sb
 
-if "search_query" not in st.session_state:
-    st.session_state["search_query"] = ""
+def dealer_ui(df_employees=None, generate_html_table=None):
+    if "search_query" not in st.session_state:
+        st.session_state["search_query"] = ""
 
-def get_api_key():
-    key = os.environ.get('KAKAO_API_KEY')
-    if key is None:
-        key = st.secrets.get('KAKAO_API_KEY')
-    return key
+    def get_api_key():
+        key = os.environ.get('KAKAO_API_KEY')
+        if key is None:
+            key = st.secrets.get('KAKAO_API_KEY')
+        return key
 
-KAKAO_API_KEY = get_api_key()
+    KAKAO_API_KEY = get_api_key()
 
-DEFAULT_LAT = 37.431095
-DEFAULT_LON = 127.128907
+    DEFAULT_LAT = 37.431095
+    DEFAULT_LON = 127.128907
+
 
 # 1) 지점/대리점 검색 함수
 def search_dealership(query, x=None, y=None):
