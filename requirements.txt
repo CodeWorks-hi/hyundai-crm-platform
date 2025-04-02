@@ -15,15 +15,43 @@ matplotlib
 scikit-learn
 xlsxwriter
 cmake
-forge 
+forge
 dlib
 face_recognition
-requests
-uuid
-datetime
-streamlit_javascript
+streamlit-javascript
 folium
 kafka-python==2.0.2
 fredapi==0.4.0
 eodhd==1.0.32
 plotly==5.18.0
+geopy
+seaborn
+bs4
+lxml
+html5lib
+streamlit-aggrid
+plotly
+kaleido
+
+
+# dlib/face_recognition 설치 시 추가 설정 필요:
+# Ubuntu/Debian
+# sudo apt-get install -y python3-dev build-essential cmake
+# MacOS
+# brew install cmake
+
+# 가상환경에서 설치
+# pip install cmake==3.26.4
+# pip install dlib==19.24.2
+# pip install face_recognition==1.3.0
+
+# Kafka 관련 종속성:
+# pip install confluent-kafka==2.2.0 
+
+
+# 한글 폰트 문제 시:
+# sudo apt-get install -y fonts-nanum*  # Ubuntu/Debian
+# brew install font-nanum  # MacOS
+
+# CUDA 가속 필요한 경우:
+# pip install cupy-cuda112  # CUDA 11.2 기준
