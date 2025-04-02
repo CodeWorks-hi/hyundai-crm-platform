@@ -4,46 +4,35 @@ import importlib
 import pandas as pd
 from modules.A_U_carousel import render_carousel
 import base64
+from dotenv import load_dotenv
+from modules.A_U_kakao_auth import handle_kakao_callback, render_kakao_login_button
+from modules.A_U_kakao_channel import render_kakao_buttons
+
 
 def get_base64_image(image_path):
     with open(image_path, "rb") as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
-# 🔁 페이지 전환 함수 (공통)
+# 페이지 전환 함수 (공통)
 def switch_page(page):
     st.session_state.current_page = page
     st.rerun()
 
 
-from modules.A_U_kakao_auth import render_kakao_login_button, handle_kakao_callback
-from modules.A_U_kakao_channel import render_kakao_channel_buttons
+
+
 
 def kakao_login_ui():
-    kak, ka, kakao1 = st.columns([4,4,1])
-    with kak:
-        st.header("")
-    with ka:
-        st.header("")
-    with kakao1:
-        # 로그인 처리
-        handle_kakao_callback()
-    aao, kaka1, kaka2, kaka3 = st.columns([4,1,1,1])
-    with aao :
-        st.header("")
-    with kaka1:
-        pass  
-    with kaka2:
-        # 로그인 버튼
-        render_kakao_login_button()
-    with kaka3:
-        # 채널 버튼
-        render_kakao_channel_buttons()
+    st.title("🔐 카카오 로그인")
+    handle_kakao_callback()
+    render_kakao_login_button()
+
 
 # 일반회원 홈화면 UI
 def user_main_ui():
-    # 🔐 카카오 로그인 UI 표시
-    kakao_login_ui()
+    
+    
 
     # 차량 이미지 캐러셀 (Swiper.js 활용)
     car_data = [
@@ -167,8 +156,13 @@ def user_main_ui():
     
 
     st.markdown("---")
-    if st.button("← 메인으로 돌아가기"):
-        switch_page("home")
+    colb, colc, cola= st.columns([1,4,1])
+    with cola :
+        render_kakao_buttons()
+        kakao_login_ui()
+    with colb:
+        if st.button("← 메인으로 돌아가기"):
+            switch_page("home")
 
 
 # ▶️ 앱 진입점
