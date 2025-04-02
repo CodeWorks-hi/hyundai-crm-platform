@@ -7,6 +7,9 @@ import streamlit as st
 
 
 def support_ui():
+    if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
+        st.session_state.current_page = "user_main"
+        st.rerun()
     
 
     # 자주 묻는 질문

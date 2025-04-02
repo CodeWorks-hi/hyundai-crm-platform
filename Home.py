@@ -83,8 +83,8 @@ else:
             auto.app()
 
         elif page == "A_U_detail":
-            import A_U_detail as detail
-            detail.detail_ui()
+            import A_U_main as auto
+            auto.app()
 
         elif page == "dealer_main":
             import B_D_main as dealer
