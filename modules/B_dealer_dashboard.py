@@ -19,7 +19,7 @@ def dashboard_ui():
             st.session_state.events = []
 
         if "edit_index" not in st.session_state:
-            st.session_state.edit_index = None
+            st.session_state.edit_index = None 
 
         if "confirm_delete_index" not in st.session_state:
             st.session_state.confirm_delete_index = None
