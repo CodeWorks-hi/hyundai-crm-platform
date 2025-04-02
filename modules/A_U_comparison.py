@@ -48,7 +48,7 @@ def comparison_ui():
         st.error("차량 데이터를 불러올 수 없습니다.")
         return
 
-    col2, col3 = st.columns([3, 1])
+    col2, col4, col3 = st.columns([3, 0.2,1])
 
     대표모델 = df.sort_values(by="기본가격").drop_duplicates(subset=["모델명"])
 
@@ -57,25 +57,32 @@ def comparison_ui():
         for i in range(0, len(대표모델), 3):
             row = 대표모델.iloc[i:i+3]
             cols = st.columns(3)
+
             for col_index, (col, (_, item)) in enumerate(zip(cols, row.iterrows())):
                 with col:
-                    st.image(item["img_url"], width=260)
+                    st.markdown(
+                        f"""
+                        <div style="border:1px solid #ddd; border-radius:12px; padding:10px; text-align:center; 
+                                    box-shadow: 2px 2px 8px rgba(0,0,0,0.06); height: 330px;">
+                            <div style="height:180px; background:#fff; display:flex; align-items:center; justify-content:center;">
+                                <img src="{item['img_url']}" 
+                                    style="height:140px; width:auto; object-fit:contain; max-width: 100%;" />
+                            </div>
+                            <div style="margin-top: 10px; font-weight:bold; font-size:16px;">{item['모델명']}</div>
+                            <div style="color:gray;">{int(item['기본가격']):,}원부터 ~</div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
-                    # 모델명 + 가격 출력
-                    st.markdown(f"**{item['모델명']}**")
-                    가격표시 = f"{int(item['기본가격']):,}원부터 ~" if pd.notna(item['기본가격']) else ""
-                    st.markdown(가격표시)
-
-                    # 버튼 key는 고유하게
                     key_val = f"선택_{item['모델명']}_{i}_{col_index}"
                     if st.button("이 차량 선택", key=key_val):
                         st.session_state["선택차량"] = item.to_dict()
                         st.rerun()
 
-        with st.expander("📋 전체 차량 비교"):
-            compare = df.drop(columns=["img_url"]).reset_index(drop=True)
-            st.dataframe(compare)
 
+    with col4:
+        pass
     with col3:
         st.markdown("### 차량 정보")
         if "선택차량" in st.session_state:

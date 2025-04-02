@@ -8,6 +8,9 @@ import pandas as pd
 import plotly.express as px
 
 def event_ui():
+    if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
+        st.session_state.current_page = "user_main"
+        st.rerun()
     st.subheader("📣 이벤트 및 공지사항")
 
     st.markdown("#### 📌 최근 공지사항")
