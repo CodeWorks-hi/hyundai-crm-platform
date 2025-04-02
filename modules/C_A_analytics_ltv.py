@@ -14,7 +14,7 @@ def analytics_ltv_ui():
     ])
 
  
-    st.markdown("""
+    st.info("""
     ###  1. LTV 모델 결과 (고객 생애 가치 예측)
 
     ** 개념 설명:**  

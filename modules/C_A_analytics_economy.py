@@ -5,7 +5,7 @@ import streamlit as st
 
 def analytics_economy_ui():
 
-    st.markdown("""
+    st.info("""
     ##  글로벌 경제 인사이트
 
     환율, 금리, GDP 등 글로벌 경제 지표를 분석하고 시각화하는 페이지입니다.  
