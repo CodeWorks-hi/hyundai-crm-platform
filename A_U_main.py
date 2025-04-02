@@ -5,7 +5,7 @@ import pandas as pd
 from modules.A_U_carousel import render_carousel
 import base64
 from dotenv import load_dotenv
-from modules.A_U_kakao_auth import handle_kakao_callback, render_kakao_login_button
+from modules.A_U_kakao_auth import handle_kakao_callback, render_kakao_login_button,render_logout_button
 from modules.A_U_kakao_channel import render_kakao_buttons
 
 
@@ -27,6 +27,7 @@ def kakao_login_ui():
     st.title("🔐 카카오 로그인")
     handle_kakao_callback()
     render_kakao_login_button()
+    render_logout_button()
 
 
 # 일반회원 홈화면 UI

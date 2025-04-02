@@ -68,6 +68,12 @@ def handle_kakao_callback():
             # 쿼리 제거용 rerun
             st.experimental_set_query_params()
 
+def render_logout_button():
+    if "kakao_user" in st.session_state:
+        if st.button("로그아웃"):
+            del st.session_state["kakao_user"]
+            st.experimental_rerun()
+            
 # 사용자 정보 CSV에 저장
 def save_user_info(user_data):
     os.makedirs("data", exist_ok=True)
