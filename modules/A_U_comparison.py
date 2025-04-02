@@ -40,6 +40,9 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 
 def comparison_ui():
+    if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
+        st.session_state.current_page = "user_main"
+        st.rerun()
     df = load_car_data()
     if df.empty:
         st.error("차량 데이터를 불러올 수 없습니다.")

@@ -61,17 +61,30 @@ if st.session_state.current_page == "home":
 # 페이지 라우팅 처리
 else:
     try:
-        if st.session_state.current_page == "user_main":
+        page = st.session_state.get("current_page")
+
+        if page == "user_main":
             import A_U_main as auto
             auto.app()
 
-        elif st.session_state.current_page == "dealer_main":
-            import B_D_main as dealer
-            dealer.app()
+        elif page == "A_U_comparison":
+            import A_U_main as auto
+            auto.app()  # 🔁 app 안에서 comparison 호출 포함
 
-        elif st.session_state.current_page == "admin_main":
-            import C_A_main as admin
-            admin.app()
+        elif page == "A_U_event":
+            import A_U_main as auto
+            auto.app()
+
+        elif page == "A_U_support":
+            import A_U_main as auto
+            auto.app()
+
+        elif page == "A_U_detail":
+            import A_U_detail as detail
+            detail.detail_ui()
+
+
+            
     except Exception as e:
         st.error("⚠️ 페이지 로딩 중 오류가 발생했습니다.")
         st.exception(e)
