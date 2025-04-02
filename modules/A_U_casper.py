@@ -110,3 +110,4 @@ def casper_ui():
                     st.markdown(f"- {col}: {value}")
         else:
             st.info("선택된 차량이 없습니다.")
+            
