@@ -3,6 +3,7 @@ import pandas as pd
 
 def consult_ui():
     st.title("🧾 고객 상담 페이지")
+    clicked = False
 
     if "show_recommendation" not in st.session_state:
         st.session_state["show_recommendation"] = False
@@ -19,50 +20,75 @@ def consult_ui():
     consult_log_df = pd.read_csv("data/consult_log.csv")
 
     # 세로 3컬럼 상단: col1 - 고객 정보 / col2 - 추천 입력 / col3 - 추천 결과
-    col1, col2, col3, col4, col5 = st.columns([0.8, 0.3, 1.5, 0.3, 2])
+    col1, col2, col3, col4, col5 = st.columns([1.2, 0.1, 1.5, 0.1, 2])
 
     with col1:
         default_name = st.session_state["고객정보"].get("이름", "")
         default_contact = st.session_state["고객정보"].get("연락처", "")
-        selected_name = st.text_input("고객 성명", value=default_name)
-        selected_contact = st.text_input("고객 연락처", value=default_contact)
-        if selected_name and selected_contact:
+        selected_name = st.text_input("고객 성명 입력", value=default_name)
+        selected_contact = st.text_input("고객 연락처 입력", value=default_contact)    
+
+        if selected_name and selected_contact :
+            clicked = True
+            st.markdown("---")
             customer_info = customer_df.loc[(customer_df["이름"] == selected_name) & (customer_df["연락처"] == selected_contact), :]
             if not customer_info.empty:
                 st.markdown(f"""
-                <div style="background-color: #f4f4f4; border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-top: 10px;">
-                    <div style="font-size: 16px; font-weight: 600; color: #333;">👤 {customer_info['이름'].values[0]}</div>
-                    <div style="font-size: 14px; color: #555;">성별: {customer_info['성별'].values[0]}</div>
-                    <div style="font-size: 14px; color: #555;">생년월일: {customer_info['생년월일'].values[0]}</div>
-                    <div style="font-size: 14px; color: #555;">전화번호: {customer_info['연락처'].values[0]}</div>
+                <div style="background-color: #e9f3fc; border: 2px solid #1570ef; padding: 18px 24px; border-radius: 10px; margin-top: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                    <div style="font-size: 20px; font-weight: 700; color: #0f3c73; margin-bottom: 10px;">👤 고객 정보 요약</div>
+                    <ul style="list-style-type: none; padding-left: 0; font-size: 15px; color: #1d2c3b;">
+                        <li><strong>📛 이름:</strong> {customer_info['이름'].values[0]}</li>
+                        <li><strong>📱 연락처:</strong> {customer_info['연락처'].values[0]}</li>
+                        <li><strong>🎂 생년월일:</strong> {customer_info['생년월일'].values[0]}</li>
+                        <li><strong>🚗 주요용도:</strong> {customer_info['주요용도'].values[0]}</li>
+                        <li><strong>⭐ 관심차종:</strong> {customer_info['관심차종'].values[0]}</li>
+                    </ul>
                 </div>
                 """, unsafe_allow_html=True)
             else :
                 st.error("❗ 설문조사 결과를 찾을 수 없습니다. 이름과 연락처를 확인해주세요.")
 
     with col3:
-        st.warning("##### * 기본적으로 설문조사 결과 기반으로 채워놓고, 추가 입력할 항목 있으면 그것만 선택하게 할 예정.")
         matched_survey = customer_df[(customer_df["이름"] == selected_name) & (customer_df["연락처"] == selected_contact)]
         if matched_survey.empty:
             st.error("❗ 설문조사 결과를 찾을 수 없습니다. 이름과 연락처를 확인해주세요.")
             return
         survey_result = matched_survey.iloc[0]
 
-        colA, colB = st.columns(2)
-        with colA:
-            st.selectbox("성별", [survey_result["성별"]], disabled=True)
-            st.selectbox("예산 (만원)", [survey_result["예상예산_만원"]], disabled=True)
-            st.selectbox("동승자 유형", [survey_result["동승인원구성"]], disabled=True)
-            st.selectbox("최근 보유 차량", [survey_result["최근보유차종"]], disabled=True)
-        with colB:
-            st.selectbox("연령", [survey_result["연령대"]], disabled=True)
-            st.selectbox("운전 용도", [survey_result["주요용도"]], disabled=True)
-            st.selectbox("관심 차종", [survey_result["관심차종"]], disabled=True)
-        if st.button("🚘 추천받기", use_container_width=True):
-            st.session_state["show_recommendation"] = True
+        if clicked:
+            colA, colB = st.columns(2)
+            with colA:
+                st.text_input("성별", value=survey_result["성별"], disabled=True)
+                st.number_input("예산 (만원)", value=survey_result["예상예산_만원"])
+                companies = [str(survey_result["동승인원구성"])] + ["1인", "부부", "자녀1명", "자녀2명 이상", "부모님 동승"]
+                unique_companies = list(dict.fromkeys(companies))
+                st.selectbox("동승자 유형", unique_companies)
+                imp1 = [str(survey_result["중요요소1"])] + ["연비", "가격", "디자인", "성능", "안전", "공간"]
+                unique_imp1 = list(dict.fromkeys(imp1))
+                st.selectbox("가장 중요한 요소", unique_imp1)
+                imp3 = [str(survey_result["중요요소3"])] + ["연비", "가격", "디자인", "성능", "안전", "공간"]
+                unique_imp3 = list(dict.fromkeys(imp3))
+                st.selectbox("세 번째로 중요한 요소", unique_imp3)
+                st.multiselect("운전 용도", ["출퇴근", "아이 통학", "주말여행", "레저활동", "업무차량"])
+            with colB:
+                st.text_input("연령", value=survey_result["연령대"], disabled=True)
+                distances = [str(survey_result["월주행거리_km"])] + ["500", "1000", "1500", "2000 이상"]
+                unique_distances = list(dict.fromkeys(distances))
+                st.selectbox("예상 월간 주행 거리 (km)", unique_distances)
+                colors = [str(survey_result["선호색상"])] + ["흰색", "검정", "회색", "은색", "파랑", "빨강", "기타"]
+                unique_colors = list(dict.fromkeys(colors))
+                st.selectbox("선호 색상", unique_colors)
+                imp2 = [str(survey_result["중요요소2"])] + ["연비", "가격", "디자인", "성능", "안전", "공간"]
+                unique_imp2 = list(dict.fromkeys(imp2))
+                st.selectbox("두 번째로 중요한 요소", unique_imp2)
+                st.text_input("최근 보유 차량", survey_result["최근보유차종"], disabled=True) # 이건 예측에 필요한가 애매
+                st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
+                
+                
+            if st.button("🚘 추천받기", use_container_width=True):
+                st.session_state["show_recommendation"] = True
 
     with col5:
-        st.warning("##### * 차량 추천 결과 박스입니다. 3종만 보여주고, 저장하기 버튼 있는 이유는 나중에 재고 관리 창에서 선택한 차종 먼저 보이게 하려고.")
         if st.session_state.get("show_recommendation", False):
             for i in range(1, 4):
                 img_col, text_col, button_col = st.columns([1.5, 1.3, 1])
