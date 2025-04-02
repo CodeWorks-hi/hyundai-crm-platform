@@ -4,9 +4,6 @@ import pandas as pd
 
 # ▶️ 메인 앱
 def app():
-    st.title("고객 페이지")
-
-
     # 탭 이름과 연결 함수
     tabs = st.tabs([
         "차량 비교", "casper", "대리점 및 정비소", "이벤트 및 공지사항", "고객센터"

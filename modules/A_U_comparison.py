@@ -40,8 +40,6 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 
 def comparison_ui():
-    st.subheader("🚗 차량 비교")
-
     df = load_car_data()
     if df.empty:
         st.error("차량 데이터를 불러올 수 없습니다.")
@@ -49,22 +47,25 @@ def comparison_ui():
 
     col2, col3 = st.columns([3, 1])
 
+    대표모델 = df.sort_values(by="기본가격").drop_duplicates(subset=["모델명"])
+
     with col2:
-        st.markdown("### 전체 차량 목록")
-        for i in range(0, len(df), 3):
-            row = df.iloc[i:i+3]
+        st.markdown("### 전체 차량 모델")
+        for i in range(0, len(대표모델), 3):
+            row = 대표모델.iloc[i:i+3]
             cols = st.columns(3)
-            for col, (_, item) in zip(cols, row.iterrows()):
+            for col_index, (col, (_, item)) in enumerate(zip(cols, row.iterrows())):
                 with col:
                     st.image(item["img_url"], width=260)
 
-                    st.markdown(f"**{item['모델명']}** {item['트림명']}")
-
-                    가격 = item.get("기본가격")
-                    가격표시 = f"{int(가격):,}원" if pd.notna(가격) else ""
+                    # 모델명 + 가격 출력
+                    st.markdown(f"**{item['모델명']}**")
+                    가격표시 = f"{int(item['기본가격']):,}원부터 ~" if pd.notna(item['기본가격']) else ""
                     st.markdown(가격표시)
 
-                    if st.button("이 차량 선택", key=f"선택_{item['모델명']}_{item['트림명']}"):
+                    # 버튼 key는 고유하게
+                    key_val = f"선택_{item['모델명']}_{i}_{col_index}"
+                    if st.button("이 차량 선택", key=key_val):
                         st.session_state["선택차량"] = item.to_dict()
                         st.rerun()
 
@@ -76,7 +77,7 @@ def comparison_ui():
         st.markdown("### 차량 정보")
         if "선택차량" in st.session_state:
             car = st.session_state["선택차량"]
-            st.image(car.get("img_url", ""), width=200)
+            st.image(car.get("img_url", ""), use_container_width=True)
             st.markdown(f"**{car.get('모델명', '')} {car.get('트림명', '')}**")
 
             가격 = car.get("기본가격")
@@ -89,7 +90,7 @@ def comparison_ui():
 
             st.markdown("---")
             st.markdown("**세부 정보**")
-            for col in ['연료구분', '배기량', '공차중량', '연비', '차량형태', '차량구분']:
+            for col in ['연료구분', '배기량', '공차중량', '연비', '차량형태', '차량구분', '탑승인원']:
                 value = car.get(col)
                 st.markdown(f"- {col}: {value if pd.notna(value) else ''}")
         else:
