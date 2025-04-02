@@ -40,7 +40,7 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 # ▶️ 캐스퍼 페이지 렌더링
 
-def casper_ui(df_employees, generate_html_table):  # 인자 추가
+def casper_ui():
     df = load_car_data()
 
     if df.empty:
