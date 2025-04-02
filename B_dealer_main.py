@@ -6,6 +6,7 @@ import pandas as pd
 
 from modules.B_dealer_dashboard import dashboard_ui
 from modules.B_dealer_eco import eco_ui
+from modules.B_dealer_recommend import recommend_ui
 from modules.B_dealer_survey import survey_ui
 
 
@@ -83,7 +84,7 @@ def app():
         survey_ui()
 
     with tabs[2]:
-        st.write("가안.")
+        recommend_ui()
 
     with tabs[3]:
         st.write("재고 현황")
