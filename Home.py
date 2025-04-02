@@ -86,11 +86,11 @@ else:
             import A_U_main as auto
             auto.app()
 
-        elif page == "dealer_main":
+        elif page == "dealer_main":  # 딜러 페이지 전환 ( 수정하면 안됩니다.)
             import B_D_main as dealer
             dealer.app()
 
-        elif page == "admin_main":
+        elif page == "admin_main":  # 어드민 페이지 전환 ( 수정하면 안됩니다.)
             import C_A_main as admin
             admin.app()
 
