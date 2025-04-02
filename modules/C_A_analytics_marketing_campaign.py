@@ -9,6 +9,10 @@ import plotly.express as px
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+from kafka import KafkaConsumer
+import json
+import plotly.graph_objects as go
+from datetime import datetime
 
 
 # 한글 폰트 설정 (윈도우/Mac/Linux 공통 지원)
@@ -88,3 +92,68 @@ def marketing_campaign_ui():
     plt.tight_layout()
     st.pyplot(fig)
 
+
+def create_realtime_chart():
+    fig = go.Figure()
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=20, b=20),
+        height=300
+    )
+    return fig
+
+def economic_dashboard():
+    st.title("실시간 경제지표 모니터링")
+    
+    # Kafka 컨슈머 설정
+    consumer = KafkaConsumer(
+        'exchange-rate',
+        'interest-rate',
+        bootstrap_servers='localhost:9092',
+        value_deserializer=lambda x: json.loads(x.decode('utf-8')),
+        auto_offset_reset='latest'
+    )
+    
+    # 실시간 데이터 버퍼
+    rate_data = []
+    interest_data = []
+    
+    placeholder = st.empty()
+    
+    for message in consumer:
+        with placeholder.container():
+            data = message.value
+            
+            # 실시간 데이터 업데이트
+            if message.topic == 'exchange-rate':
+                rate_data.append({'time': datetime.now(), 'value': data['value']})
+            elif message.topic == 'interest-rate':
+                interest_data.append({'time': datetime.now(), 'value': data['value']})
+            
+            # 대시보드 레이아웃
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("### 🇺🇸 USD/KRW 환율")
+                st.metric(
+                    label="현재 환율", 
+                    value=f"{rate_data[-1]['value']:.1f}원",
+                    delta=f"{rate_data[-1]['value']-rate_data[-2]['value']:.1f}원" if len(rate_data)>1 else ""
+                )
+                fig = create_realtime_chart()
+                fig.add_scatter(x=[d['time'] for d in rate_data[-30:]], 
+                              y=[d['value'] for d in rate_data[-30:]],
+                              name="환율 추이")
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                st.markdown("### 🏦 기준금리")
+                st.metric(
+                    label="FED Rate", 
+                    value=f"{interest_data[-1]['value']:.2f}%",
+                    delta=f"{interest_data[-1]['value']-interest_data[-2]['value']:.2f}%" if len(interest_data)>1 else ""
+                )
+                fig = create_realtime_chart()
+                fig.add_bar(x=[d['time'] for d in interest_data[-12:]], 
+                          y=[d['value'] for d in interest_data[-12:]],
+                          name="금리 변화")
+                st.plotly_chart(fig, use_container_width=True)

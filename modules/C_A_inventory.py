@@ -3,10 +3,10 @@
 
 
 import streamlit as st
-from .C_admin_inventory_status import status_ui
-from .C_admin_inventory_distribution import distribution_ui
-from .C_admin_inventory_turnover import turnover_ui
-from .C_admin_inventory_warning import warning_ui
+from .C_A_inventory_status import status_ui
+from .C_A_inventory_distribution import distribution_ui
+from .C_A_inventory_turnover import turnover_ui
+from .C_A_inventory_warning import warning_ui
 
 
 def inventory_ui():

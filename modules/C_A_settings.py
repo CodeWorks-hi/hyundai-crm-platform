@@ -3,8 +3,8 @@
 
 
 import streamlit as st
-from .C_admin_settings_users import settings_users_ui
-from .C_admin_settings_sync import settings_sync_ui
+from .C_A_settings_users import settings_users_ui
+from .C_A_settings_sync import settings_sync_ui
 
 def settings_ui():
     st.subheader(" 설정 및 환경 관리")

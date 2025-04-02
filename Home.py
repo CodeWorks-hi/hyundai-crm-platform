@@ -70,7 +70,7 @@ else:
             dealer.app()
 
         elif st.session_state.current_page == "admin_main":
-            import C_admin_main as admin
+            import C_A_main as admin
             admin.app()
     except Exception as e:
         st.error("⚠️ 페이지 로딩 중 오류가 발생했습니다.")
