@@ -66,7 +66,7 @@ else:
             auto.app()
 
         elif st.session_state.current_page == "dealer_main":
-            import B_dealer_main as dealer
+            import B_D_main as dealer
             dealer.app()
 
         elif st.session_state.current_page == "admin_main":

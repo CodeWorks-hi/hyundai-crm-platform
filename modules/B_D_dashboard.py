@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 def dashboard_ui():
     # 상담 내역 데이터 로드
     df = pd.read_csv("data/consult_log.csv")
+    new_df = df.loc[df["담당직원"] == "홍길동", :]
 
     col1, col2, col3 = st.columns([1.1, 0.2, 1.5])
 
@@ -21,10 +22,27 @@ def dashboard_ui():
             st.session_state.events = []
 
         if "edit_index" not in st.session_state:
-            st.session_state.edit_index = None 
+            st.session_state.edit_index = None
 
         if "confirm_delete_index" not in st.session_state:
             st.session_state.confirm_delete_index = None
+
+        # CSV 기반 일정 항상 갱신
+        st.session_state.events.clear()
+        for _, row in new_df.iterrows():
+            status = row.get('완료여부', '미정')
+            try:
+                start_time = pd.to_datetime(row.get("상담시간", datetime.now())).isoformat()
+            except Exception:
+                start_time = datetime.now().isoformat()
+
+            st.session_state.events.append({
+                'id': str(uuid.uuid4()),
+                'title': f"{row.get('이름', '이름 없음')} 고객님",
+                'start': start_time,
+                'done': status,
+                'description': row.get("상담내용", "")
+            })
 
         # ID 및 done 필드 보장
         for e in st.session_state.events:
@@ -125,51 +143,19 @@ def dashboard_ui():
             for e in st.session_state.events:
                 if e.get('id') == clicked['event_id']:
                     e['done'] = clicked.get('done', False)
+
+                    # 원본 df의 해당 상담내용 찾아서 완료여부 업데이트
+                    for i, row in df.iterrows():
+                        if (
+                            row.get("상담내용", "") == e.get("description", "") and
+                            str(pd.to_datetime(row.get("상담시간", "")).isoformat()) == e.get("start")
+                        ):
+                            df.at[i, "완료여부"] = 1 if clicked.get("done", False) else 0
+                            break
             st.rerun()
 
     with col3:
         st.warning("##### * 추후 유저 페이지 구축되면 '상담 추가/수정' 삭제 예정, 딜러는 상담 신청 내역 받아와서 확인만 하면 됩니다.")
-        # 일정 추가/수정 폼
-        with st.expander("##### 📝 상담 일정 추가/수정", expanded=False):
-            if st.session_state.edit_index is not None:
-                edit_event = st.session_state.events[st.session_state.edit_index]
-                default_title = edit_event['title']
-                default_date = datetime.fromisoformat(edit_event['start']).date()
-                default_time = datetime.fromisoformat(edit_event['start']).time()
-                default_description = edit_event.get('description', '')
-            else:
-                default_title = ""
-                default_date = datetime.now().date()
-                default_time = datetime.now().time().replace(second=0, microsecond=0)
-                default_description = ''
-
-            with st.form("event_form"):
-                title = st.text_input("일정 제목", value=default_title)
-                date = st.date_input("일정 날짜", value=default_date)
-                time = st.time_input("시작 시간", value=default_time)
-                description = st.text_area("상담 내용", value=default_description, max_chars=200, height=100)
-                submitted = st.form_submit_button("저장")
-
-                if submitted:
-                    dt_str = datetime.combine(date, time).strftime("%Y-%m-%dT%H:%M:%S")
-                    new_event = {
-                        'id': str(uuid.uuid4()),
-                        'title': title,
-                        'start': dt_str,
-                        'done': False,
-                        'description': description
-                    }
-
-                    if st.session_state.edit_index is not None:
-                        st.session_state.events[st.session_state.edit_index] = new_event
-                        st.success("✅ 일정이 수정되었습니다.")
-                        st.session_state.edit_index = None
-                    else:
-                        st.session_state.events.append(new_event)
-                        st.success("✅ 일정이 추가되었습니다.")
-
-                    st.rerun()
-
         # 일정 목록
         st.warning("##### * 일정 시간 순 정렬, 각 일정별 우측 끝 버튼 클릭하면 해당 '상담 정보' 창으로 이동")
         st.markdown("#### 📋 등록된 일정 목록")
@@ -177,37 +163,14 @@ def dashboard_ui():
             st.info("현재 등록된 일정이 없습니다.")
         else:
             for i, event in enumerate(st.session_state.events):
-                col1, col2, col3, col4 = st.columns([5, 3, 1, 1])
+                col1, col2, col3 = st.columns([2, 4, 2])
                 with col1:
                     st.write(f"📌 {event['title']}")
                 with col2:
-                    st.write(event['start'].replace("T", " "))
+                    st.text(f"📝 {event.get('description', '상담내용 없음')}")
                 with col3:
-                    if st.button("✏️ 수정", key=f"edit_{i}"):
-                        st.session_state.edit_index = i
-                        st.rerun()
-                with col4:
-                    if st.button("❌ 삭제", key=f"delete_{i}"):
-                        st.session_state.confirm_delete_index = i
-                        st.rerun()
+                    st.write(event['start'].replace("T", " ")[:16])
 
-        # 삭제 확인 다이얼로그
-        if st.session_state.confirm_delete_index is not None:
-            idx = st.session_state.confirm_delete_index
-            target = st.session_state.events[idx]
-            st.warning(f"⚠️ '{target['title']}' 일정을 정말 삭제하시겠습니까?")
-            col_confirm1, col_confirm2 = st.columns(2)
-            with col_confirm1:
-                if st.button("✅ 예, 삭제합니다"):
-                    del st.session_state.events[idx]
-                    st.session_state.confirm_delete_index = None
-                    st.success("🗑️ 삭제 완료")
-                    st.rerun()
-            with col_confirm2:
-                if st.button("❌ 아니요, 유지합니다"):
-                    st.session_state.confirm_delete_index = None
-                    st.info("삭제가 취소되었습니다.")
-                    st.rerun()
 
     col_left, col_mid, col_right = st.columns([1, 1, 1])
     with col_left:

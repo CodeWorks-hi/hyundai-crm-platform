@@ -4,11 +4,6 @@ import streamlit as st
 import os
 import pandas as pd
 
-from modules.B_dealer_dashboard import dashboard_ui
-from modules.B_dealer_eco import eco_ui
-from modules.B_dealer_recommend import recommend_ui
-from modules.B_dealer_survey import survey_ui
-
 
 # ▶️ 경로 설정
 EMPLOYEE_CSV_PATH = "data/employee.csv"
@@ -57,6 +52,7 @@ def app():
         "딜러 대시보드",
         "방문고객 설문조사",
         "고객 맞춤 추천",
+        "고객 상담",
         "재고 현황", 
         "리드 관리", 
         "판매 등록",
@@ -66,15 +62,16 @@ def app():
     ])
 
     tab_modules = [
-        ("modules.B_dealer_dashboard", "dashboard_ui"),
-        ("modules.B_dealer_survey", "survey_ui"),
-        ("modules.B_dealer_recommend", "recommend_ui"),                     # 고객 360도 뷰, LTV 점수, 추천 액션
-        ("modules.B_dealer_inventory", "inventory_ui"),                     # 재고 현황, 발주 추천, 마진 분석
-        ("modules.B_dealer_leads", "leads_ui"),                             # 리드 퍼널, 스코어링, 자동 팔로업
-        ("modules.B_dealer_registration", "sales_registration_ui"),         # 판매 등록
-        ("modules.B_ealer_demand_forecast", "demand_forecast_ui"),          # AI 수요 예측
-        ("modules.B_dealer_service", "demand_forecast_ui"),                 # 서비스 일정, 고객 충성도 관리
-        ("modules.B_dealer_eco", "dealer_eco_ui")                           # 경제 지표 기반 판매 인텔리전스, 금융 상품 최적화
+        ("modules.B_D_dashboard", "dashboard_ui"),
+        ("modules.B_D_survey", "survey_ui"),
+        ("modules.B_D_recommend", "recommend_ui"),                     # 고객 360도 뷰, LTV 점수, 추천 액션
+        ("modules.B_D_consult", "consult_ui"),                     # 고객 상담 정보, 차량 추천
+        ("modules.B_D_inventory", "inventory_ui"),                     # 재고 현황, 발주 추천, 마진 분석
+        ("modules.B_D_leads", "leads_ui"),                             # 리드 퍼널, 스코어링, 자동 팔로업
+        ("modules.B_D_sales_registration", "sales_registration_ui"),         # 판매 등록
+        ("modules.B_D_demand_forecast", "demand_forecast_ui"),          # AI 수요 예측
+        ("modules.B_D_service", "service_ui"),                 # 서비스 일정, 고객 충성도 관리
+        ("modules.B_D_eco", "eco_ui")                           # 경제 지표 기반 판매 인텔리전스, 금융 상품 최적화
     ]
 
 # 각 탭에 대응하는 함수 실행
