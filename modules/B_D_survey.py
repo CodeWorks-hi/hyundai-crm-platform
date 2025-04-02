@@ -106,9 +106,10 @@ def survey_ui(df_employees, generate_html_table):
             
             상담자ID = matched.iloc[0]["고유ID"]
 
-            if 보유차종 == np.nan:
+            if 보유차종 is None:
                 보유차종 = "-"
-            
+            if 기타 is None:
+                기타 = "-"
 
             customer_info = [
                 str(uuid.uuid4()), 상담자ID, st.session_state["직원이름"], today,
