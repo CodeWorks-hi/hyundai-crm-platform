@@ -41,7 +41,7 @@ def dashboard_ui():
         st.warning("딜러 정보를 먼저 등록하세요.")
         return
     
-    col1, col2, col3 = st.columns([1, 0.2, 1.5])
+    col1, col2, col3 = st.columns([1.2, 0.2, 1.5])
 
     with col1:
         # 세션 초기화
