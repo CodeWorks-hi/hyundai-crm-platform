@@ -4,7 +4,11 @@ import os
 from datetime import datetime
 
 def consult_ui():
-    st.title("📞 상담 예약")
+    if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
+        st.session_state.current_page = "user_main"
+        st.rerun()
+    
+    st.title("상담 예약")
 
     # 입력 폼
     with st.form("consult_form", clear_on_submit=True):
@@ -23,7 +27,8 @@ def consult_ui():
                 "상담날짜": date.strftime("%Y-%m-%d"),
                 "상담시간": time.strftime("%H:%M"),
                 "상담내용": content,
-                "등록일시": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                "담당직원": "홍길동",
+                "완료여부": False
             }
 
             df_path = "data/consult_log.csv"

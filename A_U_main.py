@@ -16,9 +16,34 @@ def switch_page(page):
     st.rerun()
 
 
+from modules.A_U_kakao_auth import render_kakao_login_button, handle_kakao_callback
+from modules.A_U_kakao_channel import render_kakao_channel_buttons
+
+def kakao_login_ui():
+    kak, ka, kakao1 = st.columns([4,4,1])
+    with kak:
+        st.header("")
+    with ka:
+        st.header("")
+    with kakao1:
+        # 로그인 처리
+        handle_kakao_callback()
+    aao, kaka1, kaka2, kaka3 = st.columns([4,1,1,1])
+    with aao :
+        st.header("")
+    with kaka1:
+        pass  
+    with kaka2:
+        # 로그인 버튼
+        render_kakao_login_button()
+    with kaka3:
+        # 채널 버튼
+        render_kakao_channel_buttons()
+
 # 일반회원 홈화면 UI
 def user_main_ui():
-    st.title("일반회원 전용 서비스")
+    # 🔐 카카오 로그인 UI 표시
+    kakao_login_ui()
 
     # 차량 이미지 캐러셀 (Swiper.js 활용)
     car_data = [
@@ -33,7 +58,7 @@ def user_main_ui():
     # 캐러셀 함수 ( 파라미터에 차 리스트 넣으면 실행 됨) 모듈 > A_U_carousel.py 만 수정
     render_carousel(car_data, height=400)
 
-    col6, col1, col2, col3, col4, col5, col7, col8 = st.columns([1, 1, 1, 1, 1, 1, 1,1])
+    col6, col1, col2, col3, col4, col5, col7, col8 = st.columns([2, 1, 1, 1, 1, 1, 1, 2])
     # 공통 버튼 스타일 (위에 한 번만 선언)
     btn_style = """
         <style>
@@ -89,7 +114,7 @@ def user_main_ui():
         st.markdown(
             f"""
             <div style="text-align:center">
-                <img src="data:image/png;base64,{get_base64_image('images/location.png')}" width="80" style="margin-bottom: 10px;"><br>
+                <img src="data:image/png;base64,{get_base64_image('images/customer-service.png')}" width="80" style="margin-bottom: 10px;"><br>
                 <div style='font-weight: bold; font-size: 18px; margin-bottom: 10px;'>상담 예약</div>
             </div>
             """,
@@ -102,7 +127,7 @@ def user_main_ui():
         st.markdown(
             f"""
             <div style="text-align:center">
-                <img src="data:image/png;base64,{get_base64_image('images/location.png')}" width="80" style="margin-bottom: 10px;"><br>
+                <img src="data:image/png;base64,{get_base64_image('images/handle.png')}" width="80" style="margin-bottom: 10px;"><br>
                 <div style='font-weight: bold; font-size: 18px; margin-bottom: 10px;'>시승신청</div>
             </div>
             """,
