@@ -8,8 +8,6 @@ from streamlit_javascript import st_javascript  # 👈 꼭 설치 필요!
 import plotly.graph_objects as go
 
 def dashboard_ui():
-    st.markdown("### 📅 일정 관리 캘린더")
-
     # 상담 내역 데이터 로드
     df = pd.read_csv("data/consult_log.csv")
 
