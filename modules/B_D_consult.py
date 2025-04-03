@@ -46,7 +46,7 @@ def consult_ui():
                 </div>
                 """, unsafe_allow_html=True)
             else :
-                st.error("❗ 설문조사 결과를 찾을 수 없습니다. 이름과 연락처를 확인해주세요.")
+                st.error("❗ 회원 정보를 찾을 수 없습니다. 이름과 연락처를 확인해주세요.")
 
     with col3:
         matched_survey = customer_df[(customer_df["이름"] == selected_name) & (customer_df["연락처"] == selected_contact)]
@@ -114,18 +114,44 @@ def consult_ui():
     col_left, col_right = st.columns([1, 1])
 
     with col_left:
-        st.warning("##### * 상담 요청 사항 및 설문 결과 파트입니다. 여기는 상담 요청 기록 consult_log.csv와 survey_result.csv 가져와서 표시합니다.")
+        matched_consult = consult_log_df.loc[
+            (consult_log_df["이름"] == selected_name) &
+            (consult_log_df["전화번호"] == selected_contact),
+            :].sort_values(by="상담날짜", ascending=False).head(1)
 
-        st.write("**상담 요청일:**", "2025-03-28")
-        st.write("**상담 요청 내용:** 여행용 7인승 차량 추천 요청. 연비 중요.")
+        if not matched_consult.empty:
+            latest = matched_consult.iloc[0]
+            st.markdown("#### 🗂️ 최근 상담 요청 정보")
+            st.markdown(f"""
+            <div style="background-color: #fdfdfd; border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-top: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
+                <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>📅 상담 요청일:</strong> {latest["상담날짜"]}</p>
+                <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>⏰ 상담 시간:</strong> {latest["상담시간"]}</p>
+                <p style="margin: 0; font-size: 15px; color: #333;"><strong>📝 상담 내용:</strong> {latest["상담내용"]}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.info("❕ 상담 요청 정보가 없습니다.")
 
-        st.write("**설문조사 결과 요약:**")
-        st.markdown("""
-        - ✅ 연령: 30대 초반
-        - ✅ 운전 경험: 5년 이상
-        - ✅ 주 이용 목적: 가족 여행, 레저
-        - ✅ 희망 옵션: 넓은 트렁크, 연비, 안전장치
-        """)
+        st.markdown("---")
+
+        if not customer_info.empty:
+            survey = customer_info.iloc[0]
+            st.markdown("#### 📋 설문 조사 답변 내용")
+            st.markdown(f"""
+            <div style="background-color: #f6fbff; border: 1px solid #b3d4fc; border-radius: 8px; padding: 15px; margin-top: 8px;">
+                <ul style="list-style-type: none; padding-left: 0; font-size: 14px; color: #1f2f40;">
+                    <li><strong>🚘 주요 운전 용도:</strong> {survey['주요용도']}</li>
+                    <li><strong>🎯 중요 요소:</strong> {survey['중요요소1']}, {survey['중요요소2']}, {survey['중요요소3']}</li>
+                    <li><strong>🎨 선호 색상:</strong> {survey['선호색상']}</li>
+                    <li><strong>🧍 동승 인원 구성:</strong> {survey['동승인원구성']}</li>
+                    <li><strong>💰 예산 범위:</strong> {survey['예상예산_만원']} 만원</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.info("❕ 해당 회원 정보가 없습니다.")
+        
+        st.write("")
 
     with col_right:
         st.warning("##### * 상담 내용 기록창입니다. 아직 뭘 넣을지 확정은 아니고, 상담하면서 딜러가 내용 정리하면 좋겠다 싶어서 일단 넣어봤어요.")
