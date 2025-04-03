@@ -35,18 +35,37 @@ def consult_ui():
             if not customer_info.empty:
                 st.markdown(f"""
                 <div style="background-color: #e9f3fc; border: 2px solid #1570ef; padding: 18px 24px; border-radius: 10px; margin-top: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
-                    <div style="font-size: 20px; font-weight: 700; color: #0f3c73; margin-bottom: 10px;">👤 고객 정보 요약</div>
+                    <div style="font-size: 20px; font-weight: 700; color: #0f3c73; margin-bottom: 10px;">👤 고객 기초 정보</div>
                     <ul style="list-style-type: none; padding-left: 0; font-size: 15px; color: #1d2c3b;">
                         <li><strong>📛 이름:</strong> {customer_info['이름'].values[0]}</li>
                         <li><strong>📱 연락처:</strong> {customer_info['연락처'].values[0]}</li>
                         <li><strong>🎂 생년월일:</strong> {customer_info['생년월일'].values[0]}</li>
-                        <li><strong>🚗 주요용도:</strong> {customer_info['주요용도'].values[0]}</li>
-                        <li><strong>⭐ 관심차종:</strong> {customer_info['관심차종'].values[0]}</li>
+                        <li><strong>🗺️ 거주지역:</strong> {customer_info['거주지역'].values[0]}</li>
                     </ul>
                 </div>
                 """, unsafe_allow_html=True)
             else :
                 st.error("❗ 회원 정보를 찾을 수 없습니다. 이름과 연락처를 확인해주세요.")
+
+            st.write("")
+
+            matched_consult = consult_log_df.loc[
+                (consult_log_df["이름"] == selected_name) &
+                (consult_log_df["전화번호"] == selected_contact),
+                :].sort_values(by="상담날짜", ascending=False).head(1)
+
+            if not matched_consult.empty:
+                latest = matched_consult.iloc[0]
+                st.markdown(f"""
+                <div style="background-color: #fdfdfd; border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-top: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
+                    <div style="font-size: 20px; font-weight: 700; color: #0f3c73; margin-bottom: 10px;">🗂️ 최근 상담 요청 정보</div>
+                    <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>📅 상담 요청일:</strong> {latest["상담날짜"]}</p>
+                    <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>⏰ 상담 시간:</strong> {latest["상담시간"]}</p>
+                    <p style="margin: 0; font-size: 15px; color: #333;"><strong>📝 상담 내용:</strong> {latest["상담내용"]}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.info("❕ 상담 요청 정보가 없습니다.")
 
     with col3:
         matched_survey = customer_df[(customer_df["이름"] == selected_name) & (customer_df["연락처"] == selected_contact)]
@@ -111,40 +130,21 @@ def consult_ui():
 
     # 하단 두 컬럼
     st.divider()
-    col_left, col_right = st.columns([1, 1])
+    col_left, col_midleft, col_mid, col_midright, col_right = st.columns([1, 0.1, 1, 0.1, 1])
 
     with col_left:
-        matched_consult = consult_log_df.loc[
-            (consult_log_df["이름"] == selected_name) &
-            (consult_log_df["전화번호"] == selected_contact),
-            :].sort_values(by="상담날짜", ascending=False).head(1)
-
-        if not matched_consult.empty:
-            latest = matched_consult.iloc[0]
-            st.markdown("#### 🗂️ 최근 상담 요청 정보")
-            st.markdown(f"""
-            <div style="background-color: #fdfdfd; border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-top: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
-                <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>📅 상담 요청일:</strong> {latest["상담날짜"]}</p>
-                <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>⏰ 상담 시간:</strong> {latest["상담시간"]}</p>
-                <p style="margin: 0; font-size: 15px; color: #333;"><strong>📝 상담 내용:</strong> {latest["상담내용"]}</p>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.info("❕ 상담 요청 정보가 없습니다.")
-
-        st.markdown("---")
-
         if not customer_info.empty:
             survey = customer_info.iloc[0]
             st.markdown("#### 📋 설문 조사 답변 내용")
             st.markdown(f"""
             <div style="background-color: #f6fbff; border: 1px solid #b3d4fc; border-radius: 8px; padding: 15px; margin-top: 8px;">
                 <ul style="list-style-type: none; padding-left: 0; font-size: 14px; color: #1f2f40;">
+                    <li><strong>💰 예산 범위:</strong> {survey['예상예산_만원']} 만원</li>
                     <li><strong>🚘 주요 운전 용도:</strong> {survey['주요용도']}</li>
                     <li><strong>🎯 중요 요소:</strong> {survey['중요요소1']}, {survey['중요요소2']}, {survey['중요요소3']}</li>
                     <li><strong>🎨 선호 색상:</strong> {survey['선호색상']}</li>
-                    <li><strong>🧍 동승 인원 구성:</strong> {survey['동승인원구성']}</li>
-                    <li><strong>💰 예산 범위:</strong> {survey['예상예산_만원']} 만원</li>
+                    <li><strong>🧍 동승자 유형:</strong> {survey['동승인원구성']}</li>
+                    <li><strong>🔘 기타 요청 사항:</strong> {survey['기타요청사항']}</li>
                 </ul>
             </div>
             """, unsafe_allow_html=True)
@@ -153,10 +153,14 @@ def consult_ui():
         
         st.write("")
 
-    with col_right:
-        st.warning("##### * 상담 내용 기록창입니다. 아직 뭘 넣을지 확정은 아니고, 상담하면서 딜러가 내용 정리하면 좋겠다 싶어서 일단 넣어봤어요.")
-        memo = st.text_area("상담 내용을 기록하세요", height=200)
-        if st.button("📩 상담 결과 저장"):
+    with col_mid:
+        st.markdown("#### 📝 상담 내용 메모")
+        st.markdown(
+            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
+            unsafe_allow_html=True,
+        )
+        memo = st.text_area("상담 내용을 입력하세요", height=200, label_visibility="collapsed")
+        if st.button("📩 상담 결과 저장", use_container_width=True):
             result = {
                 "이름": customer_info["이름"],
                 "전화번호": customer_info["전화번호"],
@@ -170,4 +174,22 @@ def consult_ui():
             except FileNotFoundError:
                 pass
             result_df.to_csv("data/consult_result.csv", index=False)
-            st.success("상담 내용이 저장되었습니다.")
+            st.success("✅ 상담 내용이 저장되었습니다.")
+
+    with col_right:
+        st.markdown("#### 🏷️ 상담 태그 분류")
+        st.markdown(
+            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>상담 내용을 분류하기 위한 태그를 선택하거나 직접 입력하세요.</div>",
+            unsafe_allow_html=True
+        )
+        default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
+        selected_tags = st.multiselect("상담 태그 선택", default_tags)
+        custom_tag = st.text_input("기타 태그 직접 입력")
+        if custom_tag and custom_tag not in selected_tags:
+            selected_tags.append(custom_tag)
+
+        st.markdown("##### ✅ 선택된 태그")
+        st.markdown(
+            f"<div style='background-color: #f2f7fb; padding: 10px; border-radius: 8px; min-height: 40px; font-size: 13.5px; color: #1d3557;'>{', '.join(selected_tags) if selected_tags else '선택된 태그 없음'}</div>",
+            unsafe_allow_html=True
+        )
