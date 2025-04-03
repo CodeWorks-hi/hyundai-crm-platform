@@ -3,9 +3,9 @@
 # 부품 트리맵 생성 함수
 
 import streamlit as st
-import pandas as pd
 import plotly.express as px
-import numpy as np
+import pandas as pd
+
 
 # 데이터 로드 함수
 @st.cache_data
@@ -18,10 +18,10 @@ def load_data():
     df_list['트림명'] = df_list['트림명'].astype(str).str.strip()
     return df_inv, df_list
 
-# 부품 트리맵 UI 함수
 def treemap_ui(df_inv):
     st.subheader("공장-부품 계층적 재고 분포", divider='blue')
 
+    # 📊 부품별 재고 트리맵
     part_inventory = df_inv.groupby(['공장명', '부품명'])['재고량'].sum().reset_index()
 
     fig = px.treemap(
@@ -51,8 +51,27 @@ def treemap_ui(df_inv):
 
     st.plotly_chart(fig, use_container_width=True)
 
-    # 핵심 부품 피벗 테이블
+    # 📄 상세 테이블
+    with st.expander(" 부품별 상세 데이터", expanded=True):
+        st.dataframe(
+            df_inv[['부품명', '공장명', '재고량']]
+            .groupby(['부품명', '공장명'])
+            .sum()
+            .reset_index()
+            .sort_values('재고량', ascending=False),
+            height=600,
+            use_container_width=True,
+            hide_index=True
+        )
+
+    # 🚨 핵심 부품 현황
+    st.subheader(" 핵심 부품 현황", divider='orange')
     critical_parts = df_inv[df_inv['부품명'].isin(['배터리', '모터', 'ABS 모듈'])]
+
+    if critical_parts.empty:
+        st.warning("⚠️ 핵심 부품 데이터가 없습니다.")
+        return
+
     pivot_table = critical_parts.pivot_table(
         index='부품명',
         columns='공장명',
@@ -60,14 +79,14 @@ def treemap_ui(df_inv):
         aggfunc='sum'
     ).fillna(0).astype(int)
 
-    st.subheader("핵심 부품 현황", divider='orange')
     st.dataframe(
         pivot_table.style.format("{:,}").background_gradient(cmap='YlGnBu', axis=1),
         height=200,
         use_container_width=True
     )
 
+    # ⚠️ 경고 알림
     min_stocks = critical_parts.groupby('부품명')['재고량'].min()
     for part, qty in min_stocks.items():
         if qty < 100:
-            st.error(f"⚠️ {part} 최소재고 위험: {qty:,}개 (권장 ≥100)")
+            st.error(f"🚨 {part} 최소재고 위험: {qty:,}개 (권장 ≥100)")

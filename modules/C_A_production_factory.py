@@ -4,66 +4,58 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from modules.C_A_production_factory_report import report_ui, treemap_ui
+from .C_A_production_factory_report import report_ui
+from .C_A_production_factory_treemap import treemap_ui
 
 # 데이터 로드 함수
 @st.cache_data
 def load_data():
     df_inv = pd.read_csv("data/inventory_data.csv")
     df_list = pd.read_csv("data/hyundae_car_list.csv")
-    df_inv['트림명'] = df_inv['트림명'].astype(str).str.strip()
-    df_list['트림명'] = df_list['트림명'].astype(str).str.strip()
     return df_inv, df_list
 
 # 생산 UI 함수
 def factory_ui():
     df_inv, df_list = load_data()
 
-    tab1, tab2, tab3 = st.tabs([" 생산 능력 분석", "부품 재고 현황", " 공장별 상세 리포트"])
+    # 생산 분석 리포트 생성
+    with st.spinner("생산 분석 데이터 처리 중..."):
+        prod_capacity = df_inv.groupby(['공장명', '모델명', '트림명'])['재고량'].min()
+        total_prod = prod_capacity.groupby('공장명').sum().reset_index(name='생산가능수량')
 
+        inventory_analysis = df_inv.groupby('공장명').agg(
+            총재고량=('재고량', 'sum'),
+            평균재고=('재고량', 'mean'),
+            고유부품수=('부품명', 'nunique')
+        ).reset_index()
+
+        report = pd.merge(total_prod, inventory_analysis, on='공장명')
+        report['생산효율'] = (report['생산가능수량'] / report['총재고량'] * 100).round(2)
+
+        report = report.astype({
+            '생산가능수량': 'int',
+            '총재고량': 'int',
+            '고유부품수': 'int'
+        })
+        st.subheader("현대자동차 생산 현황 실시간 모니터링 시스템")
+
+        cols = st.columns(4)
+        st.markdown("""<style>.stMetric {padding: 20px; background-color: #f8f9fa; border-radius: 10px;}</style>""", unsafe_allow_html=True)
+
+        cols[0].metric("총 부품 재고", f"{int(report['총재고량'].sum()):,}개", help="전체 공장의 부품 재고 총합")
+        cols[1].metric("최대 생산 가능", f"{int(report['생산가능수량'].max()):,}대", report.loc[report['생산가능수량'].idxmax(), '공장명'])
+        cols[2].metric("최고 생산 효율", f"{float(report['생산효율'].max()):.2f}%", report.loc[report['생산효율'].idxmax(), '공장명'])
+        cols[3].metric("평균 회전율", f"{float(report['생산효율'].mean()):.1f}%", help="전체 공장의 평균 재고 회전율")
+
+    # 탭 구성
+    tab1, tab2, tab3 = st.tabs(["공장별 상세 리포트", "생산 능력 분석", "부품 재고 현황"])
+
+    #  TAB 1 - 공장별 상세 리포트
     with tab1:
-        report_ui(df_inv)
 
-    with tab2:
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            treemap_ui(df_inv)
 
-        # 핵심 부품 정보
-        critical_parts = df_inv[df_inv['부품명'].isin(['배터리', '모터', 'ABS 모듈'])]
-        pivot_table = critical_parts.pivot_table(
-            index='부품명',
-            columns='공장명',
-            values='재고량',
-            aggfunc='sum'
-        ).fillna(0).astype(int)
+        st.markdown("---")
 
-        st.subheader(" 핵심 부품 현황", divider='orange')
-        st.dataframe(
-            pivot_table.style.format("{:,}")
-            .background_gradient(cmap='YlGnBu', axis=1),
-            height=200,
-            use_container_width=True
-        )
-
-        with st.expander(" 부품별 상세 데이터", expanded=True):
-            st.dataframe(
-                df_inv[['부품명', '공장명', '재고량']]
-                .groupby(['부품명', '공장명'])
-                .sum()
-                .reset_index()
-                .sort_values('재고량', ascending=False),
-                height=600,
-                use_container_width=True,
-                hide_index=True
-            )
-
-        min_stocks = critical_parts.groupby('부품명')['재고량'].min()
-        for part, qty in min_stocks.items():
-            if qty < 100:
-                st.error(f"⚠️ {part} 최소재고 위험: {qty:,}개 (권장 ≥100)")
-
-    with tab3:
         selected_factory = st.selectbox('공장 선택', df_inv['공장명'].unique(), key='factory_select')
         factory_data = df_inv[df_inv['공장명'] == selected_factory]
 
@@ -101,21 +93,21 @@ def factory_ui():
             )
             st.plotly_chart(fig, use_container_width=True)
 
-        with st.expander(" 원본 데이터 확인", expanded=False):
+        with st.expander("📁 원본 데이터 확인", expanded=False):
             col1, col2 = st.columns(2)
             with col1:
                 st.subheader("차량 마스터 데이터", divider='gray')
-                st.dataframe(
-                    df_list,
-                    height=400,
-                    use_container_width=True,
-                    hide_index=True
-                )
+                st.dataframe(df_list, height=400, use_container_width=True, hide_index=True)
             with col2:
                 st.subheader("부품 재고 데이터", divider='gray')
-                st.dataframe(
-                    df_inv,
-                    height=400,
-                    use_container_width=True,
-                    hide_index=True
-                )
+                st.dataframe(df_inv, height=400, use_container_width=True, hide_index=True)
+
+
+    # TAB 2 - 생산 능력 분석 (트리맵)
+    with tab2:
+        treemap_ui(df_inv)
+
+
+    # TAB 3 - 부품 재고 현황 (종합 분석)
+    with tab3:
+        report_ui(df_inv)
