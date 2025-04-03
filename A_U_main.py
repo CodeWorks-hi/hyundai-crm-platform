@@ -1,12 +1,17 @@
 # A_U_main.py
 import streamlit as st
-import importlib
 import pandas as pd
 from modules.A_U_carousel import render_carousel
 import base64
-from dotenv import load_dotenv
-from modules.A_U_kakao_auth import handle_kakao_callback, render_kakao_login_button,render_logout_button
 from modules.A_U_kakao_channel import render_kakao_buttons
+from modules.A_U_kakao_auth import (
+    handle_kakao_callback,
+    render_kakao_login_button,
+    render_logout_button,
+
+)
+
+
 
 
 def get_base64_image(image_path):
@@ -19,32 +24,33 @@ def switch_page(page):
     st.session_state.current_page = page
     st.rerun()
 
-
-
-
-
 def kakao_login_ui():
-    st.title("🔐 카카오 로그인")
     handle_kakao_callback()
     render_kakao_login_button()
     render_logout_button()
 
+# 차량 이미지 캐러셀 (Swiper.js 활용)
+car_data = [
+    {"name": "IONIQ 9", "url": "https://www.hyundai.com/contents/mainbanner/main_kv_ioniq9-pc.png"},
+    {"name": "Palisade", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_PALISADE.png"},
+    {"name": "Venue", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_venue.png"},
+    {"name": "Tucson", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_TUCSON.png"},
+    {"name": "Sonata", "url": "https://www.hyundai.com/contents/mainbanner/main_sonata_25my_w.png"},
+    {"name": "Santa Fe", "url": "https://www.hyundai.com/contents/mainbanner/main-santafe-25my-kv-w.png"},
+    {"name": "Casper Electric", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_CASPER-Electric.png"},
+]
 
 # 일반회원 홈화면 UI
 def user_main_ui():
-    
+    colb, colc, cola= st.columns([1,4,1])
+    with cola :
+        render_kakao_buttons()
+        kakao_login_ui()
+    with colb:
+        if st.button("← 메인으로 돌아가기"):
+            switch_page("home")
     
 
-    # 차량 이미지 캐러셀 (Swiper.js 활용)
-    car_data = [
-        {"name": "IONIQ 9", "url": "https://www.hyundai.com/contents/mainbanner/main_kv_ioniq9-pc.png"},
-        {"name": "Palisade", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_PALISADE.png"},
-        {"name": "Venue", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_venue.png"},
-        {"name": "Tucson", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_TUCSON.png"},
-        {"name": "Sonata", "url": "https://www.hyundai.com/contents/mainbanner/main_sonata_25my_w.png"},
-        {"name": "Santa Fe", "url": "https://www.hyundai.com/contents/mainbanner/main-santafe-25my-kv-w.png"},
-        {"name": "Casper Electric", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_CASPER-Electric.png"},
-    ]
     # 캐러셀 함수 ( 파라미터에 차 리스트 넣으면 실행 됨) 모듈 > A_U_carousel.py 만 수정
     render_carousel(car_data, height=400)
 
@@ -157,39 +163,45 @@ def user_main_ui():
     
 
     st.markdown("---")
-    colb, colc, cola= st.columns([1,4,1])
-    with cola :
-        render_kakao_buttons()
-        kakao_login_ui()
-    with colb:
-        if st.button("← 메인으로 돌아가기"):
-            switch_page("home")
+    st.image("images/event1.png")
+
 
 
 # ▶️ 앱 진입점
 def app():
     page = st.session_state.get("current_page", "user_main")
-
     if page == "user_main":
         user_main_ui()
+    
     elif page == "A_U_comparison":   # 모델확인
         import modules.A_U_comparison as auto
         auto.comparison_ui()
+        
     elif page == "A_U_map":   # 대리점 검색
         import modules.A_U_map as map
         map.map_ui()
+
     elif page == "A_U_consult":   # 삼담예약
         import modules.A_U_consult as consult
         consult.consult_ui()
+
     elif page == "A_U_event":   # 이벤트 
         import modules.A_U_event as event
         event.event_ui()
+
     elif page == "A_U_support":  # 고객센터
         import modules.A_U_support as support
         support.support_ui()
+
     elif page == "A_U_test_drive":  # 시승신청
         import modules.A_U_test_drive as test_drive
         test_drive.test_drive_ui()
+
+    # elif page == "A_U_detail":
+    #     import modules.A_U_detail as detail
+    #     detail.app()
+    
+
 
 
  
