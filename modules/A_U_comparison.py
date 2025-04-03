@@ -80,12 +80,12 @@ def comparison_ui():
         exclude_models = pd.concat([eco, hybrid, sedan, small, suv])["모델명"].unique()
         truck = df_unique[(~df_unique["모델명"].isin(exclude_models)) & (df_unique["차량형태"] == "트럭")]
 
-        display_category("친환경차 (전기/수소)", eco)
-        display_category("하이브리드", hybrid)
-        display_category("세단", sedan)
-        display_category("소형", small)
-        display_category("SUV", suv)
-        display_category("트럭", truck)
+        display_category(f"친환경차 (전기/수소) ({len(eco)})", eco)
+        display_category(f"하이브리드 ({len(hybrid)})", hybrid)
+        display_category(f"세단 ({len(sedan)})", sedan)
+        display_category(f"소형 ({len(small)})", small)
+        display_category(f"SUV ({len(suv)})", suv)
+        display_category(f"트럭 ({len(truck)})", truck)
 
     with col4:
         pass
