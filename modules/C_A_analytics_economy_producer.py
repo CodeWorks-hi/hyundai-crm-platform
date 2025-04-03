@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# 판매·수출 관리
+# 실시간 경제지표 전송기
+# 판매·수출 관리
+
 import time
 from datetime import datetime, timedelta
 from kafka import KafkaProducer
@@ -96,7 +101,9 @@ def get_economic_data():
 
     return data
 
-if __name__ == "__main__":
+def producer_ui():
+    """Kafka Producer UI"""
+    st.title("📈 실시간 경제지표 전송기")
     while True:
         start_time = time.time()
         

@@ -3,8 +3,12 @@
 
 import streamlit as st
 
+
+
 def economy_ui():
 
+
+    
     st.info("""
     ##  글로벌 경제 인사이트
 
@@ -49,3 +53,6 @@ def economy_ui():
 
     ---
     """)
+
+
+

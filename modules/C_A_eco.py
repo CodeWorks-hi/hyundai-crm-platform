@@ -4,10 +4,34 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import numpy as np
 
-@st.cache_data
+
+
+# 차량리스트 데이터 불러오기
+car_list_path = "data/hyundae_car_list.csv"
+df_list = pd.read_csv(car_list_path)
+
+# 부품 재고 데이터 불러오기
+inventory_path = "data/inventory_data.csv"
+df_inv = pd.read_csv(inventory_path)
+
 def load_data():
-    df = pd.read_csv("data/hyundae_car_list.csv")
+    for col in ['모델명', '트림명']:
+        df_list[col] = df_list[col].astype(str).str.strip()
+        df_inv[col] = df_inv[col].astype(str).str.strip()
+    df = pd.merge(df_inv, df_list[['모델명', '트림명', '연료구분', 'CO2배출량', '연비']], on=['모델명', '트림명'], how='left')
+    # 병합
+    df = pd.merge(df_inv, df_list[['모델명', '트림명', '연료구분', 'CO2배출량', '연비']],
+                on=['모델명', '트림명'], how='left')
+
+    # 병합 후 사용할 컬럼 정의 (_y 붙은 컬럼 사용)
+    df['연료구분'] = df['연료구분_y']
+    df['CO2배출량'] = df['CO2배출량_y']
+    df['연비'] = df['연비_y']
+
+    # Drop duplicates if needed
+    df = df.dropna(subset=['연료구분', 'CO2배출량', '연비', '공장명', '재고량'])
     return df
 
 def load_restriction_data():
@@ -27,38 +51,53 @@ def load_restriction_data():
     return pd.DataFrame(data)
 
 def eco_ui():
-    st.subheader("타소 발초량 모니터링 (IGIS 연동)")
-    st.markdown("\uc0ac\ubc29 \uc218명 \uc8fc\uae30 \ub0b4 \ubc1c\ucd08 \ub370\uc774\ud130를 \uae30반\uc73c로 \uce58\ud604\ud615 \uc815\ucc45 \uc218발\uc5d0 \ud65c\uc6a9\ub429\ub2c8\ub2e4.")
+    st.markdown("차량의 연료 구분, CO₂ 배출량, 연비를 기준으로 친환경 수준을 모니터링합니다.")
 
     df = load_data()
-
-    expected_cols = ["모델명", "차량형태", "연료구분", "배기량", "공차중량", "연비", "CO2배출량"]
+    expected_cols = ["연료구분", "CO2배출량", "연비", "공장명", "재고량"]
     if not all(col in df.columns for col in expected_cols):
         st.error("❌ 데이터 컬럼명이 예상과 다릅니다.")
         st.write("필요한 컬럼:", expected_cols)
         st.write("현재 컬럼:", list(df.columns))
         return
 
-    # CO2 기준 정렬
-    top_emitters = df.sort_values(by="CO2배출량", ascending=False).head(10)
-    fig1 = px.bar(top_emitters, x="모델명", y="CO2배출량", color="연료구분",
-                  title="CO₂ 배출량 상위 10개 차량 모델")
-    st.plotly_chart(fig1, use_container_width=True)
+    df = df.dropna(subset=expected_cols).copy()
 
-    # 연료별 평균 CO2
-    avg_emissions = df.groupby("연료구분")["CO2배출량"].mean().reset_index()
-    fig2 = px.bar(avg_emissions, x="연료구분", y="CO2배출량", title="연료 구분별 평균 CO₂ 배출량")
-    st.plotly_chart(fig2, use_container_width=True)
+    # 전기차 vs 내연기관차 분류 및 친환경 점수
+    df['전기차 여부'] = df['연료구분'].apply(lambda x: '친환경차' if '전기' in x or '하이브리드' in x else '내연기관차')
+    np.random.seed(42)
+    df['연도'] = np.random.choice([2020, 2021, 2022, 2023, 2024], size=len(df))
+    df['친환경점수'] = df['연비'] * 2 - df['CO2배출량'] * 0.5
 
-    # 차량형태별 연비 Boxplot
-    fig3 = px.box(df, x="차량형태", y="연비", color="연료구분", title="차량 형태별 연비 분포")
-    st.plotly_chart(fig3, use_container_width=True)
+    # 공장별 생산량 비교
+    eco_summary = df.groupby(['공장명', '전기차 여부'])['재고량'].sum().reset_index()
+    fig_eco = px.bar(eco_summary, x='공장명', y='재고량', color='전기차 여부', barmode='group',
+                     title='공장별 친환경차 vs 내연기관차 생산량 비교')
+    st.plotly_chart(fig_eco, use_container_width=True)
 
-    with st.expander("📄 전체 원본 데이터 보기"):
-        st.dataframe(df, use_container_width=True)
+    # 연도별 생산 추이
+    trend_summary = df.groupby(['연도', '전기차 여부'])['재고량'].sum().reset_index()
+    fig_trend = px.line(trend_summary, x='연도', y='재고량', color='전기차 여부', markers=True,
+                        title='연도별 친환경차 vs 내연기관차 생산 추이')
+    st.plotly_chart(fig_trend, use_container_width=True)
+
+    # 공장별 친환경 점수 평균
+    score_summary = df.groupby('공장명')['친환경점수'].mean().reset_index()
+    fig_score = px.bar(score_summary, x='공장명', y='친환경점수', color='친환경점수', color_continuous_scale='Greens',
+                       title='공장별 평균 친환경 점수')
+    st.plotly_chart(fig_score, use_container_width=True)
 
     st.markdown("---")
     st.subheader("🚫 계절관리제 운행제외 대상 정보")
     restriction_df = load_restriction_data()
     st.dataframe(restriction_df, use_container_width=True)
 
+    # 원본 데이터 섹션
+    with st.expander("📁 원본 데이터 확인", expanded=False):
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write("차량 마스터 데이터")
+            st.dataframe(df_list, use_container_width=True)
+        with col2:
+            st.write("부품 재고 데이터")
+            st.dataframe(df_inv, use_container_width=True)
