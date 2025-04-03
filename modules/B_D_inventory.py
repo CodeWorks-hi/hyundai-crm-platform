@@ -14,10 +14,71 @@ def inventory_ui():
     sal_df["최근 3개월 판매량"] = sal_df[recent_cols].sum(axis=1)
 
     # -------------------------------
-    # 상단: 컬럼1 (카드뷰) / 컬럼2 (재고 그래프)
-    col2, col1 = st.columns([3, 1.5])
+    # 상단: 컬럼1 (카드뷰) / 컬럼2 (재고 그래프) / 컬럼3 (추천 차량 재고 현황)
+    col1, col2, col3 = st.columns([3, 0.3, 1.4])
 
     with col1:
+        colA, colB = st.columns([1, 1.1])
+
+        with colA:
+            top3 = sal_df.groupby("차종")["최근 3개월 판매량"].sum().sort_values(ascending=False).head(3).reset_index()
+            fig_top3 = px.bar(top3, x="차종", y="최근 3개월 판매량", title="Top 3 인기 차종")
+            st.plotly_chart(fig_top3, use_container_width=True)
+
+        with colB:
+            bottom3 = sal_df.groupby("차종")["최근 3개월 판매량"].sum().sort_values().head(3).reset_index()
+            fig_bottom3 = px.bar(bottom3, x="차종", y="최근 3개월 판매량", title="판매 부진 차종")
+            st.plotly_chart(fig_bottom3, use_container_width=True)
+        top3_df = stock_df.merge(sal_df, on="차종").sort_values(by="최근 3개월 판매량", ascending=False).head(3).reset_index(drop=True)
+        top3_df.index = [""] * len(top3_df)  # 👉 인덱스를 공백으로 덮어서 숨김 효과
+        st.dataframe(top3_df, use_container_width=True)
+
+    with col3:
+        st.markdown("### 📦 공장별 주요 재고 현황")
+
+        shown_models = set()
+        saved_models = [st.session_state.get(f"saved_recommend_{i}") for i in range(1, 4)]
+        saved_models = list(filter(None, saved_models))  # Remove None
+        saved_models = list(dict.fromkeys(saved_models))  # Preserve order, remove duplicates
+
+        if saved_models:
+            for model in saved_models:
+                if model in shown_models:
+                    continue
+                shown_models.add(model)
+                match = stock_df[stock_df["차종"] == model]
+
+                if not match.empty:
+                    # 가까운 공장 순서 (임의 기준: 이름순)
+                    match = match.sort_values(by="공장명").head(3)
+                    for _, row in match.iterrows():
+                        st.markdown(f"""
+                            <div style="border:1px solid #ccc; border-radius:12px; padding:10px; margin-bottom:10px;
+                                        background-color:#f9f9f9;">
+                                <strong>{row['차종']} @ {row['공장명']}</strong><br>
+                                현재 재고: <strong>{int(row['재고수량'])}대</strong>
+                            </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.info(f"'{model}'에 대한 재고 정보 없음")
+        else:
+            sample_df = stock_df[stock_df["공장명"].str.contains("한국|코리아|Korea", case=False, na=False)]
+            sample_df = sample_df.sample(min(6, len(sample_df)), random_state=42)
+            for _, row in sample_df.iterrows():
+                st.markdown(f"""
+                    <div style="border:1px solid #ccc; border-radius:12px; padding:10px; margin-bottom:10px;
+                                background-color:#f9f9f9;">
+                        <strong>{row['차종']} @ {row['공장명']}</strong><br>
+                        현재 재고: <strong>{int(row['재고수량'])}대</strong>
+                    </div>
+                """, unsafe_allow_html=True)
+
+    # -------------------------------
+    # 하단: 컬럼3 (발주 추천) / 컬럼M (발주 등록) / 컬럼4 (발주 등록)
+    st.markdown("---")
+    col3, col3M, colM, col4M, col4 = st.columns([1.3, 0.1, 1.3, 0.1, 1.5])
+
+    with col3:
         st.markdown("### 🏭 재고 부족 알림 (공장 기준)")
 
         # 재고량 기준으로 공장+차종별 top 3 적은 항목 추출
@@ -61,30 +122,9 @@ def inventory_ui():
             """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    with col2:
-        colA, colB = st.columns([1, 1.1])
-
-        with colA:
-            top3 = sal_df.groupby("차종")["최근 3개월 판매량"].sum().sort_values(ascending=False).head(3).reset_index()
-            fig_top3 = px.bar(top3, x="차종", y="최근 3개월 판매량", title="Top 3 인기 차종")
-            st.plotly_chart(fig_top3, use_container_width=True)
-
-        with colB:
-            bottom3 = sal_df.groupby("차종")["최근 3개월 판매량"].sum().sort_values().head(3).reset_index()
-            fig_bottom3 = px.bar(bottom3, x="차종", y="최근 3개월 판매량", title="판매 부진 차종")
-            st.plotly_chart(fig_bottom3, use_container_width=True)
-        top3_df = stock_df.merge(sal_df, on="차종").sort_values(by="최근 3개월 판매량", ascending=False).head(3).reset_index(drop=True)
-        top3_df.index = [""] * len(top3_df)  # 👉 인덱스를 공백으로 덮어서 숨김 효과
-        st.dataframe(top3_df, use_container_width=True)
-
-    # -------------------------------
-    # 하단: 컬럼3 (발주 추천) / 컬럼4 (발주 등록)
-    st.markdown("---")
-    col3, col4 = st.columns([1,3])
-
-    with col3:
+    with colM:
         st.markdown("### 발주 추천")
-        st.warning("재고와 판매량 기준으로 발주를 추천하는 기본 시스템입니다.")
+        st.markdown("###### ")
 
         merged_df = pd.merge(
             stock_df,

@@ -22,6 +22,9 @@ def consult_ui():
         time = st.time_input("상담 시간")
         content = st.text_area("상담 내용")
 
+        if content is None :
+            content = "-"
+
         submitted = st.form_submit_button("예약하기")
 
         if submitted:
@@ -32,7 +35,10 @@ def consult_ui():
                 "상담시간": time.strftime("%H:%M"),
                 "요청사항": content,
                 "담당직원": "홍길동",
-                "완료여부": False
+                "완료여부": False,
+                "상담내용": "-",
+                "상담태그": "-",
+                "고객피드백": "-"
             }
 
             df_path = "data/consult_log.csv"
