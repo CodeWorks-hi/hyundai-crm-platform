@@ -5,23 +5,13 @@ import plotly.express as px
 
 def inventory_ui():
     # 데이터 불러오기 예시
-    data = {
-        "차종": ["트랙스", "스타리아", "팰리세이드"],
-        "재고수량": [12, 3, 5],
-        "판매량": [40, 18, 33]
-    }
-    df = pd.DataFrame(data)
-
-        
-    stock_df = pd.DataFrame({
-        "차종": ["Avante", "Sonata", "Grandeur", "Tucson", "Palisade", "Kona"],
-        "재고수량": [12, 5, 3, 9, 2, 7]
-    })
-
-    sales_df = pd.DataFrame({
-        "차종": ["Avante", "Sonata", "Grandeur", "Tucson", "Palisade", "Kona", "Avante", "Kona", "Tucson", "Sonata"],
-        "판매량": [20, 15, 8, 13, 6, 11, 18, 9, 12, 14]
-    })
+    inv_df = pd.read_csv("data/inventory_data.csv")
+    stock_df = inv_df.groupby(['모델명', '지역'], as_index=False)['재고량'].sum().rename(columns={'모델명': '차종', '재고량': '재고수량'})
+    sal_df = pd.read_csv("data/processed/total/hyundai-by-car.csv")
+    
+    # 최근 3개월 컬럼만 추출
+    recent_cols = sorted([col for col in sal_df.columns if col[:4].isdigit()], reverse=True)[:3]
+    sal_df["최근 3개월 판매량"] = sal_df[recent_cols].sum(axis=1)
 
     # -------------------------------
     # 상단: 컬럼1 (카드뷰) / 컬럼2 (재고 그래프)
@@ -29,30 +19,53 @@ def inventory_ui():
 
     with col1:
         st.markdown("### 🚗 재고/판매 요약 카드")
-        cards = st.columns(3)
-        for _, row in df.iterrows():
+        
+        # 스크롤 가능한 카드뷰 (상위 3개만 높이에 맞게 표시)
+        inventory_cards = stock_df.merge(sal_df, on='차종').sort_values(by="재고수량", ascending=True).head(3)
+
+        st.markdown("""
+            <style>
+            .scroll-container {
+                max-height: 500px;
+                overflow-y: auto;
+                padding-right: 8px;
+            }
+            .inventory-card {
+                border:1px solid #ccc;
+                border-radius:12px;
+                padding:12px;
+                margin-bottom:12px;
+                text-align:center;
+                box-shadow:2px 2px 6px rgba(0,0,0,0.05);
+                background-color: #fff;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
+        st.markdown('<div class="scroll-container">', unsafe_allow_html=True)
+        for _, row in inventory_cards.iterrows():
             st.markdown(f"""
-                <div style="border:1px solid #ccc; border-radius:12px; padding:12px; margin-bottom:12px;
-                            text-align:center; box-shadow:2px 2px 6px rgba(0,0,0,0.05);">
+                <div class="inventory-card">
                     <h4>{row['차종']}</h4>
-                    <p>재고: <strong>{row['재고수량']}대</strong></p>
-                    <p>판매: <strong>{row['판매량']}대</strong></p>
+                    <p>재고: <strong>{int(row['재고수량'])}대</strong></p>
+                    <p>판매: <strong>{int(row['최근 3개월 판매량'])}대</strong></p>
                 </div>
             """, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
         colA, colB = st.columns([1, 1.1])
 
         with colA:
-            top3 = sales_df.groupby("차종")["판매량"].sum().sort_values(ascending=False).head(3).reset_index()
-            fig_top3 = px.bar(top3, x="차종", y="판매량", title="Top 3 인기 차종")
+            top3 = sal_df.groupby("차종")["최근 3개월 판매량"].sum().sort_values(ascending=False).head(3).reset_index()
+            fig_top3 = px.bar(top3, x="차종", y="최근 3개월 판매량", title="Top 3 인기 차종")
             st.plotly_chart(fig_top3, use_container_width=True)
 
         with colB:
-            bottom3 = sales_df.groupby("차종")["판매량"].sum().sort_values().head(3).reset_index()
-            fig_bottom3 = px.bar(bottom3, x="차종", y="판매량", title="판매 부진 차종")
+            bottom3 = sal_df.groupby("차종")["판매량"].sum().sort_values().head(3).reset_index()
+            fig_bottom3 = px.bar(bottom3, x="차종", y="최근 3개월 판매량", title="판매 부진 차종")
             st.plotly_chart(fig_bottom3, use_container_width=True)
-        top3_df = df.sort_values(by="판매량", ascending=False).head(3).reset_index(drop=True)
+        top3_df = stock_df.merge(sal_df, on="차종").sort_values(by="판매량", ascending=False).head(3).reset_index(drop=True)
         top3_df.index = [""] * len(top3_df)  # 👉 인덱스를 공백으로 덮어서 숨김 효과
         st.dataframe(top3_df, use_container_width=True)
 
@@ -115,4 +128,4 @@ def inventory_ui():
     # -------------------------------
     # 전체 테이블 익스펜더
     with st.expander("전체 재고 테이블 보기"):
-        st.dataframe(df.reset_index(drop=True))
+        st.dataframe(stock_df.pivot_table(index="차종", columns="지역", values="재고수량", fill_value=0))
