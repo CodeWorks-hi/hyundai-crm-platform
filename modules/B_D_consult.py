@@ -197,6 +197,7 @@ def consult_ui():
                         st.header("")
                         if st.button(f"저장 {i+1}", key=f"save_{i+1}"):
                             st.session_state[f"saved_recommend_{i+1}"] = row['모델명']
+                            st.session_state[f"saved_recommend_trim_{i+1}"] = row['트림명']
                 st.markdown("---")
         else:
             st.info("🚘 왼쪽에서 '추천받기' 버튼을 눌러 차량 추천을 확인하세요.")
