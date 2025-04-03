@@ -1,88 +1,68 @@
-
-
-# +------------+
-# | 모델 상세보기 |
-# +------------+
-
 import streamlit as st
 import pandas as pd
-import os
-st.write("✅ A_U_detail.py 진입 성공")
 
-if not os.path.exists("data/selected_car.csv"):
-    st.error("❌ selected_car.csv 파일이 없습니다.")
-    st.stop()
+# 데이터 로드
+@st.cache_data
+def load_car_data():
+    return pd.read_csv("data/hyundae_car_list.csv")
 
-df_sel = pd.read_csv("data/selected_car.csv")
-st.write("✔ 선택된 차량 정보:", df_sel)
+# HTML 비교 테이블 생성 함수
+def generate_html_table(df: pd.DataFrame) -> str:
+    html = """
+    <style>
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+    .compare-table th, .compare-table td { border: 1px solid #ddd; padding: 8px; text-align: center; word-wrap: break-word; }
+    .compare-table th { background-color: #f5f5f5; font-weight: bold; }
+    .scroll-wrapper { max-height: 500px; overflow-y: auto; border: 1px solid #ccc; margin-top: 10px; }
+    </style>
+    <div class="scroll-wrapper">
+    <table class="compare-table">
+    """
+    headers = ["항목"] + df["트림명"].tolist()
+    html += "<tr>" + "".join(f"<th>{col}</th>" for col in headers) + "</tr>"
+    filtered_df = df.drop(columns=["img_url"], errors="ignore")  # img_url 제거
+    transpose_df = filtered_df.set_index("트림명").T.reset_index()
+    transpose_df.columns = ["항목"] + df["트림명"].tolist()
+    for _, row in transpose_df.iterrows():
+        html += "<tr>" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>"
+    html += "</table></div>"
+    return html
 
-try:
-    selected_model = df_sel.iloc[0]["선택모델"]
-except Exception as e:
-    st.error(f"🚫 선택모델 읽기 실패: {e}")
-    st.stop()
-
-df = pd.read_csv("data/hyundae_car_list.csv")
-st.write("✔ 차량 전체 데이터 개수:", len(df))
-
-filtered = df[df["모델명"] == selected_model]
-st.write("🔍 선택된 모델:", selected_model)
-st.write("📊 필터링된 데이터 수:", len(filtered))
-
-if filtered.empty:
-    st.warning("⚠ 선택한 모델명에 해당하는 차량이 없습니다.")
-    st.stop()
-
-
+# Streamlit UI
 def detail_ui():
-    st.set_page_config(page_title="차량 상세 보기", layout="wide")
-
-    # 선택된 차량 불러오기
-    try:
-        selected_model = pd.read_csv("data/selected_car.csv").iloc[0]["선택모델"]
-    except Exception as e:
-        st.error("선택된 차량 정보가 없습니다.\n차량을 먼저 선택해 주세요.")
+    df = load_car_data()
+    if df.empty:
+        st.error("차량 데이터를 불러올 수 없습니다.")
         return
 
-    # 차량 전체 리스트에서 해당 모델명으로 필터링
-    try:
-        df = pd.read_csv("data/hyundae_car_list.csv")
-    except FileNotFoundError:
-        st.error("차량 데이터 파일이 존재하지 않습니다.")
-        return
+    모델들 = df["모델명"].unique()
+    비교_대상 = st.session_state.get("비교모델", None)
 
-    filtered = df[df["모델명"] == selected_model]
+    for 모델 in 모델들:
+        st.subheader(f"📌 {모델}")
+        모델_df = df[df["모델명"] == 모델].reset_index(drop=True)
 
-    if filtered.empty:
-        st.warning(f"'{selected_model}'에 해당하는 차량이 없습니다.")
-        return
+        for i in range(0, len(모델_df), 4):
+            row = 모델_df.iloc[i:i+4]
+            cols = st.columns(4)
 
-    st.title(f" {selected_model} 전체 트림 보기")
-    st.markdown("---")
+            for col, (_, item) in zip(cols, row.iterrows()):
+                with col:
+                    st.markdown(
+                        f"""
+                        <div style="border:1px solid #ddd; border-radius:12px; padding:10px; text-align:center;
+                                    box-shadow: 2px 2px 8px rgba(0,0,0,0.06); height: 350px;">
+                            <div style="height:180px; display:flex; align-items:center; justify-content:center;">
+                                <img src="{item['img_url']}" style="height:140px; max-width:100%; object-fit:contain;" />
+                            </div>
+                            <div style="margin-top: 10px; font-weight:bold;">{item['트림명']}</div>
+                            <div style="color:gray;">{int(item['기본가격']):,}원</div>
+                        </div>
+                        """, unsafe_allow_html=True
+                    )
+                    st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
 
-    for idx, row in filtered.iterrows():
-        with st.container():
-            col1, col2 = st.columns([1, 2])
-
-            with col1:
-                st.image(row["img_url"], width=250)
-
-            with col2:
-                st.subheader(f"{row['트림명']} | {int(row['기본가격']):,}원")
-                st.markdown(f"""
-                - **모델 구분**: {row['모델 구분']}
-                - **탑승 인원**: {row['탑승인원']}
-                - **연료 구분**: {row['연료구분']}
-                - **차량 형태**: {row['차량형태']}
-                - **전장/전폭/전고**: {row['전장']} × {row['전폭']} × {row['전고']} mm
-                - **공차중량**: {row['공차중량']} kg
-                - **연비**: {row['연비']} km/l
-                - **CO2 배출량**: {row['CO2배출량']} g/km
-                """)
-
-            st.markdown("---")
-
-    st.success(f"총 {len(filtered)}개 트림이 조회되었습니다.")
-
-def app():
-    detail_ui()
+            # 한 행 끝나고 상세비교 버튼
+        with st.expander(f"{모델} 상세비교"):
+            비교_데이터 = df[df["모델명"] == 모델]
+            st.markdown(generate_html_table(비교_데이터), unsafe_allow_html=True)

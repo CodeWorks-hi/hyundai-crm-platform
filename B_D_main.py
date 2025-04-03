@@ -3,7 +3,30 @@ import importlib
 import streamlit as st
 import os
 import pandas as pd
+import base64
 
+# ▶️ 이미지 base64 인코딩 함수
+def get_base64_image(path):
+    with open(path, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+# ▶️ 로고 + 타이틀 레이아웃
+def render_logo_title():
+    logo_base64 = get_base64_image("images/hyundae_kia_logo.png")
+
+    st.markdown(
+        f"""
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+            <img src="data:image/png;base64,{logo_base64}" alt="로고" width="60" style="width: 120px; height: auto; border-radius: 8px;">
+            <h1 style="margin: 0; font-size: 28px;">현대기아 모터스 전용 관리페이지</h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+# ▶️ 호출
+render_logo_title()
 
 # ▶️ 경로 설정
 EMPLOYEE_CSV_PATH = "data/employee.csv"
@@ -47,7 +70,6 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 
 def app():
-    st.title("딜러 페이지")
     tabs = st.tabs([
         "딜러 대시보드",
         "방문고객 설문조사",

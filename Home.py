@@ -68,33 +68,7 @@ else:
 
         if page == "A_U_main":
             import A_U_main as auto
-            auto.app()
-
-        elif page == "A_U_comparison": #모델
-            import A_U_main as auto
-            auto.app()
-
-        elif page == "A_U_map":  #유저 대리점 찾기 
-            import A_U_main as auto
-            auto.app()
-
-        elif page == "A_U_consult":  #상담 예약 
-            import A_U_main as auto
-            auto.app()
-        
-        elif page == "A_U_test_drive":  #시승 신청  
-            import A_U_main as auto
-            auto.app()
-
-        elif page == "A_U_event": #이벤트
-            import A_U_main as auto
-            auto.app()
-
-        elif page == "A_U_support": # 고객센터
-            import A_U_main as auto
-            auto.app()
-
-        
+            auto.app()       
         
         # 딜러 페이지 전환 ( 수정하면 안됩니다.) - 수정시 페이지 전환 안됨
         elif page == "dealer_main":  

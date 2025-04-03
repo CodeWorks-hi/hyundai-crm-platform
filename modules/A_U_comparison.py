@@ -64,10 +64,8 @@ def comparison_ui():
 
                     key_val = f"선택_{item['모델명']}_{i}_{col_index}"
                     if st.button("이 차량 선택", key=key_val):
-                        save_selected_model(item["모델명"])
-                        switch_page("A_U_detail")
-            #                     if st.button("이동", key="btn_event"):
-            # switch_page("A_U_event")
+                        st.session_state["선택차량"] = item.to_dict()
+
 
     with col4:
         pass
@@ -96,16 +94,16 @@ def comparison_ui():
             st.info("선택된 차량이 없습니다.")
 
 
-# ▶️ 앱 진입점
-def app():
-    page = st.session_state.get("current_page", "A_U_main")
+# # ▶️ 앱 진입점
+# def app():
+#     page = st.session_state.get("current_page", "A_U_comparison")
 
-    if page == "A_U_main":
-        comparison_ui()
+#     if page == "A_U_comparison":
+#         comparison_ui()
 
-    elif page == "A_U_detail":
-        from modules.A_U_detail import detail_ui
-        detail_ui()
+#     elif page == "A_U_detail":
+#         from modules.A_U_detail import detail_ui
+#         detail_ui()
 # 상세 화면은 A_U_detail.py 내의 detail_ui 함수를 호출        
 #     elif page == "A_U_detail":
 #         import modules.A_U_detail as detail

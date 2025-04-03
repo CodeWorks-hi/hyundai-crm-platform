@@ -1,60 +1,14 @@
 # A_U_main.py
 import streamlit as st
 import pandas as pd
-from modules.A_U_carousel import render_carousel
-import base64
-from modules.A_U_kakao_channel import render_kakao_buttons
-from modules.A_U_kakao_auth import (
-    handle_kakao_callback,
-    render_kakao_login_button,
-    render_logout_button,
+import importlib
 
-)
-
-
-
-
-def get_base64_image(image_path):
-    with open(image_path, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
 
 # 페이지 전환 함수 (공통)
 def switch_page(page):
     st.session_state.current_page = page
     st.rerun()
 
-def kakao_login_ui():
-    handle_kakao_callback()
-    render_kakao_login_button()
-    render_logout_button()
-
-# 차량 이미지 캐러셀 (Swiper.js 활용)
-car_data = [
-    {"name": "IONIQ 9", "url": "https://www.hyundai.com/contents/mainbanner/main_kv_ioniq9-pc.png"},
-    {"name": "Palisade", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_PALISADE.png"},
-    {"name": "Venue", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_venue.png"},
-    {"name": "Tucson", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_TUCSON.png"},
-    {"name": "Sonata", "url": "https://www.hyundai.com/contents/mainbanner/main_sonata_25my_w.png"},
-    {"name": "Santa Fe", "url": "https://www.hyundai.com/contents/mainbanner/main-santafe-25my-kv-w.png"},
-    {"name": "Casper Electric", "url": "https://www.hyundai.com/contents/mainbanner/Main-KV_Car_CASPER-Electric.png"},
-]
-
-# 일반회원 홈화면 UI
-def user_main_ui():
-    colb, colc, cola= st.columns([1,4,1])
-    with cola :
-        render_kakao_buttons()
-        kakao_login_ui()
-    with colb:
-        if st.button("← 메인으로 돌아가기"):
-            switch_page("home")
-    
-
-    # 캐러셀 함수 ( 파라미터에 차 리스트 넣으면 실행 됨) 모듈 > A_U_carousel.py 만 수정
-    render_carousel(car_data, height=400)
-
-    col6, col1, col2, col3, col4, col5, col7, col8 = st.columns([2, 1, 1, 1, 1, 1, 1, 2])
     # 공통 버튼 스타일 (위에 한 번만 선언)
     btn_style = """
         <style>
@@ -72,135 +26,47 @@ def user_main_ui():
         }
         </style>
     """
-    st.markdown(btn_style, unsafe_allow_html=True)
 
-    with col6:
-        st.header("")
+# 일반회원 홈화면 UI
+def app():
+    tabs = st.tabs([
+        "홈화면", 
+        "모델 확인", 
+        "모델 비교", 
+        "대리점 검색", 
+        "상담 예약", 
+        "시승 신청", 
+        "고객 센터", 
+        "이벤트"
+    ])
 
-    # 모델확인
-    with col1:
-        st.markdown(
-            f"""
-            <div style="text-align:center">
-                <img src="data:image/png;base64,{get_base64_image('images/car.png')}" width="80" style="margin-bottom: 10px;"><br>
-                <div style='font-weight: bold; font-size: 18px; margin-bottom: 10px;'>모델확인</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("이동", key="btn_car_compare"):
-            switch_page("A_U_comparison")
+    tab_modules = [
+        ("modules.A_U_home", "home_ui"),
+        ("modules.A_U_comparison", "comparison_ui"),
+        ("modules.A_U_detail", "detail_ui"),
+        ("modules.A_U_map", "map_ui"),
+        ("modules.A_U_consult", "consult_ui"),
+        ("modules.A_U_test_drive", "test_drive_ui"),
+        ("modules.A_U_support", "support_ui"),
+        ("modules.A_U_event", "event_ui"),
+    ]
 
-    # 대리점 검색
-    with col2:
-        st.markdown(
-            f"""
-            <div style="text-align:center">
-                <img src="data:image/png;base64,{get_base64_image('images/location.png')}" width="80" style="margin-bottom: 10px;"><br>
-                <div style='font-weight: bold; font-size: 18px; margin-bottom: 10px;'>대리점 검색</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("이동", key="btn_map"):
-            switch_page("A_U_map")
-
-    # 상담 예약
-    with col3:
-        st.markdown(
-            f"""
-            <div style="text-align:center">
-                <img src="data:image/png;base64,{get_base64_image('images/customer-service.png')}" width="80" style="margin-bottom: 10px;"><br>
-                <div style='font-weight: bold; font-size: 18px; margin-bottom: 10px;'>상담 예약</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("이동", key="btn_consult"):
-            switch_page("A_U_consult")
-    # 시승 신청
-    with col4:
-        st.markdown(
-            f"""
-            <div style="text-align:center">
-                <img src="data:image/png;base64,{get_base64_image('images/handle.png')}" width="80" style="margin-bottom: 10px;"><br>
-                <div style='font-weight: bold; font-size: 18px; margin-bottom: 10px;'>시승신청</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("이동", key="btn_test_drive"):
-            switch_page("A_U_test_drive")
-
-    # 고객센터
-    with col5: 
-        st.markdown(
-            f"""
-            <div style="text-align:center">
-                <img src="data:image/png;base64,{get_base64_image('images/location.png')}" width="80" style="margin-bottom: 10px;"><br>
-                <div style='font-weight: bold; font-size: 18px; margin-bottom: 10px;'>고객 센터</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("이동", key="btn_support"):
-            switch_page("A_U_support")
-
-    with col7:  # 이벤트
-        st.markdown(
-            f"""
-            <div style="text-align:center">
-                <img src="data:image/png;base64,{get_base64_image('images/party.png')}" width="80" style="margin-bottom: 10px;"><br>
-                <div style='font-weight: bold; font-size: 18px; margin-bottom: 10px;'>이벤트</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("이동", key="btn_event"):
-            switch_page("A_U_event")
-    with col8:
-        pass
-    
+    for i, (module_path, function_name) in enumerate(tab_modules):
+        with tabs[i]:
+            try:
+                module = importlib.import_module(module_path)
+                getattr(module, function_name)()
+            except Exception as e:
+                st.error(f"모듈 로딩 오류: `{module_path}.{function_name}`\n\n**{e}**")
 
     st.markdown("---")
     st.image("images/event1.png")
+        # ✔ 안전한 방식: 세션 상태로 페이지 전환
+    if st.button("← 메인으로 돌아가기"):
+        st.session_state.current_page = "home"
+        st.rerun()
 
 
-
-# ▶️ 앱 진입점
-def app():
-    page = st.session_state.get("current_page", "A_U_main")
-    if page == "A_U_main":
-        user_main_ui()
-    
-    elif page == "A_U_comparison":   # 모델확인
-        import modules.A_U_comparison as comparison
-        comparison.comparison_ui()
-        
-    elif page == "A_U_map":   # 대리점 검색
-        import modules.A_U_map as map
-        map.map_ui()
-
-    elif page == "A_U_consult":   # 삼담예약
-        import modules.A_U_consult as consult
-        consult.consult_ui()
-
-    elif page == "A_U_event":   # 이벤트 
-        import modules.A_U_event as event
-        event.event_ui()
-
-    elif page == "A_U_support":  # 고객센터
-        import modules.A_U_support as support
-        support.support_ui()
-
-    elif page == "A_U_test_drive":  # 시승신청
-        import modules.A_U_test_drive as test_drive
-        test_drive.test_drive_ui()
-
-    # elif page == "A_U_detail":
-    #     import modules.A_U_detail as detail
-    #     detail.app()
-    
 
 
 
