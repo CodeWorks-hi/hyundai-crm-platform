@@ -28,7 +28,7 @@ def save_selected_model(model_name):
 
 def comparison_ui():
     if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
-        st.session_state.current_page = "user_main"
+        st.session_state.current_page = "A_U_main"
         st.rerun()
 
     df = load_car_data()
@@ -96,13 +96,18 @@ def comparison_ui():
             st.info("선택된 차량이 없습니다.")
 
 
-# # ▶️ 앱 진입점
-# def app():
-#     page = st.session_state.get("current_page", "A_U_main")
+# ▶️ 앱 진입점
+def app():
+    page = st.session_state.get("current_page", "A_U_main")
 
-#     if page == "A_U_main":
-#         comparison_ui()
-        
+    if page == "A_U_main":
+        comparison_ui()
+
+    elif page == "A_U_detail":
+        from modules.A_U_detail import detail_ui
+        detail_ui()
+# 상세 화면은 A_U_detail.py 내의 detail_ui 함수를 호출        
 #     elif page == "A_U_detail":
 #         import modules.A_U_detail as detail
 #         detail.detail_ui()
+

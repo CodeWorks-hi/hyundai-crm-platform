@@ -177,11 +177,6 @@ def app():
         import modules.A_U_comparison as comparison
         comparison.comparison_ui()
         
-    elif page == "A_U_detail":
-        # 상세 화면은 A_U_detail.py 내의 detail_ui 함수를 호출
-        from modules.A_U_detail import detail_ui
-        detail_ui()
-        
     elif page == "A_U_map":   # 대리점 검색
         import modules.A_U_map as map
         map.map_ui()
