@@ -86,7 +86,7 @@ def consult_ui():
                 st.text_input("연령대", value=survey_result["연령대"], disabled=True)
                 if survey_result["월주행거리_km"] == "2000 이상" :
                     survey_result["월주행거리_km"] = 2000
-                st.number_input("예상 월간 주행 거리 (km)", step=500, value=survey_result["월주행거리_km"])
+                st.number_input("예상 월간 주행 거리 (km)", step=500, min_value=0, value=survey_result["월주행거리_km"])
                 colors = [str(survey_result["선호색상"])] + ["흰색", "검정", "회색", "은색", "파랑", "빨강", "기타"]
                 unique_colors = list(dict.fromkeys(colors))
                 st.selectbox("선호 색상", unique_colors)
@@ -113,7 +113,6 @@ def consult_ui():
                 st.session_state["show_recommendation"] = True
 
                 car_df = pd.read_csv("data/hyundae_car_list.csv")
-                st.dataframe(car_df)
 
                 # 예산에 따라 추천 차량 필터링
                 car_df = car_df.loc[car_df["기본가격"] <= budget * 15000, :]
@@ -132,46 +131,59 @@ def consult_ui():
                 car_df = car_df.loc[car_df["차량구분"] == comp_car, :]
 
                 # 우선 순위별 필터링
-                prior_list = [prior1, prior2, prior3]
-                for i in prior_list :
-                    if i == "연비" :
-                        car_df = car_df.loc[car_df["연비"] >= car_df["연비"].mean(), :]
-                    elif i == "가격" :
-                        car_df = car_df.loc[car_df["기본가격"] <= budget * 13000, :]
-                    elif i == "성능" :
-                        car_df = car_df.loc[car_df["배기량"] >= car_df["배기량"].mean(), :]
-                    elif i == "공간" :
-                        for j in purp :
-                            if j == "출퇴근":
-                                car_df = car_df.loc[(car_df["연비"] >= car_df["연비"].mean()) & (car_df["차량구분"].isin(["소형", "준중형", "중형"])), :]
-                            elif j == "아이 통학":
-                                car_df = car_df.loc[car_df["차량구분"].isin(["중형", "대형"]) & (car_df["차량구분"].isin(["소형", "준중형", "중형"])), :]
-                            elif j == "주말여행":
-                                pass
-                            elif j == "레저활동":
-                                pass
-                            elif j == "업무차량":
-                                pass
+                # prior_list = [prior1, prior2, prior3]
+                # for i in prior_list :
+                #     if i == "연비" :
+                #         car_df = car_df.loc[car_df["연비"] >= car_df["연비"].mean(), :]
+                #     elif i == "가격" :
+                #         car_df = car_df.loc[car_df["기본가격"] <= budget * 13000, :]
+                #     elif i == "성능" :
+                #         car_df = car_df.loc[car_df["배기량"] >= car_df["배기량"].mean(), :]
+                #     elif i == "공간" :
+                #         if j is not None :
+                #             for j in purp :
+                #                 if j == "출퇴근":
+                #                     car_df = car_df.loc[(car_df["연비"] >= car_df["연비"].mean()) & (car_df["차량구분"].isin(["소형", "준중형", "중형"])), :]
+                #                 elif j == "아이 통학":
+                #                     car_df = car_df.loc[car_df["차량구분"].isin(["준중형", "중형"]), :]
+                #                 elif j == "주말여행":
+                #                     car_df = car_df.loc[car_df["차량구분"].isin(["중형", "대형"]) & (car_df["차량형태"].isin(["SUV", "승합차"])), :]
+                #                 elif j == "레저활동":
+                #                     car_df = car_df.loc[car_df["차량구분"].isin(["중형", "대형"]) & (car_df["차량형태"] == "SUV"), :]
+                #                 elif j == "업무차량":
+                #                     car_df = car_df.loc[car_df["차량구분"].isin(["대형"]) & (car_df["차량형태"] == "승합차"), :]
+
+                if len(car_df) >= 3:
+                    result_df = car_df.sample(3)
+                elif len(car_df) > 0:
+                    result_df = car_df.sample(len(car_df))  # 가능한 만큼만 추천
+                else:
+                    st.warning("추천 조건을 만족하는 차량이 없습니다.")
+                    return
+                
+                st.session_state["추천결과"] = result_df.reset_index(drop=True)
 
 
     with col5:
-        if st.session_state.get("show_recommendation", False):
-            for i in range(1, 4):
+        if "추천결과" in st.session_state:
+            display_df = st.session_state["추천결과"]
+            for i in range(len(display_df)):
+                row = display_df.iloc[i]
                 img_col, text_col, button_col = st.columns([1.5, 1.3, 1])
                 with img_col:
-                    st.write("")  # spacer
-                    st.write("")  # spacer
-                    st.markdown("## IMG")
+                    st.write("")
+                    st.write("")
+                    st.image(image=row["img_url"])  # 실제 이미지 경로 삽입 가능
                 with text_col:
-                    st.markdown(f"**🚗 추천 차량 {i}**")
-                    st.write("• 연비: 12.5km/L")
-                    st.write("• 가격: 4,200만 원~")
+                    st.markdown(f"**🚗 추천 차량 {i+1}: {row['모델명']}**")
+                    st.write(f"• 연비: {row['연비']} km/L")
+                    st.write(f"• 가격: {row['기본가격']:,} 원~")
                 with button_col:
                     with st.container():
-                        st.write("")  # spacer
-                        st.write("")  # spacer
-                        if st.button(f"저장하기 {i}", key=f"save_{i}"):
-                            st.session_state[f"saved_recommend_{i}"] = f"추천 차량 {i}"
+                        st.write("")
+                        st.write("")
+                        if st.button(f"저장하기 {i+1}", key=f"save_{i+1}"):
+                            st.session_state[f"saved_recommend_{i+1}"] = row['모델명']
                 st.markdown("---")
         else:
             st.info("🚘 왼쪽에서 '추천받기' 버튼을 눌러 차량 추천을 확인하세요.")
