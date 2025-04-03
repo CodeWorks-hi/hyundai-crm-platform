@@ -17,6 +17,7 @@ def render_carousel(car_data: list, height: int = 400):
         height: {height - 40}px;
         position: relative;
     }}
+
     
     .swiper-slide img {{
         width: 100%;

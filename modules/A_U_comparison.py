@@ -96,13 +96,13 @@ def comparison_ui():
             st.info("선택된 차량이 없습니다.")
 
 
-# ▶️ 앱 진입점
-def app():
-    page = st.session_state.get("current_page", "A_U_main")
+# # ▶️ 앱 진입점
+# def app():
+#     page = st.session_state.get("current_page", "A_U_main")
 
-    if page == "A_U_main":
-        comparison_ui()
+#     if page == "A_U_main":
+#         comparison_ui()
         
-    elif page == "A_U_detail":
-        import modules.A_U_detail as detail
-        detail.detail_ui()
+#     elif page == "A_U_detail":
+#         import modules.A_U_detail as detail
+#         detail.detail_ui()

@@ -47,7 +47,7 @@ if st.session_state.current_page == "home":
         st.image("images/user_icon.png", width=80)
         st.markdown("### 일반회원\n개인 사용자 전용 서비스")
         if st.button("접속하기", key="btn_user"):
-            switch_page("user_main")
+            switch_page("A_U_main")
 
     with col2:
         st.image("images/shop_icon.png", width=80)
@@ -66,7 +66,7 @@ else:
     try:
         page = st.session_state.get("current_page")
 
-        if page == "user_main":
+        if page == "A_U_main":
             import A_U_main as auto
             auto.app()
 
