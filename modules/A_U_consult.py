@@ -30,7 +30,7 @@ def consult_ui():
                 "전화번호": phone,
                 "상담날짜": date.strftime("%Y-%m-%d"),
                 "상담시간": time.strftime("%H:%M"),
-                "상담내용": content,
+                "요청사항": content,
                 "담당직원": "홍길동",
                 "완료여부": False
             }

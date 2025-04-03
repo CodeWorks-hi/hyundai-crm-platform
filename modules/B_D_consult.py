@@ -120,7 +120,7 @@ def consult_ui():
                 # 동승 유형에 따라 추천 차량 필터링
                 def company_type(company):
                     return {
-                        "1인": "경차",
+                        "1인": "소형",
                         "부부": "준중형",
                         "자녀1명": "준중형",
                         "자녀2명 이상": "중형",
@@ -213,29 +213,6 @@ def consult_ui():
         
         st.write("")
 
-    with col_mid:
-        st.markdown("#### 📝 상담 내용 메모")
-        st.markdown(
-            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
-            unsafe_allow_html=True,
-        )
-        memo = st.text_area("상담 내용을 입력하세요", height=200, label_visibility="collapsed")
-        if st.button("📩 상담 결과 저장", use_container_width=True):
-            result = {
-                "이름": customer_info["이름"],
-                "전화번호": customer_info["전화번호"],
-                "상담일": pd.Timestamp.now().strftime("%Y-%m-%d"),
-                "상담내용": memo
-            }
-            result_df = pd.DataFrame([result])
-            try:
-                existing = pd.read_csv("data/consult_result.csv")
-                result_df = pd.concat([existing, result_df], ignore_index=True)
-            except FileNotFoundError:
-                pass
-            result_df.to_csv("data/consult_result.csv", index=False)
-            st.success("✅ 상담 내용이 저장되었습니다.")
-
     with col_right:
         st.markdown("#### 🏷️ 상담 태그 분류")
         st.markdown(
@@ -247,9 +224,33 @@ def consult_ui():
         custom_tag = st.text_input("기타 태그 직접 입력")
         if custom_tag and custom_tag not in selected_tags:
             selected_tags.append(custom_tag)
+        if len(selected_tags) == 0:
+            selected_tags = "-"
+            
 
         st.markdown("##### ✅ 선택된 태그")
         st.markdown(
             f"<div style='background-color: #f2f7fb; padding: 10px; border-radius: 8px; min-height: 40px; font-size: 13.5px; color: #1d3557;'>{', '.join(selected_tags) if selected_tags else '선택된 태그 없음'}</div>",
             unsafe_allow_html=True
         )
+
+    with col_mid:
+        st.markdown("#### 📝 상담 내용 메모")
+        st.markdown(
+            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
+            unsafe_allow_html=True,
+        )
+        memo = st.text_area("상담 내용을 입력하세요", height=200, label_visibility="collapsed")
+        
+        if st.button("✅ 저장", use_container_width=True):
+            cr_df = pd.read_csv("data/consult_log.csv")
+            mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact) & (cr_df["완료여부"] == 0)
+            
+            if mask.any():
+                cr_df.loc[mask, "상담내용"] = memo
+                cr_df.loc[mask, "완료여부"] = 1
+                cr_df.loc[mask, "상담태그"] = ', '.join(selected_tags)
+                cr_df.to_csv("data/consult_log.csv", index=False)
+                st.success("✅ 상담 내용이 저장되었습니다.")
+            else:
+                st.warning("해당 조건에 맞는 미완료 상담이 없습니다.")

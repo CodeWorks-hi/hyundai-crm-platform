@@ -73,7 +73,6 @@ def app():
     tabs = st.tabs([
         "딜러 대시보드",
         "방문고객 설문조사",
-        "고객 맞춤 추천",
         "고객 상담",
         "재고 현황", 
         "리드 관리", 
@@ -86,7 +85,6 @@ def app():
     tab_modules = [
         ("modules.B_D_dashboard", "dashboard_ui"),
         ("modules.B_D_survey", "survey_ui"),
-        ("modules.B_D_recommend", "recommend_ui"),                     # 고객 360도 뷰, LTV 점수, 추천 액션
         ("modules.B_D_consult", "consult_ui"),                     # 고객 상담 정보, 차량 추천
         ("modules.B_D_inventory", "inventory_ui"),                     # 재고 현황, 발주 추천, 마진 분석
         ("modules.B_D_leads", "leads_ui"),                             # 리드 퍼널, 스코어링, 자동 팔로업

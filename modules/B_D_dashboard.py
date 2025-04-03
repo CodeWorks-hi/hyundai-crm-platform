@@ -33,7 +33,7 @@ def dashboard_ui():
             'id': str(uuid.uuid4()),
             'title': f"{row.get('이름', '이름 없음')} 고객님",
             'start': start_time,
-            'description': row.get("상담내용", ""),
+            'description': row.get("요청사항", ""),
             '완료여부': row.get("완료여부", 0)
         })
 
