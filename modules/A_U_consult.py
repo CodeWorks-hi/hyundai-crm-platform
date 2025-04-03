@@ -10,10 +10,10 @@ def consult_ui():
             return name[0] + "*" + name[-1]
         return name
 
-    from_col, consult_list, consult_true = st.columns([2, 1, 1])
+    left_form, right_form = st.columns(2)
 
-    with from_col:
-        with st.expander("상담 예약하기", expanded=True):
+    with left_form:
+        with st.expander("방문 예약", expanded=True):
             with st.form("consult_form", clear_on_submit=True):
                 col1, col2 = st.columns(2)
                 with col1:
@@ -58,6 +58,7 @@ def consult_ui():
                     df.to_csv(df_path, index=False)
                     st.success("상담이 예약되었습니다.")
 
+    with right_form:
         with st.expander("문의하기", expanded=True):
             with st.form("inquiry_form", clear_on_submit=True):
                 col1, col2 = st.columns(2)
@@ -103,6 +104,9 @@ def consult_ui():
                     df.to_csv(df_path, index=False)
                     st.success("문의가 접수되었습니다.")
 
+    st.markdown("---")
+    consult_list, consult_true, consult_check = st.columns(3)
+
     # 상담 내역 표시
     df_path = "data/consult_log.csv"
     if os.path.exists(df_path):
@@ -115,7 +119,13 @@ def consult_ui():
             st.markdown("#### 상담 대기중 목록")
             wait_df = df[df["완료여부"] == False]
             for idx, row in wait_df.iterrows():
-                st.markdown(f"- **성명:** {mask_name(row['이름'])} | **요청사항:** {row['요청사항']} | **진행상태:** 상담대기중")
+                st.markdown(f"""
+                <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
+                <b>성명:</b> {mask_name(row['이름'])}<br>
+                <b>요청사항:</b> {row['요청사항']}<br>
+                <b>진행상태:</b> 상담대기중
+                </div>
+                """, unsafe_allow_html=True)
                 with st.expander("열기", expanded=False):
                     with st.form(f"view_wait_{idx}"):
                         input_name = st.text_input("이름 확인", key=f"wait_name_{idx}")
@@ -123,7 +133,10 @@ def consult_ui():
                         if st.form_submit_button("열기"):
                             if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
                                 st.info(f"**상담내용:** {row['요청사항']}")
-                                st.info(f"**답변내용:** {row['답변내용']}")
+                                답변 = row['답변내용']
+                                if pd.isna(답변) or str(답변).strip() == "":
+                                    답변 = "답변대기중"
+                                st.info(f"**답변내용:** {답변}")
                             else:
                                 st.warning("정보가 일치하지 않습니다.")
 
@@ -131,7 +144,13 @@ def consult_ui():
             st.markdown("#### 상담 완료 목록")
             done_df = df[df["완료여부"] == True]
             for idx, row in done_df.iterrows():
-                st.markdown(f"- **성명:** {mask_name(row['이름'])} | **요청사항:** {row['요청사항']} | **진행상태:** 상담완료")
+                st.markdown(f"""
+                <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
+                <b>성명:</b> {mask_name(row['이름'])}<br>
+                <b>요청사항:</b> {row['요청사항']}<br>
+                <b>진행상태:</b> 상담완료
+                </div>
+                """, unsafe_allow_html=True)
                 with st.expander("열기", expanded=False):
                     with st.form(f"view_done_{idx}"):
                         input_name = st.text_input("이름 확인", key=f"done_name_{idx}")
@@ -139,6 +158,9 @@ def consult_ui():
                         if st.form_submit_button("열기"):
                             if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
                                 st.info(f"**상담내용:** {row['요청사항']}")
-                                st.info(f"**답변내용:** {row['답변내용']}")
+                                답변 = row['답변내용']
+                                if pd.isna(답변) or str(답변).strip() == "":
+                                    답변 = "답변대기중"
+                                st.info(f"**답변내용:** {답변}")
                             else:
                                 st.warning("정보가 일치하지 않습니다.")
