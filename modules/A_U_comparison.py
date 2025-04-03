@@ -34,35 +34,58 @@ def comparison_ui():
         return
 
     col2, col4, col3 = st.columns([4, 0.1, 0.7])
-    대표모델 = df.sort_values(by="기본가격").drop_duplicates(subset=["모델명"])
-
+    
     with col2:
-        st.markdown("### 전체 차량 모델")
-        for i in range(0, len(대표모델), 4):
-            row = 대표모델.iloc[i:i+4]
-            cols = st.columns(4)
+  
 
-            for col_index, (col, (_, item)) in enumerate(zip(cols, row.iterrows())):
-                with col:
-                    st.markdown(
-                        f"""
-                        <div style="border:1px solid #ddd; border-radius:12px; padding:10px; text-align:center;
-                                    box-shadow: 2px 2px 8px rgba(0,0,0,0.06); height: 330px;">
-                            <div style="height:180px; background:#fff; display:flex; align-items:center; justify-content:center;">
-                                <img src="{item['img_url']}" 
-                                    style="height:140px; width:auto; object-fit:contain; max-width: 100%;" />
-                            </div>
-                            <div style="margin-top: 10px; font-weight:bold; font-size:16px;">{item['모델명']}</div>
-                            <div style="color:gray;">{int(item['기본가격']):,}원부터 ~</div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+        def display_category(title, df_category):
+            st.markdown(f"####  {title}")
+            for i in range(0, len(df_category), 4):
+                row = df_category.iloc[i:i+4]
+                cols = st.columns(4)
+                for col_index, (col, (_, item)) in enumerate(zip(cols, row.iterrows())):
+                    with col:
+                        key_val = f"선택_{item['모델명']}_{i}_{col_index}"
+                        with st.container():
+                            st.markdown(
+                                f'''
+                                <div style="border:1px solid #ddd; border-radius:12px; padding:10px; text-align:center;
+                                            box-shadow: 2px 2px 8px rgba(0,0,0,0.06); background-color:#fff;">
+                                    <div style="height:180px; display:flex; align-items:center; justify-content:center;">
+                                        <img src="{item['img_url']}" 
+                                            style="height:140px; width:auto; object-fit:contain; max-width: 100%;" />
+                                    </div>
+                                    <div style="margin-top: 10px; font-weight:bold; font-size:16px;">{item['모델명']}</div>
+                                    <div style="color:gray;">{int(item['기본가격']):,}원부터 ~</div>
+                                </div>
+                                ''',
+                                unsafe_allow_html=True
+                            )
+                            st.markdown("<div style='height: 10px'></div>", unsafe_allow_html=True)
+                            if st.button("차량 선택", key=key_val):
+                                st.session_state["선택차량"] = item.to_dict()
 
-                    key_val = f"선택_{item['모델명']}_{i}_{col_index}"
-                    if st.button("이 차량 선택", key=key_val):
-                        st.session_state["선택차량"] = item.to_dict()
+        df_unique = df.drop_duplicates(subset="모델명").copy()
+        ev_fuel = ["전기", "수소"]
+        hybrid_fuel = ["하이브리드"]
+        sedan_exclude = ["전기", "수소", "소형"]
 
+        eco = df_unique[df_unique["연료구분"].isin(ev_fuel)]
+        hybrid = df_unique[df_unique["연료구분"].isin(hybrid_fuel)]
+        sedan = df_unique[(~df_unique["연료구분"].isin(sedan_exclude)) & (df_unique["차량형태"] == "세단")]
+        exclude_models = pd.concat([eco, hybrid, sedan])["모델명"].unique()
+        small = df_unique[(~df_unique["모델명"].isin(exclude_models)) & (df_unique["차량구분"] == "소형")]
+        exclude_models = pd.concat([eco, hybrid, sedan, small])["모델명"].unique()
+        suv = df_unique[(~df_unique["모델명"].isin(exclude_models)) & (df_unique["차량형태"] == "SUV")]
+        exclude_models = pd.concat([eco, hybrid, sedan, small, suv])["모델명"].unique()
+        truck = df_unique[(~df_unique["모델명"].isin(exclude_models)) & (df_unique["차량형태"] == "트럭")]
+
+        display_category("친환경차 (전기/수소)", eco)
+        display_category("하이브리드", hybrid)
+        display_category("세단", sedan)
+        display_category("소형", small)
+        display_category("SUV", suv)
+        display_category("트럭", truck)
 
     with col4:
         pass
