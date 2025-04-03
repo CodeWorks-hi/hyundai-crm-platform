@@ -91,9 +91,11 @@ def send_slack_alert(model_name, turnover_rate, plant=None, status=None, link=No
 
     response = requests.post(SLACK_WEBHOOK_URL, json=payload)
 
-    if response.status_code != 200:
-        st.error(f"Slack 전송 실패: {response.status_code} - {response.text}")
-
+    # 응답 확인
+    if response.status_code == 200:
+        st.success("✅ 슬랙 메시지가 정상적으로 전송되었습니다.")
+    else:
+        st.error(f"❌ 슬랙 전송 실패: {response.status_code} - {response.text}")
 
 # 🖥️ Streamlit UI
 def warning_ui():
