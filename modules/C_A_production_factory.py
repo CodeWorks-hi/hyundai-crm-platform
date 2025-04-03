@@ -8,7 +8,7 @@ import streamlit as st
 
 
 
-def production_factory_ui():
+def factory_ui():
     st.info("""
             
     공장별 생산량 비교 페이지입니다.

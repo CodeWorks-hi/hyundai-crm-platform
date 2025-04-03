@@ -59,7 +59,7 @@ def create_metric_panel(col, title, value, delta, delay, history, current_data, 
         st.plotly_chart(fig, use_container_width=True)
 
 # 메인 대시보드
-def marketing_realtime_ui():
+def realtime_ui():
     st.title("실시간 경제지표 모니터링 센터")
     
     # 초기 데이터 로드

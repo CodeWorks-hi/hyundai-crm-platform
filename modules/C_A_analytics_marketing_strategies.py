@@ -19,7 +19,7 @@ df_news = pd.read_csv(news_path)
 
 
 #  Streamlit UI 구성
-def marketing_strategies_ui():
+def strategies_ui():
 
     # 캠페인 전략 Top 5
     st.header(" 캠페인 전략 Top 5")

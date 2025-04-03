@@ -54,7 +54,7 @@ def is_same_person(new_encoding, stored_encodings, names, tolerance=0.45):
     return None
 
 # Streamlit 메인 UI
-def settings_users_ui():
+def users_ui():
     st.markdown("## 👤 사용자 관리")
     st.markdown("### 직원 등록")
 

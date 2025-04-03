@@ -3,7 +3,7 @@
 
 import streamlit as st
 
-def analytics_economy_ui():
+def economy_ui():
 
     st.info("""
     ##  글로벌 경제 인사이트

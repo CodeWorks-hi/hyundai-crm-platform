@@ -11,7 +11,7 @@ import streamlit as st
 from .C_A_analytics_sale_domestic import domestic_ui
 from .C_A_analytics_sale_export import export_ui
 
-def analytics_sales_ui():
+def sales_ui():
 
     tab1, tab2 = st.tabs([
         "국내 판매 실적", 

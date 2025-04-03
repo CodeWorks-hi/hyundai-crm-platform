@@ -7,7 +7,7 @@ import streamlit as st
 
 
 
-def production_trend_ui():
+def trend_ui():
     st.info("""
             
     연도별 추이, 목표 달성률 페이지입니다.

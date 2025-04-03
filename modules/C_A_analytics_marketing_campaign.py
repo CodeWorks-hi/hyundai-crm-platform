@@ -32,7 +32,7 @@ def set_korean_font():
 set_korean_font()
 
 
-def marketing_campaign_ui():
+def campaign_ui():
     st.markdown("""
     ##  마케팅 캠페인 성과 분석
 

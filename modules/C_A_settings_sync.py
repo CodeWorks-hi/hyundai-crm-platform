@@ -5,7 +5,7 @@
 
 import streamlit as st
 
-def settings_sync_ui():
+def sync_ui():
     st.subheader("데이터 동기화 상태")
 
     st.info("데이터 동기화 시스템 상태를 확인하고, 오류 로그 및 마지막 동기화 일시를 확인합니다.")

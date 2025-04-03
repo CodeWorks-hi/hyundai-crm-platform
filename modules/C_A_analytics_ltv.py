@@ -6,7 +6,7 @@
 import streamlit as st
 
 
-def analytics_ltv_ui():
+def ltv_ui():
 
     # 탭 구성
     tab1, tab2, tab3= st.tabs([
