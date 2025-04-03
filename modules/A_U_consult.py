@@ -45,7 +45,8 @@ def consult_ui():
                         "완료여부": False,
                         "상담내용": "-",
                         "상담태그": "-",
-                        "고객피드백": "-"
+                        "고객피드백": "-",
+                        "목적": "방문"
                     }
 
                     df_path = "data/consult_log.csv"
@@ -56,7 +57,7 @@ def consult_ui():
                         df = pd.DataFrame([new_data])
 
                     df.to_csv(df_path, index=False)
-                    st.success("상담이 예약되었습니다.")
+                    st.success("방문예약 신청이 되었습니다.")
 
     with right_form:
         with st.expander("문의하기", expanded=True):
@@ -91,7 +92,8 @@ def consult_ui():
                         "완료여부": False,
                         "상담내용": "-",
                         "상담태그": "-",
-                        "고객피드백": "-"
+                        "고객피드백": "-",
+                        "목적": "문의"
                     }
 
                     df_path = "data/consult_log.csv"
@@ -105,7 +107,7 @@ def consult_ui():
                     st.success("문의가 접수되었습니다.")
 
     st.markdown("---")
-    consult_list, consult_true, consult_check = st.columns(3)
+    consult_list, consult_true, consult_visit = st.columns(3)
 
     # 상담 내역 표시
     df_path = "data/consult_log.csv"
@@ -116,7 +118,7 @@ def consult_ui():
             df["답변내용"] = ""
 
         with consult_list:
-            st.markdown("#### 상담 대기중 목록")
+            st.markdown("##### 상담 대기")
             wait_df = df[df["완료여부"] == False]
             for idx, row in wait_df.iterrows():
                 st.markdown(f"""
@@ -126,22 +128,34 @@ def consult_ui():
                 <b>진행상태:</b> 상담대기중
                 </div>
                 """, unsafe_allow_html=True)
-                with st.expander("열기", expanded=False):
+                with st.expander("내용확인 및 삭제", expanded=False):
                     with st.form(f"view_wait_{idx}"):
                         input_name = st.text_input("이름 확인", key=f"wait_name_{idx}")
                         input_phone = st.text_input("전화번호 확인", key=f"wait_phone_{idx}")
-                        if st.form_submit_button("열기"):
-                            if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
+                        col_open, col_delete = st.columns([1, 1])
+                        with col_open:
+                            open_clicked = st.form_submit_button("열기")
+                        with col_delete:
+                            delete_clicked = st.form_submit_button("삭제")
+
+                        if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
+                            if open_clicked:
                                 st.info(f"**상담내용:** {row['요청사항']}")
                                 답변 = row['답변내용']
                                 if pd.isna(답변) or str(답변).strip() == "":
                                     답변 = "답변대기중"
                                 st.info(f"**답변내용:** {답변}")
-                            else:
+                            elif delete_clicked:
+                                df.drop(index=idx, inplace=True)
+                                df.to_csv("data/consult_log.csv", index=False)
+                                st.success("삭제되었습니다.")
+                                st.rerun()
+                        else:
+                            if open_clicked or delete_clicked:
                                 st.warning("정보가 일치하지 않습니다.")
 
         with consult_true:
-            st.markdown("#### 상담 완료 목록")
+            st.markdown("##### 상담 완료 ")
             done_df = df[df["완료여부"] == True]
             for idx, row in done_df.iterrows():
                 st.markdown(f"""
@@ -151,16 +165,39 @@ def consult_ui():
                 <b>진행상태:</b> 상담완료
                 </div>
                 """, unsafe_allow_html=True)
-                with st.expander("열기", expanded=False):
+                with st.expander("내용확인 및 삭제", expanded=False):
                     with st.form(f"view_done_{idx}"):
                         input_name = st.text_input("이름 확인", key=f"done_name_{idx}")
                         input_phone = st.text_input("전화번호 확인", key=f"done_phone_{idx}")
-                        if st.form_submit_button("열기"):
-                            if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
+                        col_open, col_delete = st.columns([1, 1])
+                        with col_open:
+                            open_clicked = st.form_submit_button("열기")
+                        with col_delete:
+                            delete_clicked = st.form_submit_button("삭제")
+
+                        if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
+                            if open_clicked:
                                 st.info(f"**상담내용:** {row['요청사항']}")
                                 답변 = row['답변내용']
                                 if pd.isna(답변) or str(답변).strip() == "":
                                     답변 = "답변대기중"
                                 st.info(f"**답변내용:** {답변}")
-                            else:
+                            elif delete_clicked:
+                                df.drop(index=idx, inplace=True)
+                                df.to_csv("data/consult_log.csv", index=False)
+                                st.success("삭제되었습니다.")
+                                st.rerun()
+                        else:
+                            if open_clicked or delete_clicked:
                                 st.warning("정보가 일치하지 않습니다.")
+
+        with consult_visit:
+            st.markdown("##### 방문 신청 목록")
+            visit_df = df[(df["완료여부"] == False) & (df["목적"] == "방문")]
+            for _, row in visit_df.iterrows():
+                st.markdown(f"""
+                <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
+                <b>성명:</b> {mask_name(row['이름'])}<br>
+                <b>방문예정일:</b> {row['상담날짜']}<br>
+                </div>
+                """, unsafe_allow_html=True)
