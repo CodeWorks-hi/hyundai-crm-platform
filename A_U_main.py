@@ -169,13 +169,18 @@ def user_main_ui():
 
 # ▶️ 앱 진입점
 def app():
-    page = st.session_state.get("current_page", "user_main")
-    if page == "user_main":
+    page = st.session_state.get("current_page", "A_U_main")
+    if page == "A_U_main":
         user_main_ui()
     
     elif page == "A_U_comparison":   # 모델확인
-        import modules.A_U_comparison as auto
-        auto.comparison_ui()
+        import modules.A_U_comparison as comparison
+        comparison.comparison_ui()
+        
+    elif page == "A_U_detail":
+        # 상세 화면은 A_U_detail.py 내의 detail_ui 함수를 호출
+        from modules.A_U_detail import detail_ui
+        detail_ui()
         
     elif page == "A_U_map":   # 대리점 검색
         import modules.A_U_map as map
