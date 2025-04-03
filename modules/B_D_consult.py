@@ -107,6 +107,9 @@ def consult_ui():
                 st.session_state["show_recommendation"] = True
 
     with col5:
+        car_df = pd.read_csv("data/hyundai_car_list.csv")
+        st.dataframe(car_df)
+
         if st.session_state.get("show_recommendation", False):
             for i in range(1, 4):
                 img_col, text_col, button_col = st.columns([1.5, 1.3, 1])
