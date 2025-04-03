@@ -78,38 +78,83 @@ def consult_ui():
             colA, colB = st.columns(2)
             with colA:
                 st.text_input("성별", value=survey_result["성별"], disabled=True)
-                st.number_input("예산 (만원)", step=500, value=survey_result["예상예산_만원"])
+                budget = st.number_input("예산 (만원)", step=500, value=survey_result["예상예산_만원"])
                 companies = [str(survey_result["동승인원구성"])] + ["1인", "부부", "자녀1명", "자녀2명 이상", "부모님 동승"]
                 unique_companies = list(dict.fromkeys(companies))
-                st.selectbox("동승자 유형", unique_companies)
-                imp1 = [str(survey_result["중요요소1"])] + ["연비", "가격", "디자인", "성능", "안전", "공간"]
-                unique_imp1 = list(dict.fromkeys(imp1))
-                st.selectbox("가장 중요한 요소", unique_imp1)
-                imp3 = [str(survey_result["중요요소3"])] + ["연비", "가격", "디자인", "성능", "안전", "공간"]
-                unique_imp3 = list(dict.fromkeys(imp3))
-                st.selectbox("세 번째로 중요한 요소", unique_imp3)
+                company = st.selectbox("동승자 유형", unique_companies)
             with colB:
-                st.text_input("연령", value=survey_result["연령대"], disabled=True)
-                distances = [str(survey_result["월주행거리_km"])] + ["500", "1000", "1500", "2000 이상"]
-                unique_distances = list(dict.fromkeys(distances))
-                st.selectbox("예상 월간 주행 거리 (km)", unique_distances)
+                st.text_input("연령대", value=survey_result["연령대"], disabled=True)
+                if survey_result["월주행거리_km"] == "2000 이상" :
+                    survey_result["월주행거리_km"] = 2000
+                st.number_input("예상 월간 주행 거리 (km)", step=500, value=survey_result["월주행거리_km"])
                 colors = [str(survey_result["선호색상"])] + ["흰색", "검정", "회색", "은색", "파랑", "빨강", "기타"]
                 unique_colors = list(dict.fromkeys(colors))
                 st.selectbox("선호 색상", unique_colors)
+
+            purp = st.multiselect("운전 용도", ["출퇴근", "아이 통학", "주말여행", "레저활동", "업무차량"])
+
+            colC, colD = st.columns(2)
+            with colC:
+                imp1 = [str(survey_result["중요요소1"])] + ["연비", "가격", "디자인", "성능", "안전", "공간"]
+                unique_imp1 = list(dict.fromkeys(imp1))
+                prior1 = st.selectbox("가장 중요한 요소", unique_imp1)
+                imp3 = [str(survey_result["중요요소3"])] + ["연비", "가격", "디자인", "성능", "안전", "공간"]
+                unique_imp3 = list(dict.fromkeys(imp3))
+                prior3 = st.selectbox("세 번째로 중요한 요소", unique_imp3)
+            with colD:
                 imp2 = [str(survey_result["중요요소2"])] + ["연비", "가격", "디자인", "성능", "안전", "공간"]
                 unique_imp2 = list(dict.fromkeys(imp2))
-                st.selectbox("두 번째로 중요한 요소", unique_imp2)
-                st.text_input("최근 보유 차량", survey_result["최근보유차종"], disabled=True) # 이건 예측에 필요한가 애매
-            st.multiselect("운전 용도", ["출퇴근", "아이 통학", "주말여행", "레저활동", "업무차량"])
+                prior2 = st.selectbox("두 번째로 중요한 요소", unique_imp2)
+                st.text_input("최근 보유 차량", survey_result["최근보유차종"], disabled=True)
+            
             st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
                 
             if st.button("🚘 추천받기", use_container_width=True):
                 st.session_state["show_recommendation"] = True
 
-    with col5:
-        car_df = pd.read_csv("data/hyundai_car_list.csv")
-        st.dataframe(car_df)
+                car_df = pd.read_csv("data/hyundae_car_list.csv")
+                st.dataframe(car_df)
 
+                # 예산에 따라 추천 차량 필터링
+                car_df = car_df.loc[car_df["기본가격"] <= budget * 15000, :]
+
+                # 동승 유형에 따라 추천 차량 필터링
+                def company_type(company):
+                    return {
+                        "1인": "경차",
+                        "부부": "준중형",
+                        "자녀1명": "준중형",
+                        "자녀2명 이상": "중형",
+                        "부모님 동승": "중형"
+                    }.get(company, "")
+
+                comp_car = company_type(company)
+                car_df = car_df.loc[car_df["차량구분"] == comp_car, :]
+
+                # 우선 순위별 필터링
+                prior_list = [prior1, prior2, prior3]
+                for i in prior_list :
+                    if i == "연비" :
+                        car_df = car_df.loc[car_df["연비"] >= car_df["연비"].mean(), :]
+                    elif i == "가격" :
+                        car_df = car_df.loc[car_df["기본가격"] <= budget * 13000, :]
+                    elif i == "성능" :
+                        car_df = car_df.loc[car_df["배기량"] >= car_df["배기량"].mean(), :]
+                    elif i == "공간" :
+                        for j in purp :
+                            if j == "출퇴근":
+                                car_df = car_df.loc[(car_df["연비"] >= car_df["연비"].mean()) & (car_df["차량구분"].isin(["소형", "준중형", "중형"])), :]
+                            elif j == "아이 통학":
+                                car_df = car_df.loc[car_df["차량구분"].isin(["중형", "대형"]) & (car_df["차량구분"].isin(["소형", "준중형", "중형"])), :]
+                            elif j == "주말여행":
+                                pass
+                            elif j == "레저활동":
+                                pass
+                            elif j == "업무차량":
+                                pass
+
+
+    with col5:
         if st.session_state.get("show_recommendation", False):
             for i in range(1, 4):
                 img_col, text_col, button_col = st.columns([1.5, 1.3, 1])
