@@ -6,7 +6,6 @@
 
 
 import streamlit as st
-import seaborn as sb
 
 def domestic_performance_ui():
     st.subheader("판매·수출 관리")
