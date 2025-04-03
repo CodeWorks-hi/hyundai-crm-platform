@@ -5,6 +5,7 @@
 import streamlit as st
 from .C_A_inventory_distribution import distribution_ui
 from .C_A_inventory_warning import warning_ui
+from .C_A_inventory_turnover import turnover_ui
 
 
 def inventory_ui():
@@ -29,8 +30,9 @@ def inventory_ui():
 
     # 탭 구성
     tab_names = [
-        "공장 재고 분포 및 차종별 재고 현황",
-        "재고 회전율 분석 및 재고 경고 시스템"
+        "공장 및 차종별 재고 현황",
+        "재고 회전율 분석",
+        "재고 경고 시스템"
         ""
     ]
     
@@ -38,9 +40,11 @@ def inventory_ui():
 
     # 각 탭별 UI 호출
     with selected_tab[0]:
-        distribution_ui()  # 공장/지역별 재고 분포
+        distribution_ui()       # 공장/지역별 재고 분포
 
     with selected_tab[1]:
-        warning_ui() # 재고 회전율 분석
+        turnover_ui()          # 재고 회전율 분석
 
-  
+
+    with selected_tab[2]:
+        warning_ui()            # 재고 경고 시스템

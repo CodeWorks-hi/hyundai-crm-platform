@@ -11,8 +11,11 @@ from datetime import datetime
 # 데이터 불러오기
 car_list_path = "data/hyundae_car_list.csv"
 inventory_path = "data/inventory_data.csv"
+hyundai_plant_path = "data/processed/total/hyundai-by-plant.csv"
+
 df_list = pd.read_csv(car_list_path)
 df_inv = pd.read_csv(inventory_path)
+df_plant = pd.read_csv(hyundai_plant_path)
 
 def trend_ui():
     st.title("생산·제조 현황 분석")
