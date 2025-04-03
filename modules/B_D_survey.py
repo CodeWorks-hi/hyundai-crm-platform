@@ -63,9 +63,8 @@ def survey_ui(df_employees, generate_html_table):
                 min_value=datetime.date(1950, 1, 1),
                 max_value=today,
                 value=datetime.date(1990, 1, 1))
-        with gender :   
-            is_male = st.toggle("남성 / 여성", value=True)
-            성별 = "남성" if is_male else "여성"
+        with gender:
+            성별 = st.selectbox("성별", ["남성", "여성"])
 
         거주지역 = st.selectbox("거주 지역", [
             "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시", "대전광역시",
