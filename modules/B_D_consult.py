@@ -107,7 +107,7 @@ def consult_ui():
                 prior2 = st.selectbox("두 번째로 중요한 요소", unique_imp2)
                 st.text_input("최근 보유 차량", survey_result["최근보유차종"], disabled=True)
             
-            fav_list = st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
+            st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
                 
             if st.button("🚘 추천받기", use_container_width=True):
                 st.session_state["show_recommendation"] = True
@@ -226,7 +226,6 @@ def consult_ui():
             selected_tags.append(custom_tag)
         if len(selected_tags) == 0:
             selected_tags = "-"
-            
 
         st.markdown("##### ✅ 선택된 태그")
         st.markdown(
