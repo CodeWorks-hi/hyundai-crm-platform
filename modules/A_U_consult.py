@@ -4,6 +4,9 @@ import pandas as pd
 
 
 def consult_ui():
+    if "wait_page" not in st.session_state: st.session_state["wait_page"] = 0
+    if "done_page" not in st.session_state: st.session_state["done_page"] = 0
+    if "visit_page" not in st.session_state: st.session_state["visit_page"] = 0
 
     def mask_name(name):
         if len(name) >= 2:
@@ -107,7 +110,11 @@ def consult_ui():
                     st.success("문의가 접수되었습니다.")
 
     st.markdown("---")
-    consult_list, consult_true, consult_visit = st.columns(3)
+    consult_list, spacer1, consult_true, spacer2, consult_visit = st.columns([1, 0.02, 1, 0.02, 1])
+    with spacer1:
+        st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
+    with spacer2:
+        st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
 
     # 상담 내역 표시
     df_path = "data/consult_log.csv"
@@ -120,7 +127,12 @@ def consult_ui():
         with consult_list:
             st.markdown("##### 상담 대기")
             wait_df = df[df["완료여부"] == False]
-            for idx, row in wait_df.iterrows():
+            per_page = 5
+            total_wait_pages = (len(wait_df) - 1) // per_page + 1
+            start = st.session_state["wait_page"] * per_page
+            end = start + per_page
+            wait_df_page = wait_df.iloc[start:end]
+            for idx, row in wait_df_page.iterrows():
                 st.markdown(f"""
                 <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
                 <b>성명:</b> {mask_name(row['이름'])}<br>
@@ -154,10 +166,38 @@ def consult_ui():
                             if open_clicked or delete_clicked:
                                 st.warning("정보가 일치하지 않습니다.")
 
+            st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
+            page_buttons = st.columns(7)
+
+            with page_buttons[0]:
+                if st.button("«", key="wait_first"):
+                    st.session_state["wait_page"] = 0
+                    st.rerun()
+
+            start_page = max(0, st.session_state["wait_page"] - 2)
+            end_page = min(total_wait_pages, start_page + 5)
+
+            for i, page_num in enumerate(range(start_page, end_page)):
+                with page_buttons[i + 1]:
+                    if st.button(f"{page_num + 1}", key=f"wait_page_{page_num}"):
+                        st.session_state["wait_page"] = page_num
+                        st.rerun()
+
+            with page_buttons[6]:
+                if st.button("»", key="wait_last"):
+                    st.session_state["wait_page"] = total_wait_pages - 1
+                    st.rerun()
+
+            st.markdown("</div>", unsafe_allow_html=True)
+
         with consult_true:
             st.markdown("##### 상담 완료 ")
             done_df = df[df["완료여부"] == True]
-            for idx, row in done_df.iterrows():
+            total_done_pages = (len(done_df) - 1) // per_page + 1
+            start = st.session_state["done_page"] * per_page
+            end = start + per_page
+            done_df_page = done_df.iloc[start:end]
+            for idx, row in done_df_page.iterrows():
                 st.markdown(f"""
                 <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
                 <b>성명:</b> {mask_name(row['이름'])}<br>
@@ -191,13 +231,79 @@ def consult_ui():
                             if open_clicked or delete_clicked:
                                 st.warning("정보가 일치하지 않습니다.")
 
+            st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
+            page_buttons = st.columns(7)
+
+            with page_buttons[0]:
+                if st.button("«", key="done_first"):
+                    st.session_state["done_page"] = 0
+                    st.rerun()
+
+            start_page = max(0, st.session_state["done_page"] - 2)
+            end_page = min(total_done_pages, start_page + 5)
+
+            for i, page_num in enumerate(range(start_page, end_page)):
+                with page_buttons[i + 1]:
+                    if st.button(f"{page_num + 1}", key=f"done_page_{page_num}"):
+                        st.session_state["done_page"] = page_num
+                        st.rerun()
+
+            with page_buttons[6]:
+                if st.button("»", key="done_last"):
+                    st.session_state["done_page"] = total_done_pages - 1
+                    st.rerun()
+
+            st.markdown("</div>", unsafe_allow_html=True)
+
         with consult_visit:
             st.markdown("##### 방문 신청 목록")
             visit_df = df[(df["완료여부"] == False) & (df["목적"] == "방문")]
-            for _, row in visit_df.iterrows():
-                st.markdown(f"""
-                <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
-                <b>성명:</b> {mask_name(row['이름'])}<br>
-                <b>방문예정일:</b> {row['상담날짜']}<br>
-                </div>
-                """, unsafe_allow_html=True)
+            total_visit_pages = (len(visit_df) - 1) // per_page + 1
+            start = st.session_state["visit_page"] * per_page
+            end = start + per_page
+            visit_df_page = visit_df.iloc[start:end]
+            for idx, row in visit_df_page.iterrows():
+                with st.container():
+                    st.markdown(f"""
+                    <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
+                    <b>성명:</b> {mask_name(row['이름'])}<br>
+                    <b>방문예정일:</b> {row['상담날짜']}
+                    </div>
+                    """, unsafe_allow_html=True)
+                    with st.expander("예약 취소", expanded=False):
+                        with st.form(f"cancel_visit_{idx}"):
+                            input_name = st.text_input("이름 확인", key=f"cancel_name_{idx}")
+                            input_phone = st.text_input("전화번호 확인", key=f"cancel_phone_{idx}")
+                            cancel_clicked = st.form_submit_button("예약 취소")
+                            if cancel_clicked:
+                                if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
+                                    df.drop(index=idx, inplace=True)
+                                    df.to_csv("data/consult_log.csv", index=False)
+                                    st.success("예약이 취소되었습니다.")
+                                    st.rerun()
+                                else:
+                                    st.warning("정보가 일치하지 않습니다.")
+
+            st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
+            page_buttons = st.columns(7)
+
+            with page_buttons[0]:
+                if st.button("«", key="visit_first"):
+                    st.session_state["visit_page"] = 0
+                    st.rerun()
+
+            start_page = max(0, st.session_state["visit_page"] - 2)
+            end_page = min(total_visit_pages, start_page + 5)
+
+            for i, page_num in enumerate(range(start_page, end_page)):
+                with page_buttons[i + 1]:
+                    if st.button(f"{page_num + 1}", key=f"visit_page_{page_num}"):
+                        st.session_state["visit_page"] = page_num
+                        st.rerun()
+
+            with page_buttons[6]:
+                if st.button("»", key="visit_last"):
+                    st.session_state["visit_page"] = total_visit_pages - 1
+                    st.rerun()
+
+            st.markdown("</div>", unsafe_allow_html=True)
