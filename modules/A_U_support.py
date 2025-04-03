@@ -11,7 +11,7 @@ import streamlit as st
 # +---------+
 
 def support_ui():
-    if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
+    if st.button("← 유저 메인으로 돌아가기", key="support_back_to_user_main"):
         st.session_state.current_page = "A_U_main"
         st.rerun()
     
