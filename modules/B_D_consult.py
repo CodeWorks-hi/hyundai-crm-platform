@@ -59,7 +59,7 @@ def consult_ui():
             colA, colB = st.columns(2)
             with colA:
                 st.text_input("성별", value=survey_result["성별"], disabled=True)
-                st.number_input("예산 (만원)", value=survey_result["예상예산_만원"])
+                st.number_input("예산 (만원)", step=500, value=survey_result["예상예산_만원"])
                 companies = [str(survey_result["동승인원구성"])] + ["1인", "부부", "자녀1명", "자녀2명 이상", "부모님 동승"]
                 unique_companies = list(dict.fromkeys(companies))
                 st.selectbox("동승자 유형", unique_companies)
@@ -69,7 +69,6 @@ def consult_ui():
                 imp3 = [str(survey_result["중요요소3"])] + ["연비", "가격", "디자인", "성능", "안전", "공간"]
                 unique_imp3 = list(dict.fromkeys(imp3))
                 st.selectbox("세 번째로 중요한 요소", unique_imp3)
-                st.multiselect("운전 용도", ["출퇴근", "아이 통학", "주말여행", "레저활동", "업무차량"])
             with colB:
                 st.text_input("연령", value=survey_result["연령대"], disabled=True)
                 distances = [str(survey_result["월주행거리_km"])] + ["500", "1000", "1500", "2000 이상"]
@@ -82,8 +81,8 @@ def consult_ui():
                 unique_imp2 = list(dict.fromkeys(imp2))
                 st.selectbox("두 번째로 중요한 요소", unique_imp2)
                 st.text_input("최근 보유 차량", survey_result["최근보유차종"], disabled=True) # 이건 예측에 필요한가 애매
-                st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
-                
+            st.multiselect("운전 용도", ["출퇴근", "아이 통학", "주말여행", "레저활동", "업무차량"])
+            st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
                 
             if st.button("🚘 추천받기", use_container_width=True):
                 st.session_state["show_recommendation"] = True
