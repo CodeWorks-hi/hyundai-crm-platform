@@ -111,7 +111,7 @@ def inventory_ui():
     col3, col3M, colM, col4M, col4 = st.columns([1, 0.1, 1.5, 0.1, 1.5])
 
     with col3:
-        st.markdown("### 🏭 생산 부품 부족 알림")
+        st.markdown("### 🏭 출고 이슈")
         
         inv_df["차종트림"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
         low_inventory_df = (
