@@ -282,3 +282,8 @@ def dashboard_ui():
                             <span style="font-size: 15px; font-weight: 500; color: #333;">• {row[col]}</span>
                         </div>
                         """, unsafe_allow_html=True)
+
+        st.markdown("---")
+
+        with st.expander("카카오톡 플러스톡 상담 화면"):
+            st.image("images/kakao.png", use_column_width=True)
