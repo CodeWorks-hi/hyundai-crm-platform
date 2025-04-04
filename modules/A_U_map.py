@@ -1,4 +1,4 @@
-# 고객 메인 대시보드   
+# 고객 메인 대시보드
 # 대리점 및 정비소 지도화
 # 대리점 및 정비소 리스트
 
@@ -7,6 +7,8 @@ import requests
 import folium
 import os
 import streamlit.components.v1 as components
+from st_aggrid import AgGrid
+import pandas as pd
 
 # +-------------+
 # | 대리점 지도보기 |
@@ -67,22 +69,37 @@ def create_popup_html(place):
 # 메인 함수 (탭 UI 렌더링)
 # --------------------------
 def map_ui():
-    if st.button("← 유저 메인으로 돌아가기", key="map_back_to_user_main"):
-        st.session_state.current_page = "A_U_main"
-        st.rerun()
-    st.title(" 대리점 및 정비소 찾기")
-
     tab1, tab2 = st.tabs([' 지점 찾기', ' 정비소 찾기'])
 
     for tab, keyword in zip([tab1, tab2], ["지점", "정비소"]):
         with tab:
-            st.markdown(f"### 🔍 {keyword} 검색")
+
 
             col_map, col_list = st.columns([2, 1])
+            with col_list:
+                search_query = st.text_input(f"{keyword} 검색어 입력:", key=f"{keyword}_input")
+                st.write("")
+                if search_query:
+                    results = search_place(search_query, keyword)
+                    if results:
+                        st.write(f"**검색 결과 ({len(results)}개)**")
+                        for i, place in enumerate(results, start=1):
+                            with st.container():
+                                st.markdown(f"##### {i}. {place['place_name']}")
+                                st.write(f"**주소**: {place['road_address_name'] or place['address_name']}")
+                                st.write(f"**전화**: {place['phone'] or '없음'}")
+                                col_a, col_b = st.columns(2)
+                                with col_a:
+                                    st.link_button("상세확인", place['place_url'])
+                                with col_b:
+                                    st.link_button("길찾기", f"https://map.kakao.com/link/from/내위치,{DEFAULT_LAT},{DEFAULT_LON}/to/{place['place_name']},{place['y']},{place['x']}")
+                                st.markdown("---")
+                    else:
+                        st.warning("검색 결과가 없습니다.")
+                else:
+                    st.info("검색어를 입력해주세요.")
 
             with col_map:
-                search_query = st.text_input(f"{keyword} 검색어 입력:", key=f"{keyword}_input")
-
                 if not search_query:
                     m = folium.Map(location=DEFAULT_LOCATION, zoom_start=13)
                 else:
@@ -104,21 +121,3 @@ def map_ui():
                     f"""<div style="width:1000px; height:500px;">{m._repr_html_()}</div>""",
                     height=800,
                 )
-
-            with col_list:
-                st.write("")
-                if search_query:
-                    results = search_place(search_query, keyword)
-                    if results:
-                        st.write(f"**검색 결과 ({len(results)}개)**")
-                        for i, place in enumerate(results, start=1):
-                            st.markdown(f"**{i}. [{place['place_name']}]({place['place_url']})**", unsafe_allow_html=True)
-                            st.caption(f"{place['road_address_name'] or place['address_name']}")
-                            if place["phone"]:
-                                st.caption(f"📞 {place['phone']}")
-                            st.write("---")
-                    else:
-                        st.warning("검색 결과가 없습니다.")
-                else:
-                    st.info("검색어를 입력해주세요.")
-
