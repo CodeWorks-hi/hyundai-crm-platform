@@ -158,7 +158,9 @@ def warning_ui():
     
     col1, col2 = st.columns([3,1])
     with col1:
-        selected_factory = st.selectbox("공장 선택", ['전체'] + df['공장명'].unique().tolist())
+        factories = df['공장명'].astype(str).unique().tolist()
+        factories.sort()
+        selected_factory = st.selectbox("공장 선택", ['전체'] + factories)
     with col2:
         selected_grade = st.multiselect("경고 등급", df['경고등급'].unique(), ['🚨 긴급', '⚠️ 주의'])
 
