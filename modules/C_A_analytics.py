@@ -25,11 +25,11 @@ def analytics_ui():
     """, unsafe_allow_html=True)
 
     tab_names = [
-        "국내해외 판매 관리",
-        "해외 판매 관리",
-        "LTV 및 시장 예측 분석",
-        "글로벌 경제 인사이트내",
-        "마케팅 캠페인 성과"
+        "국내",
+        "해외",
+        "LTV 예측",
+        "글로벌 경제",
+        "마케팅 캠페인"
 
     ]
 
@@ -48,8 +48,8 @@ def analytics_ui():
 
     with selected_tab[3]:
         economy_ui()      # "글로벌 경제 인사이트내"
-        
-        
+
+   
     with selected_tab[4]:     
         marketing_ui()    # "마케팅 캠페인 성과"
 
