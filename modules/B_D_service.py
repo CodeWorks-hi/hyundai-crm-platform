@@ -21,12 +21,13 @@ def fetch_forecast_table():
 
 
 def service_ui():
-    # 미세먼지 예보 등급 확인
-    st.markdown("#### 🌫️ 초미세먼지(PM2.5) 예보 등급 보기")
-    st.caption("출처: AirKorea - www.airkorea.or.kr")
+    with st.expander(" "):
+        # 미세먼지 예보 등급 확인
+        st.markdown("#### 🌫️ 초미세먼지(PM2.5) 예보 등급 보기")
+        st.caption("출처: AirKorea - www.airkorea.or.kr")
 
-    with st.spinner("최신 예보 정보를 불러오는 중..."):
-        df = fetch_forecast_table()
-        st.dataframe(df, use_container_width=True)
+        with st.spinner("최신 예보 정보를 불러오는 중..."):
+            df = fetch_forecast_table()
+            st.dataframe(df, use_container_width=True)
 
-    st.info("이 페이지는 매일 17:30 이후 갱신되는 예보 데이터를 표시합니다.")
+        st.info("이 페이지는 매일 17:30 이후 갱신되는 예보 데이터를 표시합니다.")
