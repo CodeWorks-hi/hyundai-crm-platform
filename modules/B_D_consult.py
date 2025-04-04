@@ -144,7 +144,7 @@ def consult_ui():
                 car_df = car_df.loc[car_df["차량구분"] == comp_car, :]
 
                 # 우선 순위별 필터링
-                prior_list = list(set[prior1, prior2, prior3])
+                prior_list = list(set([prior1, prior2, prior3]))
                 for i in prior_list :
                     if i == "연비" :
                         car_df = car_df.loc[car_df["연비"] >= car_df["연비"].mean(), :]
