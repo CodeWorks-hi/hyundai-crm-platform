@@ -60,8 +60,9 @@ def preprocess_data(df_inv):
             df_inv['재고회전율'] <= 0.3,
             df_inv['재고회전율'] > 0.3
         ],
-        ['🚨 긴급', '⚠️ 주의', '✅ 정상']
-    )
+        ['🚨 긴급', '⚠️ 주의', '✅ 정상'],
+        default='✅ 정상'
+    ).astype(str) 
 
     # 제거할 컬럼 목록
     columns_to_drop = [
@@ -211,9 +212,16 @@ def warning_ui():
     with col1:
         selected_factory = st.selectbox("공장 선택", ['전체'] + df_inv['공장명'].unique().tolist())
     with col2:
-        selected_grade = st.multiselect("경고 등급", df_inv['경고등급'].unique(), ['🚨 긴급', '⚠️ 주의'])
-    
+        grade_list = df_inv['경고등급'].astype(str).unique().tolist()
+        valid_defaults = [g for g in ['🚨 긴급', '⚠️ 주의'] if g in grade_list]
+        
+        selected_grade = st.multiselect(
+            "경고 등급",
+            options=grade_list,
+            default=valid_defaults if valid_defaults else []
+        )
 
+    # 데이터 필터링
     filtered_df = df_inv[df_inv['경고등급'].isin(selected_grade)]
     if selected_factory != '전체':
         filtered_df = filtered_df[filtered_df['공장명'] == selected_factory]
