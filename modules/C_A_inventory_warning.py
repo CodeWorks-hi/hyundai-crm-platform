@@ -287,10 +287,19 @@ def warning_ui():
         if st.button("🚨 슬랙 전송"):
             for _, row in filtered_df.iterrows():
                 send_slack_alert(
-                    model_name=row["모델명"],
-                    turnover_rate=row["재고회전율"],
-                    plant=row.get("공장명", ""),
-                    status=row.get("생산상태", ""),
-                    link=f"https://example.com/cars/{row['모델명']}"
+                    model_name=row.get("모델명", "N/A"),
+                    turnover_rate=row.get("재고회전율", 0),
+                    plant=row.get("공장명", "미지정"),
+                    status=row.get("생산상태", "알 수 없음"),
+                    link=f"https://example.com/cars/{row.get('모델명', 'unknown')}"
                 )
             st.success("✅ 선택된 모델이 슬랙으로 전송되었습니다.")
+
+            # 슬랙 알림 예시 이미지 표시
+            col1, col2 = st.columns(2)
+            with col1:
+                st.image("data/salack_photos/salack_1.png", caption="슬랙 알림 요약 예시", use_container_width=True)
+            with col2:
+                st.image("data/salack_photos/salack_2.png", caption="슬랙 경고 상세 예시", use_container_width=True)
+
+            st.markdown("---")
