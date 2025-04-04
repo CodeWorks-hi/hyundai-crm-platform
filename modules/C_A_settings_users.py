@@ -16,9 +16,9 @@ import uuid
 import streamlit as st
 import pandas as pd
 import numpy as np
-import cv2
-import face_recognition
-import mediapipe as mp
+# import cv2
+# import face_recognition
+# import mediapipe as mp
 from PIL import Image
 
 # 경로 설정
@@ -43,19 +43,19 @@ def load_employees():
 def save_employees(df):
     df.to_csv(EMPLOYEE_CSV_PATH, index=False)
 
-# 얼굴 인코딩
-def encode_face(img_path):
-    image = face_recognition.load_image_file(img_path)
-    encodings = face_recognition.face_encodings(image)
-    return encodings[0] if encodings else None
+# # 얼굴 인코딩
+# def encode_face(img_path):
+#     image = face_recognition.load_image_file(img_path)
+#     encodings = face_recognition.face_encodings(image)
+#     return encodings[0] if encodings else None
 
-# 얼굴 비교
-def is_same_person(new_encoding, stored_encodings, names, tolerance=0.45):
-    results = face_recognition.compare_faces(stored_encodings, new_encoding, tolerance)
-    if True in results:
-        idx = results.index(True)
-        return names[idx]
-    return None
+# # 얼굴 비교
+# def is_same_person(new_encoding, stored_encodings, names, tolerance=0.45):
+#     results = face_recognition.compare_faces(stored_encodings, new_encoding, tolerance)
+#     if True in results:
+#         idx = results.index(True)
+#         return names[idx]
+#     return None
 
 # Streamlit UI
 def users_ui():
@@ -82,21 +82,21 @@ def users_ui():
                     with open(save_path, "wb") as f:
                         f.write(photo.getbuffer())
 
-                    encoding = encode_face(save_path)
-                    if encoding is not None:
-                        new_row = pd.DataFrame([{
-                            "고유ID": new_id,
-                            "직원이름": name,
-                            "사번": emp_number,
-                            "사진경로": save_path,
-                            "인코딩": encoding.tolist()
-                        }])
-                        df = pd.concat([df, new_row], ignore_index=True)
-                        save_employees(df)
-                        st.success(f"{name} 님이 등록되었습니다.")
-                    else:
-                        os.remove(save_path)
-                        st.warning("❌ 사진에서 얼굴을 인식할 수 없습니다.")
+                    # encoding = encode_face(save_path)
+                    # if encoding is not None:
+                    new_row = pd.DataFrame([{
+                        "고유ID": new_id,
+                        "직원이름": name,
+                        "사번": emp_number,
+                        "사진경로": save_path
+                        # "인코딩": encoding.tolist()
+                    }])
+                    df = pd.concat([df, new_row], ignore_index=True)
+                    save_employees(df)
+                    st.success(f"{name} 님이 등록되었습니다.")
+                    # else:
+                    #     os.remove(save_path)
+                    #     st.warning("❌ 사진에서 얼굴을 인식할 수 없습니다.")
             else:
                 st.warning("이름, 사번, 사진을 모두 입력해주세요.")
 
