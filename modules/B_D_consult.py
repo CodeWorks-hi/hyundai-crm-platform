@@ -105,6 +105,7 @@ def consult_ui():
                 unique_colors = list(dict.fromkeys(colors))
                 st.selectbox("선호 색상", unique_colors)
 
+            
             purp = st.multiselect("운전 용도", ["출퇴근", "아이 통학", "주말여행", "레저활동", "업무차량"])
 
             colC, colD = st.columns(2)
@@ -238,7 +239,9 @@ def consult_ui():
             unsafe_allow_html=True
         )
         default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
-        selected_tags = st.multiselect("상담 태그 선택", default_tags)
+        selected_tags_input = st.multiselect("상담 태그 선택", default_tags)
+        selected_tags = selected_tags_input.copy() if isinstance(selected_tags_input, list) else []
+
         custom_tag = st.text_input("기타 태그 직접 입력")
         if custom_tag and custom_tag not in selected_tags:
             selected_tags.append(custom_tag)
