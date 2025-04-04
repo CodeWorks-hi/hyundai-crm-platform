@@ -12,7 +12,7 @@ from datetime import datetime
 @st.cache_data
 def load_data():
     # 파일 경로 수정
-    car_list_path = "data/hyundai_car_list.csv"  
+    car_list_path = "data/hyundae_car_list.csv"  
     inventory_path = "data/inventory_data.csv"
     hyundai_plant_path = "data/processed/total/hyundai-by-plant.csv"
 

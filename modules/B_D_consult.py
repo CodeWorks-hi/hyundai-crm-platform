@@ -5,6 +5,10 @@ def consult_ui():
     st.title("🧾 고객 상담 페이지")
     clicked = False
 
+    if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
+        st.warning("딜러 정보를 먼저 등록하세요.")
+        return
+    
     if "show_recommendation" not in st.session_state:
         st.session_state["show_recommendation"] = False
     if "고객정보" not in st.session_state or not isinstance(st.session_state["고객정보"], dict):

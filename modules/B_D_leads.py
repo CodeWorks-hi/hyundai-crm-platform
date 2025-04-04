@@ -5,6 +5,10 @@ import plotly.graph_objects as go
 def leads_ui():
     st.markdown("### 👥 고객 리드 관리 대시보드")
 
+    if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
+        st.warning("딜러 정보를 먼저 등록하세요.")
+        return
+
     col1, col2, col3 = st.columns([1, 1, 4])
     with col1:
         selected_name = st.text_input("고객 성명 입력", key="leads_name")

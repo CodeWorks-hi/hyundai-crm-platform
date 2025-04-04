@@ -4,6 +4,10 @@ import plotly.express as px
 
 
 def inventory_ui():
+    if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
+        st.warning("딜러 정보를 먼저 등록하세요.")
+        return
+
     # 데이터 불러오기 예시
     inv_df = pd.read_csv("data/inventory_data.csv")
     inv_df["차종"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
