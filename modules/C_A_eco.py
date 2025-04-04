@@ -90,14 +90,14 @@ def eco_ui():
     st.markdown("---")
     st.subheader("🚫 계절관리제 운행제외 대상 정보")
     restriction_df = load_restriction_data()
-    st.dataframe(restriction_df, use_container_width=True)
+    st.dataframe(restriction_df, use_container_width=True, hide_index=True)
 
     # 원본 데이터 섹션
     with st.expander("📁 원본 데이터 확인", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
             st.write("차량 마스터 데이터")
-            st.dataframe(df_list, use_container_width=True)
+            st.dataframe(df_list, use_container_width=True, hide_index=True)
         with col2:
             st.write("부품 재고 데이터")
-            st.dataframe(df_inv, use_container_width=True)
+            st.dataframe(df_inv, use_container_width=True, hide_index=True)

@@ -146,7 +146,8 @@ def turnover_ui():
                 )
             },
             height=600,
-            use_container_width=True
+            use_container_width=True,
+            hide_index=True
         )
     st.download_button("📥 CSV 내보내기", df_inv.to_csv(index=False), 
                         file_name="inventory_ltv_analysis.csv")

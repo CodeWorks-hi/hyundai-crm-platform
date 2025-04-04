@@ -51,12 +51,12 @@ def create_popup_html(place):
 
     return f"""
     <div style="width:300px;">
-        <h4 style="margin-bottom:5px;">🔹 {place_name}</h4>
-        <p><strong>📍 주소:</strong> {address}</p>
-        <p><strong>📞 전화:</strong> {phone}</p>
+        <h4 style="margin-bottom:5px;">{place_name}</h4>
+        <p><strong>주소:</strong> {address}</p>
+        <p><strong>전화:</strong> {phone}</p>
         <p>
-          <a href="{detail_url}" target="_blank" style="color:blue; text-decoration:none;">📷 상세보기</a> |
-          <a href="{kakao_map_url}" target="_blank" style="color:blue; text-decoration:none;">🗺️ 길찾기</a>
+          <a href="{detail_url}" target="_blank" style="color:blue; text-decoration:none;">상세보기</a> |
+          <a href="{kakao_map_url}" target="_blank" style="color:blue; text-decoration:none;">길찾기</a>
         </p>
     </div>
     """
@@ -70,7 +70,7 @@ def render_char_search_map():
 
     # 🔹 지역 선택
     with col1:
-        st.markdown("### 🔍 충전소 지역 선택")
+        st.markdown("### 충전소 선택")
         selected_sido = st.selectbox("시도", char['시도'].unique(), key="sido")
         selected_gungu = st.selectbox("군구", char[char['시도'] == selected_sido]['군구'].unique(), key="gungu")
 
@@ -83,14 +83,14 @@ def render_char_search_map():
         # 충전소 선택
         selected_station = st.selectbox("충전소 선택", selected_area['충전소명'].unique(), key="station")
      
-        st.markdown("### 📋 충전소 상세 정보")
+        st.markdown("### 상세 정보")
         selected_info = selected_area[selected_area['충전소명'] == selected_station].iloc[0]
         st.markdown(f"""
         <div style="border:1px solid #ccc; border-radius:10px; padding:12px;">
             <h4>{selected_info['충전소명']}</h4>
-            <p>📍 <b>주소</b>: {selected_info['주소']}</p>
-            <p>🔌 <b>충전기타입</b>: {selected_info['충전기타입']}</p>
-            <p>🏢 <b>시설구분</b>: {selected_info['시설구분(대)']} / {selected_info['시설구분(소)']}</p>
+            <p><b>주소</b>: {selected_info['주소']}</p>
+            <p><b>충전기타입</b>: {selected_info['충전기타입']}</p>
+            <p><b>시설구분</b>: {selected_info['시설구분(대)']} / {selected_info['시설구분(소)']}</p>
         </div>
         """, unsafe_allow_html=True)
 

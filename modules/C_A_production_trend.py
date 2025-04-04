@@ -92,7 +92,7 @@ def trend_ui():
         ],
         '월평균생산량': [6500, 7200, 5000, 4800, 7000]
     })
-    st.dataframe(current_models, use_container_width=True)
+    st.dataframe(current_models, use_container_width=True, hide_index=True)
     
     # 위험 모델 경고 섹션
     st.subheader("⚠️ 생산 위험 모델 알림")
@@ -105,7 +105,7 @@ def trend_ui():
     st.dataframe(risk_models.style.applymap(
         lambda x: 'background-color: #ffcccc' if x in ['중단', 0, 12] else '', 
         subset=['위험등급', '잔여재고']
-    ), use_container_width=True)
+    ), use_container_width=True, hide_index=True)
     
     st.markdown("---")
     
@@ -141,15 +141,15 @@ def trend_ui():
     plant_status = df_plant.groupby(['공장명', '생산상태']).size().unstack(fill_value=0)
     st.dataframe(
         plant_status.style.background_gradient(cmap='YlGnBu'),
-        use_container_width=True
+        use_container_width=True, hide_index=True
     )
     
     # 원본 데이터 표시
     with st.expander(" 원본 데이터 확인"):
         tab1, tab2, tab3 = st.tabs(["차량정보", "재고데이터", "공장데이터"])
         with tab1:
-            st.dataframe(df_list, use_container_width=True)
+            st.dataframe(df_list, use_container_width=True, hide_index=True)
         with tab2:
-            st.dataframe(df_inv, use_container_width=True)
+            st.dataframe(df_inv, use_container_width=True, hide_index=True)
         with tab3:
-            st.dataframe(df_plant, use_container_width=True)
+            st.dataframe(df_plant, use_container_width=True, hide_index=True)
