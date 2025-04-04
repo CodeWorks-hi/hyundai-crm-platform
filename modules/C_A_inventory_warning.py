@@ -57,8 +57,9 @@ def warning_ui():
         st.download_button("CSV 다운로드", data=df_inv.to_csv(index=False), file_name="inventory_turnover.csv")
 
 
-    # 위험 부품 매트릭스 분석
-    st.subheader("위험 부품 관리 매트릭스", divider="red")
+     # 기본값 초기화
+    risk_df = pd.DataFrame()
+
     if "경고등급" in df_inv.columns and "부품명" in df_inv.columns:
         risk_df = df_inv[(df_inv["경고등급"] != "정상") & (df_inv["부품명"] != "미확인부품")]
 
