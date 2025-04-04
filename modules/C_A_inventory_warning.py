@@ -41,40 +41,41 @@ def preprocess_data(df_inv):
         "싱가포르공장": (1.352, 103.819),
         "인도네시아공장": (-6.305, 107.097)
     }
-    # 위치 정보 추가
+
     df_inv[['위도', '경도']] = pd.DataFrame(
         df_inv['공장명'].map(plant_location).tolist(),
         index=df_inv.index
     )
 
-    # 데이터 타입 강제 변환
-    df_inv['공장명'] = df_inv['공장명'].astype(str)  # 공장명 문자열 보장
-    df_inv['경고등급'] = df_inv['경고등급'].astype(str)  # 경고등급 문자열 보장
-
-    # 재고 지표 계산
+    # 2. 회전율 계산
     np.random.seed(23)
     df_inv["월평균입고"] = np.random.randint(50, 500, size=len(df_inv))
     df_inv["월평균출고"] = np.random.randint(30, 400, size=len(df_inv))
-    df_inv["재고회전율"] = (df_inv["월평균출고"] / df_inv["재고량"]).replace([np.inf, -np.inf], 0).round(2)
+    df_inv["재고회전율"] = (df_inv["월평균출고"] / df_inv["재고량"]).replace([np.inf, -np.inf], 0).fillna(0).round(2)
 
-    # 경고 등급 시스템
+
     df_inv['경고등급'] = np.select(
         [
             df_inv['재고회전율'] <= 0.15,
             df_inv['재고회전율'] <= 0.3,
             df_inv['재고회전율'] > 0.3
         ],
-        ['🚨 긴급', '⚠️ 주의', '✅ 정상'],
-        default='✅ 정상'
+        ['🚨 긴급', '⚠️ 주의', '✅ 정상']
     )
 
-    # 불필요 컬럼 제거
-    df_inv = df_inv.drop(columns=[
+    # 제거할 컬럼 목록
+    columns_to_drop = [
         '전장', '전폭', '전고', '배기량',
         '공차중량', 'CO2배출량', '연비', '기본가격'
-    ], errors='ignore')
+    ]
+    
+    # 존재하는 컬럼만 필터링하여 제거
+    existing_columns = [col for col in columns_to_drop if col in df_inv.columns]
+    df_inv = df_inv.drop(columns=existing_columns)
     
     return df_inv
+
+
 
 # 슬랙 웹훅 URL 환경변수에서 불러오기
 SLACK_WEBHOOK_URL = st.secrets["SLACK_WEBHOOK_URL"]
@@ -117,39 +118,13 @@ def warning_ui():
     with st.container(border=True):
         cols = st.columns([2, 1, 1, 2])
         cols[0].markdown("##### 🏭 통합 재고 관리 플랫폼 v2.1")
-    # 필터 섹션
+    # ⚠️ 회전율 경고 기준 및 상태 필터
     threshold = st.select_slider(
         "⚠️ 경고 임계값 선택 (재고 회전율)",
-        options=np.round(np.arange(0.1, 1.05, 0.05), 2).tolist(),  # Numpy 배열 -> Python 리스트
+        options=np.round(np.arange(0.1, 1.05, 0.05), 2),
         value=0.3
     )
-    
-    status_filter = st.radio(
-        "경고 대상 생산상태 선택", 
-        ["전체", "생산 중", "생산 종료"], 
-        horizontal=True
-    )
-
-    # 위젯 옵션 생성 방식 개선
-    factory_options = ['전체'] + df_inv['공장명'].unique().tolist()
-    selected_factory = st.selectbox(
-        "공장 선택",
-        options=factory_options,
-        index=0
-    )
-
-    # 경고 등급 필터링
-    grade_options = df_inv['경고등급'].unique().tolist()
-    selected_grade = st.multiselect(
-        "경고 등급",
-        options=grade_options,
-        default=[g for g in grade_options if g in ['🚨 긴급', '⚠️ 주의']]  # 동적 기본값 설정
-    )
-
-    # 데이터 필터링
-    filtered_df = df_inv[df_inv['경고등급'].isin(selected_grade)]
-    if selected_factory != '전체':
-        filtered_df = filtered_df[filtered_df['공장명'] == selected_factory]
+    status_filter = st.radio(" 경고 대상 생산상태 선택", ["전체", "생산 중", "생산 종료"], horizontal=True)
 
     # 경고 상태 업데이트
     df_inv["경고"] = np.where(df_inv["재고회전율"] <= threshold, "⚠️ 경고", "정상")
@@ -234,16 +209,10 @@ def warning_ui():
     
     col1, col2 = st.columns([1,1])
     with col1:
-        selected_factory = st.selectbox("공장 선택",options=['전체'] + df_inv['공장명'].astype(str).unique().tolist(),index=0)
-
+        selected_factory = st.selectbox("공장 선택", ['전체'] + df_inv['공장명'].unique().tolist())
     with col2:
-        # 경고등급 문자열 처리
-        df_inv['경고등급'] = df_inv['경고등급'].astype(str)
-    selected_grade = st.multiselect(
-        "경고 등급",
-        options=df_inv['경고등급'].unique().tolist(),
-        default=["🚨 긴급", "⚠️ 주의"]
-    )
+        selected_grade = st.multiselect("경고 등급", df_inv['경고등급'].unique(), ['🚨 긴급', '⚠️ 주의'])
+    
 
     filtered_df = df_inv[df_inv['경고등급'].isin(selected_grade)]
     if selected_factory != '전체':
