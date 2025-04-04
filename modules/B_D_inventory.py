@@ -11,7 +11,7 @@ def inventory_ui():
     # 데이터 불러오기 예시
     inv_df = pd.read_csv("data/inventory_data.csv")
     inv_df["차종"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
-    stock_df = inv_df.groupby(['차종', '공장명'], as_index=False)['재고량'].sum().rename(columns={'재고량': '재고수량'})
+    stock_df = inv_df.groupby(['차종', '공장명'], as_index=False)['재고량'].sum().rename(columns={'재고량': '생산 가능 수량'})
     sal_df = pd.read_csv("data/processed/total/hyundai-by-car.csv")
     
     # 최근 3개월 컬럼만 추출
@@ -50,7 +50,7 @@ def inventory_ui():
             st.plotly_chart(fig_bottom10, use_container_width=True)
 
     with col3:
-        st.markdown("### 📦 주요 공장별 재고 현황")
+        st.markdown("### 📦 주요 공장별 생산 가능 수량 현황")
 
         shown_models = set()
         saved_models = [st.session_state.get(f"saved_recommend_{i}") for i in range(1, 4)]
@@ -71,8 +71,8 @@ def inventory_ui():
                 if not match.empty:
                     match = (
                         match.groupby(["공장명", "차종"], as_index=False)["재고량"]
-                        .sum()
-                        .rename(columns={"재고량": "재고수량"})
+                        .min()
+                        .rename(columns={"재고량": "생산 가능 수량"})
                     )
                 
                 if not match.empty:
@@ -83,7 +83,7 @@ def inventory_ui():
                             <div style="border:1px solid #ccc; border-radius:12px; padding:10px; margin-bottom:10px;
                                         background-color:#f9f9f9;">
                                 <strong>{row['차종']} @ {row['공장명']}</strong><br>
-                                현재 재고: <strong>{int(row['재고수량'])}대</strong>
+                                현재 생산 가능 수량: <strong>{int(row['생산 가능 수량'])}대</strong>
                             </div>
                         """, unsafe_allow_html=True)
                 else:
@@ -92,8 +92,8 @@ def inventory_ui():
             inv_df["차종"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
             sample_df = (
                 inv_df.groupby(['공장명', '차종'], as_index=False)['재고량']
-                .sum()
-                .rename(columns={'재고량': '재고수량'})
+                .min()
+                .rename(columns={'재고량': '생산 가능 수량'})
                 .sample(n=min(6, len(inv_df)), random_state=42)
             )
             for _, row in sample_df.iterrows():
@@ -101,7 +101,7 @@ def inventory_ui():
                     <div style="border:1px solid #ccc; border-radius:12px; padding:10px; margin-bottom:10px;
                                 background-color:#f9f9f9;">
                         <strong>{row['차종']} @ {row['공장명']}</strong><br>
-                        현재 재고: <strong>{int(row['재고수량'])}대</strong>
+                        현재 생산 가능 수량: <strong>{int(row['생산 가능 수량'])}대</strong>
                     </div>
                 """, unsafe_allow_html=True)
 
@@ -111,14 +111,14 @@ def inventory_ui():
     col3, col3M, colM, col4M, col4 = st.columns([1, 0.1, 1.5, 0.1, 1.5])
 
     with col3:
-        st.markdown("### 🏭 재고 부족 알림")
+        st.markdown("### 🏭 생산 부품 부족 알림")
         
         inv_df["차종트림"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
         low_inventory_df = (
             inv_df.groupby(['공장명', '차종트림'], as_index=False)['재고량']
-            .sum()
-            .rename(columns={'차종트림': '차종', '재고량': '재고수량'})
-            .sort_values(by='재고수량', ascending=True)
+            .min()
+            .rename(columns={'차종트림': '차종', '재고량': '생산 가능 수량'})
+            .sort_values(by='생산 가능 수량', ascending=True)
             .head(3)
         )
 
@@ -148,61 +148,97 @@ def inventory_ui():
                 <div class="inventory-card">
                     <h4>{row['차종']}</h4>
                     <p>공장: <strong>{row['공장명']}</strong></p>
-                    <p>현재 재고: <strong>{int(row['재고수량'])}대</strong></p>
-                    <p style="color:#d9534f;"><strong>⚠️ 재고 부족 주의</strong></p>
+                    <p>생산 가능 수량: <strong>{int(row['생산 가능 수량'])}대</strong></p>
+                    <p style="color:#d9534f;"><strong>⚠️ 부품 조달 필요</strong></p>
                 </div>
             """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with colM:
-        st.markdown("### 🔍 재고 검색")
-        st.markdown("#### 공장을 선택하여 재고 현황을 확인하세요.")
+        st.markdown("### 🔍 생산 가능 수량 검색")
+        st.markdown("#### 공장을 선택하여 생산 가능 수량을 확인하세요.")
         
-        selected_factory = st.selectbox("🏭 공장 선택", sorted(inv_df["공장명"].unique()))
-        stock_filter = st.selectbox(
-                "재고 보기 옵션",
-                ["전체", "재고 부족", "재고 과잉"]
-            )
+        selected_model = st.selectbox("🚗 차종 선택", sorted(inv_df["모델명"].unique()))
 
-        result = inv_df[inv_df["공장명"] == selected_factory]
-        result_grouped = result.groupby(["공장명", "모델명", "트림명"], as_index=False)["재고량"].sum()
+        filtered_trims = inv_df[
+            (inv_df["모델명"] == selected_model)
+        ]["트림명"].unique()
+        selected_trim = st.selectbox("🔧 트림명 선택", sorted(filtered_trims))
 
-        if stock_filter == "재고 부족":
-            result_grouped = result_grouped[result_grouped["재고량"] < 1000]
-        elif stock_filter == "재고 과잉":
-            result_grouped = result_grouped[result_grouped["재고량"] >= 8000]
-
+        result = inv_df[
+            (inv_df["모델명"] == selected_model) &
+            (inv_df["트림명"] == selected_trim)
+        ]
+        
         st.markdown("#### 🔎 검색 결과")
-        if not result_grouped.empty:
-            st.dataframe(result_grouped.rename(columns={"재고량": "재고수량"}), use_container_width=True, hide_index=True)
+        if not result.empty:
+            grouped_result = (
+                result.groupby(["공장명", "모델명", "트림명"], as_index=False)["재고량"]
+                .min()
+                .rename(columns={"재고량": "생산 가능 수량"})
+            )
+            st.dataframe(grouped_result[["공장명", "모델명", "트림명", "생산 가능 수량"]].sort_values("생산 가능 수량", ascending=False),
+                         use_container_width=True, hide_index=True)
+            
+            colA, colB, colC = st.columns(3)
+            with colA:
+                st.metric("공장 수", grouped_result['공장명'].nunique())
+            with colB:
+                st.metric("총 생산 가능 수량", int(grouped_result["생산 가능 수량"].sum()))
+            with colC:
+                st.metric("최소 생산 가능 수량", int(grouped_result["생산 가능 수량"].min()))
         else:
-            st.info("선택한 조건에 해당하는 재고가 없습니다.")
+            st.info("선택한 조건에 해당하는 결과가 없습니다.")
 
     with col4:
         st.markdown("### 📋 발주 등록")
         st.caption("필요한 차량을 선택해 발주를 등록하세요.")
 
-        with st.form("order_form_col4"):
-            vehicle_models = sorted(inv_df["모델명"].unique())
-            selected_model = st.selectbox("🚗 차종 선택", vehicle_models)
+        vehicle_models = sorted(inv_df["모델명"].unique())
+        selected_model = st.selectbox("🚗 차종 선택", vehicle_models, key='inven_car')
 
-            available_trims = inv_df[inv_df["모델명"] == selected_model]["트림명"].unique()
-            selected_trim = st.selectbox("🔧 트림 선택", sorted(available_trims))
+        available_trims = inv_df[inv_df["모델명"] == selected_model]["트림명"].unique()
+        selected_trim = st.selectbox("🔧 트림 선택", sorted(available_trims), key='inven_trim')
+        available_factories = inv_df[
+            (inv_df["모델명"] == selected_model) &
+            (inv_df["트림명"] == selected_trim)
+        ]["공장명"].dropna().unique()
+        selected_factory = st.selectbox("🏭 공장 선택", sorted(available_factories), key='inven_fac')
+        quantity = 1
+        requestor = st.text_input("👤 요청자", value=st.session_state.get("manager_name", "홍길동"), disabled=True)
+
+        submitted = st.button("✅ 발주 등록")
+
+        if submitted:
             vehicle = f"{selected_model} {selected_trim}"
-            color = st.selectbox("🎨 색상", ["흰색", "검정", "회색", "파랑", "빨강"])
-            quantity = st.number_input("🔢 수량", min_value=1, step=1)
-            requestor = st.text_input("👤 요청자", value=st.session_state.get("manager_name", "홍길동"), disabled=True)
-            urgency = st.radio("📌 긴급도", ["보통", "긴급", "매우 긴급"], horizontal=True)
+            
+            # 재고 차감
+            inv_df.loc[
+                (inv_df["모델명"] == selected_model) &
+                (inv_df["트림명"] == selected_trim) &
+                (inv_df["공장명"] == selected_factory),
+                ["재고량", "생산가능수량"]
+            ] -= 1
 
-            submitted = st.form_submit_button("✅ 발주 등록")
+            # 생산 가능 수량은 재계산
+            inv_df["차종"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
+            stock_df = (
+                inv_df.groupby(['차종', '공장명'], as_index=False)['재고량']
+                .min()
+                .rename(columns={'재고량': '생산 가능 수량'})
+            )
 
-            if submitted:
-                st.success(
-                    f"{vehicle} ({color}) {quantity}대 발주가 등록되었습니다.\n\n"
-                    f"요청자: {requestor} / 긴급도: {urgency}"
-                )
+            # 저장
+            inv_df.to_csv("data/inventory_data.csv", index=False)
+
+            st.success(
+                f"{vehicle} @ {selected_factory} 공장에서 {quantity}대 발주가 등록되었습니다.\n\n"
+                f"요청자: {requestor}"
+            )
 
     # -------------------------------
     # 전체 테이블 익스펜더
-    with st.expander("전체 재고 테이블 보기"):
-        st.dataframe(stock_df.pivot_table(index="차종", columns="공장명", values="재고수량", fill_value=0))
+    with st.expander("전체 생산 가능 수량 테이블 보기"):
+        pivot_df = inv_df.groupby(['차종', '공장명'])['재고량'].min().reset_index()
+        pivot_df = pivot_df.rename(columns={"재고량": "생산 가능 수량"})
+        st.dataframe(pivot_df.pivot(index="차종", columns="공장명", values="생산 가능 수량").fillna(0).astype(int))
