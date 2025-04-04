@@ -1,6 +1,9 @@
-# 글로벌 재고 최적화, 공급망 관리
-# 재고 회전율 경고 시스템
-# 재고 회전율이 임계값 이하인 경우 슬랙으로 경고 메시지 전송
+
+    # 글로벌 재고 최적화, 공급망 관리
+        # 재고 회전율 경고 시스템
+            # 재고 회전율이 임계값 이하인 경우 슬랙으로 경고 메시지 전송
+
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -20,8 +23,11 @@ def load_data():
     df_list = pd.read_csv(LIST_PATH)
     return df_inv, df_list
 
+
+
+
 # 데이터 전처리 함수
-def preprocess_data(df):
+def preprocess_data(df_inv):
     plant_location = {
         "울산공장": (35.546, 129.317),
         "아산공장": (36.790, 126.977),
@@ -36,155 +42,208 @@ def preprocess_data(df):
         "인도네시아공장": (-6.305, 107.097)
     }
 
-    df[['위도', '경도']] = pd.DataFrame(
-        df['공장명'].map(plant_location).tolist(),
-        index=df.index
+    df_inv[['위도', '경도']] = pd.DataFrame(
+        df_inv['공장명'].map(plant_location).tolist(),
+        index=df_inv.index
     )
 
+    # 2. 회전율 계산
     np.random.seed(23)
-    df["월평균입고"] = np.random.randint(50, 500, size=len(df))
-    df["월평균출고"] = np.random.randint(30, 400, size=len(df))
-    df["재고회전율"] = (df["월평균출고"] / df["재고량"]).replace([np.inf, -np.inf], 0).fillna(0).round(2)
+    df_inv["월평균입고"] = np.random.randint(50, 500, size=len(df_inv))
+    df_inv["월평균출고"] = np.random.randint(30, 400, size=len(df_inv))
+    df_inv["재고회전율"] = (df_inv["월평균출고"] / df_inv["재고량"]).replace([np.inf, -np.inf], 0).fillna(0).round(2)
 
-    df['경고등급'] = np.select(
+
+    df_inv['경고등급'] = np.select(
         [
-            df['재고회전율'] <= 0.15,
-            df['재고회전율'] <= 0.3,
-            df['재고회전율'] > 0.3
+            df_inv['재고회전율'] <= 0.15,
+            df_inv['재고회전율'] <= 0.3,
+            df_inv['재고회전율'] > 0.3
         ],
         ['🚨 긴급', '⚠️ 주의', '✅ 정상']
     )
-    return df
 
-# 슬랙 알림 시스템
-def send_slack_alert(df):
-    try:
-        slack_webhook_url = os.environ.get("SLACK_WEBHOOK_URL") or st.secrets.get("SLACK_WEBHOOK_URL")
-        
-        if not slack_webhook_url:
-            raise ValueError("슬랙 웹훅 URL이 설정되지 않았습니다")
+    # 제거할 컬럼 목록
+    columns_to_drop = [
+        '전장', '전폭', '전고', '배기량',
+        '공차중량', 'CO2배출량', '연비', '기본가격'
+    ]
+    
+    # 존재하는 컬럼만 필터링하여 제거
+    existing_columns = [col for col in columns_to_drop if col in df_inv.columns]
+    df_inv = df_inv.drop(columns=existing_columns)
+    
+    return df_inv
 
-        blocks = [{
-            "type": "section",
-            "text": {"type": "mrkdwn", "text": "🚨 *재고 경고 발생 목록*"}
-        }]
 
-        for _, row in df.iterrows():
-            blocks.append({
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": (
-                        f"• 공장: `{row['공장명']}`\n"
-                        f"• 부품: `{row['부품명']}`\n"
-                        f"• 회전율: `{row['재고회전율']:.2f}`\n"
-                        f"• 잔여량: `{int(row['재고량'])}개`"
-                    )
-                }
-            })
 
-        response = requests.post(
-            slack_webhook_url,
-            json={"blocks": blocks},
-            headers={'Content-Type': 'application/json'},
-            timeout=10
-        )
-        response.raise_for_status()
-        st.success("✅ 슬랙 알림 전송 성공!")
-    except Exception as e:
-        st.error(f"❌ 오류 발생: {str(e)}")
+# 슬랙 웹훅 URL 환경변수에서 불러오기
+SLACK_WEBHOOK_URL = st.secrets["SLACK_WEBHOOK_URL"]
+
+# 슬랙 알림 함수 정의
+def send_slack_alert(model_name, turnover_rate, plant=None, status=None, link=None):
+    emoji = "⚠️" if turnover_rate < 0.2 else "🔔"
+
+    text = (
+        f"{emoji} *재고 회전율 경고 발생!*\n"
+        f"• 모델명: *{model_name}*\n"
+        f"• 회전율: *{turnover_rate:.2f}*\n"
+    )
+
+    if plant:
+        text += f"• 공장: `{plant}`\n"
+    if status:
+        text += f"• 생산상태: `{status}`\n"
+    if link:
+        text += f"🔗 <{link}|차량 상세정보 보기>\n"
+
+    payload = {
+        "text": text,
+        "link_names": 1  # 멘션 지원용 (예: @here)
+    }
+
+    response = requests.post(SLACK_WEBHOOK_URL, json=payload)
+
+    if response.status_code != 200:
+        raise Exception(f"Slack 전송 실패: {response.status_code}, {response.text}")
+
 
 # 메인 UI
 def warning_ui():
     # 데이터 로드 및 전처리
-    df_inv_raw, df_list = load_data()
-    df = preprocess_data(df_inv_raw.copy())
-
-    st.header("현대 글로벌 재고 관리 대시보드")
+    df_inv, df_list = load_data()
+    df_inv = preprocess_data(df_inv.copy())
     
     # 대시보드 헤더
     with st.container(border=True):
         cols = st.columns([2, 1, 1, 2])
-        cols[0].markdown("##### IGIS 통합 재고 관리 플랫폼 v2.1")
-        threshold = cols[1].slider("⚠️ 회전율 경고선", 0.1, 1.0, 0.3, 0.05)
-        cols[2].metric("현재 경고율", f"{threshold:.2f}", delta="목표 0.4")
-        cols[3].progress(0.75, text="시스템 건강 지수 75%")
+        cols[0].markdown("##### 🏭 통합 재고 관리 플랫폼 v2.1")
+    # ⚠️ 회전율 경고 기준 및 상태 필터
+    threshold = st.select_slider(
+        "⚠️ 경고 임계값 선택 (재고 회전율)",
+        options=np.round(np.arange(0.1, 1.05, 0.05), 2),
+        value=0.3
+    )
+    status_filter = st.radio(" 경고 대상 생산상태 선택", ["전체", "생산 중", "생산 종료"], horizontal=True)
 
-    # 실시간 지도 시각화
-    with st.expander("공장 위치 현황", expanded=True):
+    # 경고 상태 업데이트
+    df_inv["경고"] = np.where(df_inv["재고회전율"] <= threshold, "⚠️ 경고", "정상")
+    
+    # 실시간 지도 시각화 개선
+    with st.expander(" 실시간 공장 위치 모니터링", expanded=True):
         fig = px.scatter_mapbox(
-            df,
+            df_inv,
             lat='위도',
             lon='경도',
             color='경고등급',
             size='재고량',
-            hover_data=['부품명', '재고회전율'],
+            hover_name='부품명',
+            hover_data={'재고량': True, '재고회전율': ':.2f'},
             color_discrete_map={
-                '🚨 긴급': '#FF0000',
+                '🚨 긴급': '#FF4B4B',
                 '⚠️ 주의': '#FFA500',
-                '✅ 정상': '#00FF00'
+                '✅ 정상': '#00C853'
             },
             zoom=3,
             height=600
         )
-        fig.update_layout(mapbox_style="carto-positron")
+        fig.update_layout(
+            mapbox_style="carto-positron",
+            margin={"r":0,"t":40,"l":0,"b":0},
+            legend=dict(orientation="h", yanchor="bottom", y=1.02)
+        )
         st.plotly_chart(fig, use_container_width=True)
 
-    # 재고 요약 섹션
-    st.markdown("---")
-    st.subheader("공장별 부품 재고 요약")
-    factory_parts = df.groupby(['공장명', '부품명'], as_index=False)['재고량'].sum()
-    st.dataframe(factory_parts, use_container_width=True)
-
-    # 위험 알림 섹션
-    st.markdown("---")
-    st.subheader("재고 위험 알림")
-    danger_parts = df[df['재고량'] < 100]
+    # 재고 분석 섹션
+    col1, col2 = st.columns(2)
     
-    if not danger_parts.empty:
-        cols = st.columns([3,1])
-        with cols[0]:
-            st.error("📉 일부 부품 재고가 임계치 이하입니다.")
-            st.dataframe(danger_parts, use_container_width=True)
-        with cols[1]:
-            fig = px.pie(danger_parts, names='부품명', title="위험 부품 비율")
-            st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.success("✅ 모든 부품 재고가 정상입니다.")
+    with col1:
+        st.subheader(" 공장별 부품 재고 현황", divider="blue")
+        fig = px.bar(
+            df_inv.groupby(['공장명', '부품명'])['재고량'].sum().reset_index(),
+            x='공장명',
+            y='재고량',
+            color='부품명',
+            barmode='group',
+            height=400,
+            text_auto=True,
+            labels={'재고량': '총 재고량'}
+        )
+        fig.update_layout(xaxis_title=None, yaxis_title="재고량(개)")
+        st.plotly_chart(fig, use_container_width=True)
+        
+    with col2:
+        st.subheader(" 위험 부품 상세 분석", divider="red")
+        danger_df = df_inv[df_inv['재고량'] < 100]
+        
+        if not danger_df.empty:
+            tab1, tab2 = st.tabs(["분포", "추이"])
+            
+            with tab1:
+                fig = px.pie(
+                    danger_df,
+                    names='부품명',
+                    values='재고량',
+                    hole=0.4,
+                    color_discrete_sequence=px.colors.sequential.Reds_r
+                )
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with tab2:
+                # 필요한 컬럼만 선택
+                plot_df = danger_df[['부품명', '월평균입고', '월평균출고']]
+                fig = px.line(
+                    plot_df.sort_values('월평균입고'),
+                    x='부품명',
+                    y=['월평균입고', '월평균출고'],
+                    markers=True,
+                    height=300,
+                    labels={'value': '수량', 'variable': '구분'}
+                )
+                st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.success("✅ 모든 부품 재고가 안전 수준입니다.")
 
     # 경고 관리 섹션
-    st.markdown("---")
-    st.header("재고 경고 관리")
+    st.subheader("🚨 실시간 경고 관리 시스템", divider="orange")
     
-    col1, col2 = st.columns([3,1])
+    col1, col2 = st.columns([1,1])
     with col1:
-        selected_factory = st.selectbox("공장 선택", ['전체'] + df['공장명'].unique().tolist())
+        selected_factory = st.selectbox("공장 선택", ['전체'] + df_inv['공장명'].unique().tolist())
     with col2:
-        selected_grade = st.multiselect("경고 등급", df['경고등급'].unique(), ['🚨 긴급', '⚠️ 주의'])
+        selected_grade = st.multiselect("경고 등급", df_inv['경고등급'].unique(), ['🚨 긴급', '⚠️ 주의'])
+    
 
-    filtered_df = df[df['경고등급'].isin(selected_grade)]
+    filtered_df = df_inv[df_inv['경고등급'].isin(selected_grade)]
     if selected_factory != '전체':
         filtered_df = filtered_df[filtered_df['공장명'] == selected_factory]
-
+            
     if not filtered_df.empty:
-        st.dataframe(
+        fig = px.treemap(
             filtered_df,
-            column_config={
-                "재고량": st.column_config.ProgressColumn("잔여량", format="%d개", min_value=0, max_value=500),
-                "재고회전율": st.column_config.ProgressColumn("회전율", format="%.2f", min_value=0, max_value=1.0)
-            },
-            height=400,
-            use_container_width=True
+            path=['공장명', '모델명', '부품명'],
+            values='재고량',
+            color='재고회전율',
+            color_continuous_scale='RdYlGn_r',
+            height=800,
+            title="<b>재고 위험 항목 계층 분석</b>"
         )
+        st.plotly_chart(fig, use_container_width=True)
 
-        selected_models = st.multiselect("슬랙 전송할 모델 선택", filtered_df['모델명'].unique())
-        models_to_send = filtered_df[filtered_df['모델명'].isin(selected_models)]
 
-        if st.button("📤 선택 모델 슬랙 전송", type="primary"):
-            if not models_to_send.empty:
-                send_slack_alert(models_to_send)
-                st.toast("IGIS 시스템 알림 전송 완료", icon="✅")
-            else:
-                st.warning("전송할 모델을 선택해주세요.")
-    else:
-        st.success("✅ 모든 재고가 안전 수준입니다.", icon="🛡️")
+    # 8. 슬랙 전송 UI
+    warning_df = df_inv[df_inv["재고회전율"] <= threshold]
+    with st.expander("📤 슬랙 경고 전송"):
+        selected_models = st.multiselect("📌 슬랙으로 전송할 모델 선택", warning_df["모델명"].unique())
+        filtered_df = warning_df[warning_df["모델명"].isin(selected_models)]
+
+        if st.button("🚨 슬랙 전송"):
+            for _, row in filtered_df.iterrows():
+                send_slack_alert(
+                    model_name=row["모델명"],
+                    turnover_rate=row["재고회전율"],
+                    plant=row.get("공장명", ""),
+                    status=row.get("생산상태", ""),
+                    link=f"https://example.com/cars/{row['모델명']}"
+                )
+            st.success("✅ 선택된 모델이 슬랙으로 전송되었습니다.")

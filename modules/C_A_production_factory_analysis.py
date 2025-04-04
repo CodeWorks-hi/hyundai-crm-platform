@@ -105,11 +105,4 @@ def factory_analysis_ui():
     st.dataframe(factory_parts, use_container_width=True)
 
     st.markdown("---")
-    st.subheader(" 재고 위험 알림")
 
-    danger_parts = df_inv[df_inv['재고량'] < 100][['공장명', '부품명', '재고량']]
-    if not danger_parts.empty:
-        st.error("📉 일부 부품 재고가 임계치 이하입니다.")
-        st.dataframe(danger_parts, use_container_width=True)
-    else:
-        st.success("✅ 모든 부품 재고가 정상입니다.")
