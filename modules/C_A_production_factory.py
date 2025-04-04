@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.express as px
 from .C_A_production_factory_report import report_ui
 from .C_A_production_factory_treemap import treemap_ui
-from .C_A_production_capacity_analysis import capacity_analysis_ui
+from .C_A_production_factory_analysis import factory_analysis_ui
 
 # 데이터 로드 함수
 @st.cache_data
@@ -58,7 +58,7 @@ def factory_ui():
         treemap_ui(df_inv)
 
     with tab2:
-        capacity_analysis_ui()
+        factory_analysis_ui()
         
     #  TAB 1 -  공장별 재고 현황
     with tab3:
