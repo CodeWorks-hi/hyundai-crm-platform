@@ -62,8 +62,19 @@ def inventory_ui():
                 if model in shown_models:
                     continue
                 shown_models.add(model)
-                match = stock_df[(stock_df["차종"] == model.split(" ")[0]) &(stock_df["트림명"] == model.split(" ")[1])]
+                split_model = model.split(" ", 1)
+                base_model = split_model[0]
+                trim_name = split_model[1] if len(split_model) > 1 else ""
 
+                match = inv_df[inv_df["모델명"] == base_model]
+
+                if not match.empty:
+                    match = (
+                        match.groupby(["공장명", "차종"], as_index=False)["재고량"]
+                        .sum()
+                        .rename(columns={"재고량": "재고수량"})
+                    )
+                
                 if not match.empty:
                     # 가까운 공장 순서 (임의 기준: 이름순)
                     match = match.sort_values(by="공장명").head(3)
