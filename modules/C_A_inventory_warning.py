@@ -212,6 +212,8 @@ def warning_ui():
         selected_factory = st.selectbox("공장 선택",options=['전체'] + df_inv['공장명'].astype(str).unique().tolist(),index=0)
 
     with col2:
+        # 경고등급 문자열 처리
+        df_inv['경고등급'] = df_inv['경고등급'].astype(str)
         selected_grade = st.multiselect(
                                 "경고 등급",
                                 options=df_inv['경고등급'].astype(str).unique(),  # 데이터 타입 보정
