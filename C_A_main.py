@@ -17,7 +17,7 @@ def app():
         f"""
         <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
             <img src="data:image/png;base64,{logo_base64}" alt="로고" width="60" style="width: 120px; height: auto; border-radius: 8px;">
-            <h1 style="margin: 0; font-size: 28px;">현대기아 Admin Console</h1>
+            <h1 style="margin: 0; font-size: 28px;"> 관리자 콘솔 </h1>
         </div>
         """,
         unsafe_allow_html=True
