@@ -48,8 +48,8 @@ def analytics_ui():
 
     with selected_tab[3]:
         economy_ui()      # "글로벌 경제 인사이트내"
-        
-        
+
+   
     with selected_tab[4]:     
         marketing_ui()    # "마케팅 캠페인 성과"
 
