@@ -63,32 +63,36 @@ def warning_ui():
     if "경고등급" in df_inv.columns and "부품명" in df_inv.columns:
         risk_df = df_inv[(df_inv["경고등급"] != "정상") & (df_inv["부품명"] != "미확인부품")]
 
-    st.markdown("###### 🔥 긴급 조치 필요 항목")
-    st.dataframe(
-        risk_df[risk_df["경고등급"] == "🚨 긴급"],
-        column_order=["공장코드", "부품명", "재고량", "재고회전율"],
-        hide_index=True,
-        height=300
-    )
+    if not risk_df.empty:
+        st.markdown("###### 🔥 긴급 조치 필요 항목")
+        st.dataframe(
+            risk_df[risk_df["경고등급"] == "🚨 긴급"],
+            column_order=["공장코드", "부품명", "재고량", "재고회전율"],
+            hide_index=True,
+            height=300
+        )
 
-    st.markdown("###### 📌 주시 필요 항목")
-    st.dataframe(
-        risk_df[risk_df["경고등급"] == "⚠️ 주의"],
-        column_order=["공장코드", "부품명", "재고량", "재고회전율"],
-        hide_index=True,
-        height=300
-    )
+        st.markdown("###### 📌 주시 필요 항목")
+        st.dataframe(
+            risk_df[risk_df["경고등급"] == "⚠️ 주의"],
+            column_order=["공장코드", "부품명", "재고량", "재고회전율"],
+            hide_index=True,
+            height=300
+        )
 
-    st.subheader("위험 부품 분포 분석", divider="red")
-    fig2 = px.treemap(
-        risk_df.dropna(subset=['공장코드', '부품명']),
-        path=['공장코드', '부품명'],
-        values='재고량',
-        color='재고회전율',
-        color_continuous_scale='Reds',
-        height=600
-    )
-    st.plotly_chart(fig2, use_container_width=True)
+        st.subheader("위험 부품 분포 분석", divider="red")
+        fig2 = px.treemap(
+            risk_df.dropna(subset=['공장코드', '부품명']),
+            path=['공장코드', '부품명'],
+            values='재고량',
+            color='재고회전율',
+            color_continuous_scale='Reds',
+            height=600
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+
+    else:
+        st.info("표시할 위험 부품 데이터가 없습니다.")
 
     st.markdown("---")
 
