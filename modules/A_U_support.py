@@ -32,14 +32,15 @@ def render_kakao_chat_button():
     html(kakao_html, height=0, width=0)
 
 
-col1, col2 = st.columns([4,1])
-with col1:
-    st.title("📞 고객 지원 센터")
-with col2:
-        render_kakao_buttons()
-st.write("무엇을 도와드릴까요? 실시간 상담을 원하시면 우측 하단의 채팅 아이콘을 클릭해주세요.")
+
 
 def support_ui():
+    col1, col2 = st.columns([4,1])
+    with col1:
+        st.title("📞 고객 지원 센터")
+    with col2:
+            render_kakao_buttons()
+    st.write("무엇을 도와드릴까요? 실시간 상담을 원하시면 우측 하단의 채팅 아이콘을 클릭해주세요.")
     # 자주 묻는 질문
     
     st.markdown("#####  자주 묻는 질문")
