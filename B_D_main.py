@@ -97,7 +97,7 @@ def app():
 # 각 탭에 대응하는 함수 실행
     for i, (module_path, function_name) in enumerate(tab_modules):
         with tabs[i]:
-            # try:
+            try:
                 module = importlib.import_module(module_path)
                 func = getattr(module, function_name)
 
@@ -109,8 +109,8 @@ def app():
                 else:
                     func()  # 인자가 없는 함수 (이벤트/공지, 딜러 찾기 등)
 
-            # except Exception as e:
-            #     st.error(f"❌ `{module_path}.{function_name}` 로딩 중 오류:\n\n{e}")
+            except Exception as e:
+                st.error(f"❌ `{module_path}.{function_name}` 로딩 중 오류:\n\n{e}")
 
     # ▶️ 사이드바 - 직원 로그인 UI
     with st.sidebar:
