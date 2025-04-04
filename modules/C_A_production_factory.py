@@ -13,6 +13,7 @@ from .C_A_production_factory_analysis import factory_analysis_ui
 def load_data():
     df_inv = pd.read_csv("data/inventory_data.csv")
     df_list = pd.read_csv("data/hyundae_car_list.csv")
+    hyundai_plant_path = "data/processed/total/hyundai-by-plant.csv"
     return df_inv, df_list
 
 # 생산 UI 함수

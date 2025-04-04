@@ -63,16 +63,18 @@ def trend_ui():
             '총재고량': 'int',
             '고유부품수': 'int'
         })
+        st.subheader("현대자동차 생산 현황 실시간 모니터링 시스템")
 
-    # UI 시작
-    st.title("현대자동차 생산 현황 분석 대시보드")
-    
-    # 상단 KPI
-    cols = st.columns(4)
-    cols[0].metric("총 부품 재고", f"{report['총재고량'].sum():,}개")
-    cols[1].metric("최대 생산 가능", f"{report['생산가능수량'].max():,}대")
-    cols[2].metric("최고 효율", f"{report['생산효율'].max():.1f}%")
-    cols[3].metric("최저 효율", f"{report['생산효율'].min():.1f}%")
+        cols = st.columns(5)
+        st.markdown("""<style>.stMetric {padding: 20px; background-color: #f8f9fa; border-radius: 10px;}</style>""", unsafe_allow_html=True)
+
+        cols[0].metric("최다 재고", f"{report['총재고량'].max():,}개", report.loc[report['총재고량'].idxmax(), '공장명'])
+        cols[1].metric("신규 부품", f"{report['고유부품수'].sum():,}종", "2025년 4월 기준")
+        cols[2].metric("최대 생산 가능", f"{int(report['생산가능수량'].max()):,}대", report.loc[report['생산가능수량'].idxmax(), '공장명'])
+        cols[3].metric("최고 생산 효율", f"{float(report['생산효율'].max()):.2f}%", report.loc[report['생산효율'].idxmax(), '공장명'])
+        cols[4].metric("평균 회전율", f"{float(report['생산효율'].mean()):.1f}%", help="전체 공장의 평균 재고 회전율")
+
+
     
     st.markdown("---")
     
