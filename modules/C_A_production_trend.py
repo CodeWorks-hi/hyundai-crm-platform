@@ -77,7 +77,7 @@ def trend_ui():
     st.markdown("---")
     
     # 현재 생산중인 주요 차량 섹션
-    st.subheader("🚗 현재 생산 중인 주요 차량 현황")
+    st.subheader(" 현재 생산 중인 주요 차량 현황")
     current_models = pd.DataFrame({
         '모델명': ['IONIQ5(Long Range)', 'IONIQ6', 'Creta(SU2i LWB)', 'Venue(QXi)', 'Exter(AI3 SUV)'],
         '생산공장': ['울산/앨라배마', '인도/싱가포르', '인도', '인도', '인도'],
@@ -108,7 +108,7 @@ def trend_ui():
     st.markdown("---")
     
     # 생산 추이 시각화
-    st.subheader("📈 연도별 생산 추이 분석")
+    st.subheader(" 연도별 생산 추이 분석")
     trend_df = df_inv.groupby(['연도', '공장명'])['재고량'].sum().reset_index()
     
     col1, col2 = st.columns(2)
@@ -135,7 +135,7 @@ def trend_ui():
         st.plotly_chart(fig2, use_container_width=True)
     
     # 생산상태 데이터 연동
-    st.subheader("🏭 공장별 생산상태 현황")
+    st.subheader(" 공장별 생산상태 현황")
     plant_status = df_plant.groupby(['공장명', '생산상태']).size().unstack(fill_value=0)
     st.dataframe(
         plant_status.style.background_gradient(cmap='YlGnBu'),
@@ -143,7 +143,7 @@ def trend_ui():
     )
     
     # 원본 데이터 표시
-    with st.expander("🔍 원본 데이터 확인"):
+    with st.expander(" 원본 데이터 확인"):
         tab1, tab2, tab3 = st.tabs(["차량정보", "재고데이터", "공장데이터"])
         with tab1:
             st.dataframe(df_list, use_container_width=True)

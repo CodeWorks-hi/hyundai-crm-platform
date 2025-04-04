@@ -93,7 +93,7 @@ def factory_ui():
             )
             st.plotly_chart(fig, use_container_width=True)
 
-        with st.expander("📁 원본 데이터 확인", expanded=False):
+        with st.expander(" 원본 데이터 확인", expanded=False):
             col1, col2 = st.columns(2)
             with col1:
                 st.subheader("차량 마스터 데이터", divider='gray')

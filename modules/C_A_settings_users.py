@@ -16,7 +16,10 @@ import uuid
 import streamlit as st
 import pandas as pd
 import numpy as np
+import cv2
 import face_recognition
+import mediapipe as mp
+from PIL import Image
 
 # 경로 설정
 EMPLOYEE_CSV_PATH = "data/employee.csv"
@@ -24,28 +27,29 @@ EMPLOYEE_PHOTO_DIR = "data/employee_photos"
 os.makedirs("data", exist_ok=True)
 os.makedirs(EMPLOYEE_PHOTO_DIR, exist_ok=True)
 
-#  직원 데이터 로드 및 저장
+# 직원 데이터 로드
 def load_employees():
     if os.path.exists(EMPLOYEE_CSV_PATH):
         df = pd.read_csv(EMPLOYEE_CSV_PATH)
-        # ✅ 컬럼 자동 보완
         expected_columns = ["고유ID", "직원이름", "사번", "사진경로", "인코딩"]
         for col in expected_columns:
             if col not in df.columns:
-                df[col] = np.nan  # 누락된 컬럼을 추가
+                df[col] = np.nan
         return df[expected_columns]
     else:
         return pd.DataFrame(columns=["고유ID", "직원이름", "사번", "사진경로", "인코딩"])
+
+# 직원 데이터 저장
 def save_employees(df):
     df.to_csv(EMPLOYEE_CSV_PATH, index=False)
 
-#  얼굴 인코딩 함수
+# 얼굴 인코딩
 def encode_face(img_path):
     image = face_recognition.load_image_file(img_path)
     encodings = face_recognition.face_encodings(image)
     return encodings[0] if encodings else None
 
-#  얼굴 비교 함수
+# 얼굴 비교
 def is_same_person(new_encoding, stored_encodings, names, tolerance=0.45):
     results = face_recognition.compare_faces(stored_encodings, new_encoding, tolerance)
     if True in results:
@@ -53,11 +57,8 @@ def is_same_person(new_encoding, stored_encodings, names, tolerance=0.45):
         return names[idx]
     return None
 
-# Streamlit 메인 UI
+# Streamlit UI
 def users_ui():
-    if "sync_log" not in st.session_state:
-        st.session_state.sync_log = []
-
     st.markdown("## 👤 사용자 관리")
     st.markdown("### 직원 등록")
 
@@ -99,7 +100,7 @@ def users_ui():
             else:
                 st.warning("이름, 사번, 사진을 모두 입력해주세요.")
 
-    # 👨‍💻 직원 목록 보기
+    # 직원 목록 보기
     st.markdown("### 직원 목록")
     df_employees = load_employees()
 
@@ -125,7 +126,7 @@ def users_ui():
                     st.success(f"{row['직원이름']} 님이 삭제되었습니다.")
                     st.rerun()
 
-    # 🔍 얼굴 비교 기능
+    # 얼굴 매칭
     st.markdown("### 얼굴 사진 일치 여부 확인")
     upload = st.file_uploader("비교할 얼굴 사진을 업로드하세요", type=["jpg", "jpeg", "png"], key="match")
 
@@ -149,3 +150,23 @@ def users_ui():
                 st.warning("⚠️ 일치하는 직원이 없습니다.")
 
         os.remove(temp_path)
+
+    # MediaPipe 얼굴 탐지 (웹캠)
+    # st.markdown("###  실시간 웹캠 얼굴 탐지 (MediaPipe)")
+    # if st.button("📷 얼굴 탐지 실행"):
+    #     mp_face = mp.solutions.face_detection.FaceDetection(model_selection=0)
+    #     cap = cv2.VideoCapture(0)
+    #     st.info("카메라에서 한 장의 이미지를 캡처 중입니다...")
+
+    #     ret, frame = cap.read()
+    #     if ret:
+    #         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #         results = mp_face.process(rgb_frame)
+
+    #         if results.detections:
+    #             for detection in results.detections:
+    #                 print("Face detected with score:", detection.score)
+    #         else:
+    #             print("No face detected.")
+
+    #     cap.release()
