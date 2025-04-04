@@ -65,7 +65,7 @@ def consult_ui():
                     <div style="font-size: 20px; font-weight: 700; color: #0f3c73; margin-bottom: 10px;">🗂️ 최근 상담 요청 정보</div>
                     <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>📅 상담 요청일:</strong> {latest["상담날짜"]}</p>
                     <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>⏰ 상담 시간:</strong> {latest["상담시간"]}</p>
-                    <p style="margin: 0; font-size: 15px; color: #333;"><strong>📝 상담 내용:</strong> {latest["요청사항"]}</p>
+                    <p style="margin: 0; font-size: 15px; color: #333;"><strong>📝 요청 사항:</strong> {latest["요청사항"]}</p>
                 </div>
                 """, unsafe_allow_html=True)
             else:
@@ -150,7 +150,7 @@ def consult_ui():
                     if i == "연비" :
                         car_df = car_df.loc[car_df["연비"] >= car_df["연비"].mean(), :]
                     elif i == "가격" :
-                        car_df = car_df.loc[car_df["기본가격"] <= budget * 13000, :]
+                        car_df = car_df.loc[car_df["기본가격"] <= budget * 11000, :]
                     elif i == "성능" :
                         car_df = car_df.loc[car_df["배기량"] >= car_df["배기량"].mean(), :]
                     elif i == "공간" :
@@ -167,12 +167,12 @@ def consult_ui():
                                 elif j == "업무차량":
                                     car_df = car_df.loc[car_df["차량구분"].isin(["대형"]) & (car_df["차량형태"] == "승합차"), :]
 
-                if len(car_df) >= 3:
-                    # result_df = car_df.sample(3)
-                    result_df = car_df.loc[car_df["기본가격"] >= car_df["기본가격"].mean(), :].sample(3)
-                elif len(car_df) > 0:
-                    # result_df = car_df.sample(len(car_df))  # 가능한 만큼만 추천
-                    result_df = car_df.loc[car_df["기본가격"] >= car_df["기본가격"].mean(), :].sample(len(car_df))
+                filtered_df = car_df.loc[car_df["기본가격"] >= car_df["기본가격"].mean(), :]
+
+                if len(filtered_df) >= 3:
+                    result_df = filtered_df.sample(3)
+                elif len(filtered_df) > 0:
+                    result_df = filtered_df.sample(len(filtered_df))
                 else:
                     st.warning("추천 조건을 만족하는 차량이 없습니다.")
                     return
@@ -275,15 +275,24 @@ def consult_ui():
                 else:
                     st.warning("해당 조건에 맞는 미완료 상담이 없습니다.")
             else:
-                # 새로운 상담 로그 행 추가
-                new_log = {
-                    "이름": selected_name,
-                    "전화번호": selected_contact,
-                    "상담내용": memo,
-                    "상담날짜": pd.Timestamp.now().strftime("%Y-%m-%d"),
-                    "상담시간": pd.Timestamp.now().strftime("%H:%M"),
-                    "상담태그": ', '.join(selected_tags),
-                    "완료여부": 1
-                }
-                cr_df = cr_df.append(new_log, ignore_index=True)
-                cr_df.to_csv("data/consult_log.csv", index=False)
+                if (cr_df.loc[mask, "완료여부"] == 1).any():
+                    st.warning("이미 상담이 완료된 상태입니다.")
+                else:
+                    # 새로운 상담 로그 행 추가
+                    new_log = {
+                        "이름": selected_name,
+                        "전화번호": selected_contact,
+                        "상담내용": memo,
+                        "요청사항": "-",
+                        "상담날짜": pd.Timestamp.now().strftime("%Y-%m-%d"),
+                        "상담시간": pd.Timestamp.now().strftime("%H:%M"),
+                        "상담태그": ', '.join(selected_tags),
+                        "담당직원": st.session_state["직원이름"],
+                        "답변내용": "-",
+                        "고객피드백": "-",
+                        "목적": "방문",
+                        "완료여부": 1
+                    }
+                    cr_df = pd.concat([cr_df, pd.DataFrame([new_log])], ignore_index=True)
+                    cr_df.to_csv("data/consult_log.csv", index=False)
+                    st.success("✅ 상담 내용이 저장되었습니다.")
