@@ -1,9 +1,27 @@
 import streamlit as st
 import importlib
 import pandas as pd
+import base64
+
+# ▶️ 이미지 base64 인코딩 함수
+def get_base64_image(path):
+    with open(path, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
 
 def app():
-    st.title("본사 관리자 포털")
+    logo_base64 = get_base64_image("images/hyundae_kia_logo.png")
+
+    st.markdown(
+        f"""
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+            <img src="data:image/png;base64,{logo_base64}" alt="로고" width="60" style="width: 120px; height: auto; border-radius: 8px;">
+            <h1 style="margin: 0; font-size: 28px;">현대기아 Admin Console</h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     tabs = st.tabs([
         "판매·수출 관리",

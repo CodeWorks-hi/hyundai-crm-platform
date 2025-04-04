@@ -108,14 +108,22 @@ def render_char_search_map():
                 loc = res.json()["documents"][0]
                 lat = float(loc["y"])
                 lon = float(loc["x"])
-
             m = folium.Map(location=[lat, lon], zoom_start=16)
-            folium.Marker([lat, lon], tooltip=selected_info['충전소명'], popup=selected_info['주소']).add_to(m)
+            # 팝업 구성
+            popup_html = f"""
+            <b>{selected_info['충전소명']}</b><br>
+            주소: {selected_info['주소']}<br>
+            충전기 타입: {selected_info['충전기타입']}<br>
+            시설 구분: {selected_info['시설구분(대)']} / {selected_info['시설구분(소)']}
+            """
+
+            folium.Marker(
+                [lat, lon],
+                tooltip=selected_info['충전소명'],
+                popup=folium.Popup(popup_html, max_width=300),
+                icon=folium.Icon(color="blue", icon="info-sign")
+            ).add_to(m)
             st.components.v1.html(m._repr_html_(), height=600)
-
-    # 🔹 상세 카드 뷰
-
-
 
 # 이미지 URL을 Base64로 변환하는 함수
 def encode_image_from_url_to_base64(image_url):
