@@ -33,7 +33,8 @@ def dashboard_ui():
             'id': str(uuid.uuid4()),
             'title': f"{row.get('이름', '이름 없음')} 고객님",
             'start': start_time,
-            'description': row.get("상담내용", ""),
+            'contact': row.get('전화번호', '전화번호 없음'),
+            'description': row.get("요청사항", ""),
             '완료여부': row.get("완료여부", 0)
         })
 
@@ -86,7 +87,7 @@ def dashboard_ui():
                     events: {json.dumps([
                         {
                             'id': e['id'],
-                            'title': f"<b>{e['title']}</b><br><span style='font-size: 12px; color: #666;'>{e.get('description', '')}</span>",
+                            'title': f"<b>{e['title']}</b><br><span style='font-size: 12px; color: #666;'>{e.get('description', '')}</span><br><span style='font-size: 11px; color: #999;'>{e.get('contact', '')}</span>",
                             'start': e['start'],
                             'description': e.get('description', '')
                         } for e in st.session_state.events
@@ -144,7 +145,7 @@ def dashboard_ui():
                         st.success("상담 완료 처리되었습니다.")
                         st.rerun()
 
-    col_left, col_midleft, col_mid, col_midright, col_right = st.columns([0.9, 0.1, 0.8, 0.1, 1])
+    col_left, col_midleft, col_mid, col_midright, col_right = st.columns([0.9, 0.1, 0.8, 0.1, 0.7])
     with col_left:
         st.subheader("🎯 개인 목표 달성률")
 
@@ -163,7 +164,7 @@ def dashboard_ui():
         rate = current_sales[selected] / target_sales[selected] * 100
 
         st.markdown(f"""
-        <div style="background-color: #f0f2f6; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 16px;">
+        <div style="background-color: #f0f2f6; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 18px;">
             <b>🎯 목표량:</b> {target_sales[selected]}건 &nbsp;&nbsp;&nbsp;
             <b>📊 실제 판매량:</b> {current_sales[selected]}건
         </div>
@@ -214,7 +215,57 @@ def dashboard_ui():
 
         st.plotly_chart(fig_gauge, use_container_width=True)
 
+        if rate < 50:
+            st.info("🚀 아직 목표에 도달하려면 시간이 필요해요. 오늘 한 건 더 도전해보는 건 어떨까요?")
+        elif rate < 75:
+            st.success("💪 잘하고 있어요! 조금만 더 힘내면 목표 달성이 눈앞입니다.")
+        else:
+            st.success("🎉 훌륭합니다! 이미 목표치에 근접했어요. 멋진 마무리 기대할게요.")
+
     with col_mid:
+        st.markdown("### 상담 요청 답변")
+
+        colL, colR = st.columns(2)
+        with colL:
+            selected_name = st.text_input("고객 성명 입력", key="dash_name")
+        with colR:
+            selected_contact = st.text_input("고객 연락처 입력", key="dash_contact")
+
+        memo = st.text_area("답변 내용을 입력하세요", height=100, label_visibility="collapsed")
+
+        if st.button("✅ 저장", use_container_width=True):
+            cr_df = pd.read_csv("data/consult_log.csv")
+            mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact) & (cr_df["완료여부"] == 0)
+            
+            if mask.any():
+                cr_df.loc[mask, "답변내용"] = memo
+                cr_df.to_csv("data/consult_log.csv", index=False)
+                st.success("✅ 답변 내용이 저장되었습니다.")
+            else:
+                st.warning("해당 조건에 맞는 미완료 상담이 없습니다.")
+
+        st.markdown("---")
+
+        st.markdown("### ✅ 최근 완료 상담")
+        st.write("")
+
+        completed_df = df[(df["담당직원"] == st.session_state["직원이름"]) & (df["완료여부"] == 1)]
+        recent_done = completed_df.sort_values(by=["상담날짜", "상담시간"], ascending=False).head(2)
+
+        if recent_done.empty:
+            st.info("아직 완료된 상담이 없습니다.")
+        else:
+            for _, row in recent_done.iterrows():
+                st.markdown(f"""
+                <div style="background-color: #f4f4f4; border: 1px solid #ddd; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;">
+                    <div style="font-size: 15px; font-weight: 600; color: #333;">👤 {row['이름']} ({row['전화번호']})</div>
+                    <div style="font-size: 13px; color: #555;">📅 {row['상담날짜']} {row['상담시간']}</div>
+                    <div style="font-size: 13px; color: #777; margin-top: 4px;">📝 {row['상담내용']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+       
+
+    with col_right:
         st.subheader("📢 회사 공지사항")
         st.write("")
 
@@ -231,22 +282,3 @@ def dashboard_ui():
                             <span style="font-size: 15px; font-weight: 500; color: #333;">• {row[col]}</span>
                         </div>
                         """, unsafe_allow_html=True)
-
-    with col_right:
-        st.markdown("### ✅ 최근 완료 상담")
-        st.write("")
-
-        completed_df = df[(df["담당직원"] == st.session_state["직원이름"]) & (df["완료여부"] == 1)]
-        recent_done = completed_df.sort_values(by=["상담날짜", "상담시간"], ascending=False).head(3)
-
-        if recent_done.empty:
-            st.info("아직 완료된 상담이 없습니다.")
-        else:
-            for _, row in recent_done.iterrows():
-                st.markdown(f"""
-                <div style="background-color: #f4f4f4; border: 1px solid #ddd; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;">
-                    <div style="font-size: 15px; font-weight: 600; color: #333;">👤 {row['이름']} ({row['전화번호']})</div>
-                    <div style="font-size: 13px; color: #555;">📅 {row['상담날짜']} {row['상담시간']}</div>
-                    <div style="font-size: 13px; color: #777; margin-top: 4px;">📝 {row['상담내용']}</div>
-                </div>
-                """, unsafe_allow_html=True)

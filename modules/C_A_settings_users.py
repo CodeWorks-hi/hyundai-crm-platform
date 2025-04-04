@@ -55,6 +55,9 @@ def is_same_person(new_encoding, stored_encodings, names, tolerance=0.45):
 
 # Streamlit 메인 UI
 def users_ui():
+    if "sync_log" not in st.session_state:
+        st.session_state.sync_log = []
+
     st.markdown("## 👤 사용자 관리")
     st.markdown("### 직원 등록")
 

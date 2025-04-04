@@ -1,10 +1,11 @@
 # 고객 메인 대시보드     
-    # 차량 비교
+# 차량 비교
 
 import streamlit as st
 import pandas as pd
 import os
 from A_U_main import switch_page
+from streamlit.components.v1 import html
 
 # +-------------+
 # | 전차종 모델보기 |
@@ -27,85 +28,102 @@ def save_selected_model(model_name):
 
 
 def comparison_ui():
-    if st.button("← 유저 메인으로 돌아가기", key="back_to_user_main"):
-        st.session_state.current_page = "A_U_main"
-        st.rerun()
-
     df = load_car_data()
     if df.empty:
         st.error("차량 데이터를 불러올 수 없습니다.")
         return
 
-    col2, col4, col3 = st.columns([3, 0.2, 1])
-    대표모델 = df.sort_values(by="기본가격").drop_duplicates(subset=["모델명"])
-
+    col2, col4, col3 = st.columns([4, 0.1, 0.7])
+    
     with col2:
-        st.markdown("### 전체 차량 모델")
-        for i in range(0, len(대표모델), 3):
-            row = 대표모델.iloc[i:i+3]
-            cols = st.columns(3)
+  
 
-            for col_index, (col, (_, item)) in enumerate(zip(cols, row.iterrows())):
-                with col:
-                    st.markdown(
-                        f"""
-                        <div style="border:1px solid #ddd; border-radius:12px; padding:10px; text-align:center;
-                                    box-shadow: 2px 2px 8px rgba(0,0,0,0.06); height: 330px;">
-                            <div style="height:180px; background:#fff; display:flex; align-items:center; justify-content:center;">
-                                <img src="{item['img_url']}" 
-                                    style="height:140px; width:auto; object-fit:contain; max-width: 100%;" />
-                            </div>
-                            <div style="margin-top: 10px; font-weight:bold; font-size:16px;">{item['모델명']}</div>
-                            <div style="color:gray;">{int(item['기본가격']):,}원부터 ~</div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+        def display_category(title, df_category):
+            st.markdown(f"####  {title}")
+            for i in range(0, len(df_category), 4):
+                row = df_category.iloc[i:i+4]
+                cols = st.columns(4)
+                for col_index, (col, (_, item)) in enumerate(zip(cols, row.iterrows())):
+                    with col:
+                        key_val = f"선택_{item['모델명']}_{i}_{col_index}"
+                        with st.container():
+                            st.markdown(
+                                f'''
+                                <div style="border:1px solid #ddd; border-radius:12px; padding:10px; text-align:center;
+                                            box-shadow: 2px 2px 8px rgba(0,0,0,0.06); background-color:#fff;">
+                                    <div style="height:180px; display:flex; align-items:center; justify-content:center;">
+                                        <img src="{item['img_url']}" 
+                                            style="height:140px; width:auto; object-fit:contain; max-width: 100%;" />
+                                    </div>
+                                    <div style="margin-top: 10px; font-weight:bold; font-size:16px;">{item['모델명']}</div>
+                                    <div style="color:gray;">{int(item['기본가격']):,}원부터 ~</div>
+                                </div>
+                                ''',
+                                unsafe_allow_html=True
+                            )
+                            st.markdown("<div style='height: 10px'></div>", unsafe_allow_html=True)
+                            if st.button("차량 선택", key=key_val):
+                                st.session_state["선택차량"] = item.to_dict()
 
-                    key_val = f"선택_{item['모델명']}_{i}_{col_index}"
-                    if st.button("이 차량 선택", key=key_val):
-                        st.session_state["선택차량"] = item.to_dict()
+        df_unique = df.drop_duplicates(subset="모델명").copy()
+        ev_fuel = ["전기", "수소"]
+        hybrid_fuel = ["하이브리드"]
+        sedan_exclude = ["전기", "수소", "소형"]
 
+        eco = df_unique[df_unique["연료구분"].isin(ev_fuel)]
+        hybrid = df_unique[df_unique["연료구분"].isin(hybrid_fuel)]
+        sedan = df_unique[(~df_unique["연료구분"].isin(sedan_exclude)) & (df_unique["차량형태"] == "세단")]
+        exclude_models = pd.concat([eco, hybrid, sedan])["모델명"].unique()
+        small = df_unique[(~df_unique["모델명"].isin(exclude_models)) & (df_unique["차량구분"] == "소형")]
+        exclude_models = pd.concat([eco, hybrid, sedan, small])["모델명"].unique()
+        suv = df_unique[(~df_unique["모델명"].isin(exclude_models)) & (df_unique["차량형태"] == "SUV")]
+        exclude_models = pd.concat([eco, hybrid, sedan, small, suv])["모델명"].unique()
+        truck = df_unique[(~df_unique["모델명"].isin(exclude_models)) & (df_unique["차량형태"] == "트럭")]
+
+        display_category(f"친환경차 (전기/수소) ({len(eco)})", eco)
+        display_category(f"하이브리드 ({len(hybrid)})", hybrid)
+        display_category(f"세단 ({len(sedan)})", sedan)
+        display_category(f"소형 ({len(small)})", small)
+        display_category(f"SUV ({len(suv)})", suv)
+        display_category(f"트럭 ({len(truck)})", truck)
 
     with col4:
         pass
 
     with col3:
-        st.markdown("### 차량 정보")
-        if "선택차량" in st.session_state:
-            car = st.session_state["선택차량"]
-            st.image(car.get("img_url", ""), use_container_width=True)
-            st.markdown(f"**{car.get('모델명', '')} {car.get('트림명', '')}**")
+        pass  # 차량 정보는 col3에 표시하지 않고, 별도 박스에 표시
 
-            가격 = car.get("기본가격")
-            가격표시 = f"{int(가격):,}원" if pd.notna(가격) else ""
-            st.markdown(f"가격: {가격표시}")
-
-            if st.button("판매 등록으로 이동"):
-                st.session_state.current_page = "판매 등록"
-                st.rerun()
-
-            st.markdown("---")
-            st.markdown("**세부 정보**")
-            for col in ['연료구분', '배기량', '공차중량', '연비', '차량형태', '차량구분', '탑승인원']:
-                value = car.get(col)
-                st.markdown(f"- {col}: {value if pd.notna(value) else ''}")
-        else:
-            st.info("선택된 차량이 없습니다.")
-
-
-# # ▶️ 앱 진입점
-# def app():
-#     page = st.session_state.get("current_page", "A_U_comparison")
-
-#     if page == "A_U_comparison":
-#         comparison_ui()
-
-#     elif page == "A_U_detail":
-#         from modules.A_U_detail import detail_ui
-#         detail_ui()
-# 상세 화면은 A_U_detail.py 내의 detail_ui 함수를 호출        
-#     elif page == "A_U_detail":
-#         import modules.A_U_detail as detail
-#         detail.detail_ui()
-
+    if "선택차량" in st.session_state:
+        car = st.session_state["선택차량"]
+        st.markdown(f"""
+            <style>
+            #car-info-box {{
+                position: fixed;
+                top: 150px;
+                right: 30px;
+                width: 320px;
+                z-index: 999;
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                border-radius: 12px;
+                padding: 16px;
+                box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+                font-family: sans-serif;
+            }}
+            </style>
+            <div id="car-info-box">
+                <img src="{car.get('img_url', '')}" style="width:100%; border-radius:8px;" />
+                <h4 style="margin-top:10px;">{car.get('모델명', '')} {car.get('트림명', '')}</h4>
+                <p><strong>가격:</strong> {int(car.get('기본가격', 0)):,}원</p>
+                <hr />
+                <p><strong>연료구분:</strong> {car.get('연료구분','')}</p>
+                <p><strong>배기량:</strong> {car.get('배기량','')}</p>
+                <p><strong>공차중량:</strong> {car.get('공차중량','')}</p>
+                <p><strong>연비:</strong> {car.get('연비','')}</p>
+                <p><strong>차량형태:</strong> {car.get('차량형태','')}</p>
+                <p><strong>차량구분:</strong> {car.get('차량구분','')}</p>
+                <p><strong>탑승인원:</strong> {car.get('탑승인원','')}</p>
+            </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.info("선택된 차량이 없습니다.")

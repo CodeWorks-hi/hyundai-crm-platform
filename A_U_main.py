@@ -35,7 +35,7 @@ def app():
         "모델 비교", 
         "대리점 검색", 
         "상담 예약", 
-        "시승 신청", 
+        "친환경차량 구매보조금 조회", 
         "고객 센터", 
         "이벤트"
     ])
@@ -46,7 +46,7 @@ def app():
         ("modules.A_U_detail", "detail_ui"),
         ("modules.A_U_map", "map_ui"),
         ("modules.A_U_consult", "consult_ui"),
-        ("modules.A_U_test_drive", "test_drive_ui"),
+        ("modules.A_U_eco", "eco_ui"),
         ("modules.A_U_support", "support_ui"),
         ("modules.A_U_event", "event_ui"),
     ]
@@ -60,7 +60,7 @@ def app():
                 st.error(f"모듈 로딩 오류: `{module_path}.{function_name}`\n\n**{e}**")
 
     st.markdown("---")
-    st.image("images/event1.png")
+
         # ✔ 안전한 방식: 세션 상태로 페이지 전환
     if st.button("← 메인으로 돌아가기"):
         st.session_state.current_page = "home"

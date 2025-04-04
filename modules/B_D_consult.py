@@ -5,6 +5,10 @@ def consult_ui():
     st.title("🧾 고객 상담 페이지")
     clicked = False
 
+    if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
+        st.warning("딜러 정보를 먼저 등록하세요.")
+        return
+    
     if "show_recommendation" not in st.session_state:
         st.session_state["show_recommendation"] = False
     if "고객정보" not in st.session_state or not isinstance(st.session_state["고객정보"], dict):
@@ -61,7 +65,7 @@ def consult_ui():
                     <div style="font-size: 20px; font-weight: 700; color: #0f3c73; margin-bottom: 10px;">🗂️ 최근 상담 요청 정보</div>
                     <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>📅 상담 요청일:</strong> {latest["상담날짜"]}</p>
                     <p style="margin: 0 0 8px 0; font-size: 15px; color: #333;"><strong>⏰ 상담 시간:</strong> {latest["상담시간"]}</p>
-                    <p style="margin: 0; font-size: 15px; color: #333;"><strong>📝 상담 내용:</strong> {latest["상담내용"]}</p>
+                    <p style="margin: 0; font-size: 15px; color: #333;"><strong>📝 상담 내용:</strong> {latest["요청사항"]}</p>
                 </div>
                 """, unsafe_allow_html=True)
             else:
@@ -78,15 +82,25 @@ def consult_ui():
             colA, colB = st.columns(2)
             with colA:
                 st.text_input("성별", value=survey_result["성별"], disabled=True)
-                budget = st.number_input("예산 (만원)", step=500, value=survey_result["예상예산_만원"])
+                budget_raw = survey_result["예상예산_만원"]
+                if isinstance(budget_raw, str) and "3500" in budget_raw:
+                    budg = 3500
+                else:
+                    try:
+                        budg = int(budget_raw)
+                    except:
+                        budg = 0
+                budget = st.number_input("예산 (만원)", step=500, min_value=0, value=budg)
                 companies = [str(survey_result["동승인원구성"])] + ["1인", "부부", "자녀1명", "자녀2명 이상", "부모님 동승"]
                 unique_companies = list(dict.fromkeys(companies))
                 company = st.selectbox("동승자 유형", unique_companies)
             with colB:
                 st.text_input("연령대", value=survey_result["연령대"], disabled=True)
                 if survey_result["월주행거리_km"] == "2000 이상" :
-                    survey_result["월주행거리_km"] = 2000
-                st.number_input("예상 월간 주행 거리 (km)", step=500, min_value=0, value=survey_result["월주행거리_km"])
+                    distance = 2000
+                else :
+                    distance = int(survey_result["월주행거리_km"])
+                st.number_input("예상 월간 주행 거리 (km)", step=500, min_value=0, value=distance)
                 colors = [str(survey_result["선호색상"])] + ["흰색", "검정", "회색", "은색", "파랑", "빨강", "기타"]
                 unique_colors = list(dict.fromkeys(colors))
                 st.selectbox("선호 색상", unique_colors)
@@ -106,8 +120,6 @@ def consult_ui():
                 unique_imp2 = list(dict.fromkeys(imp2))
                 prior2 = st.selectbox("두 번째로 중요한 요소", unique_imp2)
                 st.text_input("최근 보유 차량", survey_result["최근보유차종"], disabled=True)
-            
-            fav_list = st.multiselect("관심 차종", ["캐스퍼", "캐스퍼 일렉트릭", "그랜저", "아반떼", "투싼", "기타"])
                 
             if st.button("🚘 추천받기", use_container_width=True):
                 st.session_state["show_recommendation"] = True
@@ -120,7 +132,7 @@ def consult_ui():
                 # 동승 유형에 따라 추천 차량 필터링
                 def company_type(company):
                     return {
-                        "1인": "경차",
+                        "1인": "소형",
                         "부부": "준중형",
                         "자녀1명": "준중형",
                         "자녀2명 이상": "중형",
@@ -154,9 +166,11 @@ def consult_ui():
                                     car_df = car_df.loc[car_df["차량구분"].isin(["대형"]) & (car_df["차량형태"] == "승합차"), :]
 
                 if len(car_df) >= 3:
-                    result_df = car_df.sample(3)
+                    # result_df = car_df.sample(3)
+                    result_df = car_df.loc[car_df["기본가격"] >= car_df["기본가격"].mean(), :].sample(3)
                 elif len(car_df) > 0:
-                    result_df = car_df.sample(len(car_df))  # 가능한 만큼만 추천
+                    # result_df = car_df.sample(len(car_df))  # 가능한 만큼만 추천
+                    result_df = car_df.loc[car_df["기본가격"] >= car_df["기본가격"].mean(), :].sample(len(car_df))
                 else:
                     st.warning("추천 조건을 만족하는 차량이 없습니다.")
                     return
@@ -177,13 +191,17 @@ def consult_ui():
                     st.markdown(f"##### **추천 차량 {i+1}**")
                     st.markdown(f"###### **{row['모델명']} ({row['트림명']})**")
                     st.write(f"• 연료 유형: {row['연료구분']}")
-                    st.write(f"• 연비: {row['연비']} km/L")
+                    if row['연료구분'] == '전기' :
+                        st.write(f"• 연비: {row['연비']} km/kWh")
+                    else :
+                        st.write(f"• 연비: {row['연비']} km/L")
                     st.write(f"• 가격: {row['기본가격']:,} 원~")
                 with button_col:
                     with st.container():
                         st.header("")
                         if st.button(f"저장 {i+1}", key=f"save_{i+1}"):
                             st.session_state[f"saved_recommend_{i+1}"] = row['모델명']
+                            st.session_state[f"saved_recommend_trim_{i+1}"] = row['트림명']
                 st.markdown("---")
         else:
             st.info("🚘 왼쪽에서 '추천받기' 버튼을 눌러 차량 추천을 확인하세요.")
@@ -199,7 +217,7 @@ def consult_ui():
             st.markdown(f"""
             <div style="background-color: #f6fbff; border: 1px solid #b3d4fc; border-radius: 8px; padding: 15px; margin-top: 8px;">
                 <ul style="list-style-type: none; padding-left: 0; font-size: 14px; color: #1f2f40;">
-                    <li><strong>💰 예산 범위:</strong> {survey['예상예산_만원']} 만원</li>
+                    <li><strong>💰 예산 범위:</strong> {budg} 만원</li>
                     <li><strong>🚘 주요 운전 용도:</strong> {survey['주요용도']}</li>
                     <li><strong>🎯 중요 요소:</strong> {survey['중요요소1']}, {survey['중요요소2']}, {survey['중요요소3']}</li>
                     <li><strong>🎨 선호 색상:</strong> {survey['선호색상']}</li>
@@ -213,29 +231,6 @@ def consult_ui():
         
         st.write("")
 
-    with col_mid:
-        st.markdown("#### 📝 상담 내용 메모")
-        st.markdown(
-            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
-            unsafe_allow_html=True,
-        )
-        memo = st.text_area("상담 내용을 입력하세요", height=200, label_visibility="collapsed")
-        if st.button("📩 상담 결과 저장", use_container_width=True):
-            result = {
-                "이름": customer_info["이름"],
-                "전화번호": customer_info["전화번호"],
-                "상담일": pd.Timestamp.now().strftime("%Y-%m-%d"),
-                "상담내용": memo
-            }
-            result_df = pd.DataFrame([result])
-            try:
-                existing = pd.read_csv("data/consult_result.csv")
-                result_df = pd.concat([existing, result_df], ignore_index=True)
-            except FileNotFoundError:
-                pass
-            result_df.to_csv("data/consult_result.csv", index=False)
-            st.success("✅ 상담 내용이 저장되었습니다.")
-
     with col_right:
         st.markdown("#### 🏷️ 상담 태그 분류")
         st.markdown(
@@ -247,9 +242,32 @@ def consult_ui():
         custom_tag = st.text_input("기타 태그 직접 입력")
         if custom_tag and custom_tag not in selected_tags:
             selected_tags.append(custom_tag)
+        if len(selected_tags) == 0:
+            selected_tags = "-"
 
         st.markdown("##### ✅ 선택된 태그")
         st.markdown(
             f"<div style='background-color: #f2f7fb; padding: 10px; border-radius: 8px; min-height: 40px; font-size: 13.5px; color: #1d3557;'>{', '.join(selected_tags) if selected_tags else '선택된 태그 없음'}</div>",
             unsafe_allow_html=True
         )
+
+    with col_mid:
+        st.markdown("#### 📝 상담 내용 메모")
+        st.markdown(
+            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
+            unsafe_allow_html=True,
+        )
+        memo = st.text_area("상담 내용을 입력하세요", height=200, label_visibility="collapsed")
+        
+        if st.button("✅ 저장", use_container_width=True, key='save_memo'):
+            cr_df = pd.read_csv("data/consult_log.csv")
+            mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact) & (cr_df["완료여부"] == 0)
+            
+            if mask.any():
+                cr_df.loc[mask, "상담내용"] = memo
+                cr_df.loc[mask, "완료여부"] = 1
+                cr_df.loc[mask, "상담태그"] = ', '.join(selected_tags)
+                cr_df.to_csv("data/consult_log.csv", index=False)
+                st.success("✅ 상담 내용이 저장되었습니다.")
+            else:
+                st.warning("해당 조건에 맞는 미완료 상담이 없습니다.")

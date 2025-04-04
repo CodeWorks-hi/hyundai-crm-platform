@@ -4,115 +4,194 @@ import plotly.express as px
 
 
 def inventory_ui():
+    if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
+        st.warning("딜러 정보를 먼저 등록하세요.")
+        return
+
     # 데이터 불러오기 예시
-    data = {
-        "차종": ["트랙스", "스타리아", "팰리세이드"],
-        "재고수량": [12, 3, 5],
-        "판매량": [40, 18, 33]
-    }
-    df = pd.DataFrame(data)
-
-        
-    stock_df = pd.DataFrame({
-        "차종": ["Avante", "Sonata", "Grandeur", "Tucson", "Palisade", "Kona"],
-        "재고수량": [12, 5, 3, 9, 2, 7]
-    })
-
-    sales_df = pd.DataFrame({
-        "차종": ["Avante", "Sonata", "Grandeur", "Tucson", "Palisade", "Kona", "Avante", "Kona", "Tucson", "Sonata"],
-        "판매량": [20, 15, 8, 13, 6, 11, 18, 9, 12, 14]
-    })
+    inv_df = pd.read_csv("data/inventory_data.csv")
+    inv_df["차종"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
+    stock_df = inv_df.groupby(['차종', '공장명'], as_index=False)['재고량'].sum().rename(columns={'재고량': '재고수량'})
+    sal_df = pd.read_csv("data/processed/total/hyundai-by-car.csv")
+    
+    # 최근 3개월 컬럼만 추출
+    recent_cols = sorted([col for col in sal_df.columns if col[:4].isdigit()], reverse=True)[:3]
+    sal_df["최근 3개월 판매량"] = sal_df[recent_cols].sum(axis=1)
 
     # -------------------------------
-    # 상단: 컬럼1 (카드뷰) / 컬럼2 (재고 그래프)
-    col2, col1 = st.columns([3, 1.5])
+    # 상단: 컬럼1 (카드뷰) / 컬럼2 (재고 그래프) / 컬럼3 (추천 차량 재고 현황)
+    col1, col2, col3 = st.columns([3, 0.3, 1.4])
 
     with col1:
-        st.markdown("### 🚗 재고/판매 요약 카드")
-        cards = st.columns(3)
-        for _, row in df.iterrows():
-            st.markdown(f"""
-                <div style="border:1px solid #ccc; border-radius:12px; padding:12px; margin-bottom:12px;
-                            text-align:center; box-shadow:2px 2px 6px rgba(0,0,0,0.05);">
-                    <h4>{row['차종']}</h4>
-                    <p>재고: <strong>{row['재고수량']}대</strong></p>
-                    <p>판매: <strong>{row['판매량']}대</strong></p>
-                </div>
-            """, unsafe_allow_html=True)
-
-    with col2:
+        st.markdown("### 📊 최근 3개월 판매량 차트")
         colA, colB = st.columns([1, 1.1])
 
         with colA:
-            top3 = sales_df.groupby("차종")["판매량"].sum().sort_values(ascending=False).head(3).reset_index()
-            fig_top3 = px.bar(top3, x="차종", y="판매량", title="Top 3 인기 차종")
-            st.plotly_chart(fig_top3, use_container_width=True)
+            top10 = sal_df.groupby("차종")["최근 3개월 판매량"].sum().sort_values(ascending=False).head(10).reset_index()
+            fig_top10 = px.bar(
+                top10,
+                x="차종",
+                y="최근 3개월 판매량",
+                title="Top 3 인기 차종 (최근 3개월)",
+                color_discrete_sequence=["#E74C3C"]
+            )
+            st.plotly_chart(fig_top10, use_container_width=True)
 
         with colB:
-            bottom3 = sales_df.groupby("차종")["판매량"].sum().sort_values().head(3).reset_index()
-            fig_bottom3 = px.bar(bottom3, x="차종", y="판매량", title="판매 부진 차종")
-            st.plotly_chart(fig_bottom3, use_container_width=True)
-        top3_df = df.sort_values(by="판매량", ascending=False).head(3).reset_index(drop=True)
-        top3_df.index = [""] * len(top3_df)  # 👉 인덱스를 공백으로 덮어서 숨김 효과
-        st.dataframe(top3_df, use_container_width=True)
+            bottom10 = sal_df.groupby("차종")["최근 3개월 판매량"].sum()
+            bottom10 = bottom10[bottom10 > 0].sort_values().head(10).reset_index()
 
-    # -------------------------------
-    # 하단: 컬럼3 (발주 추천) / 컬럼4 (발주 등록)
-    st.markdown("---")
-    col3, col4 = st.columns([1,3])
+            fig_bottom10 = px.bar(
+                bottom10,
+                x="차종",
+                y="최근 3개월 판매량",
+                title="판매 저조 Top 3 (최근 3개월, 판매량 0 제외)"
+            )
+            st.plotly_chart(fig_bottom10, use_container_width=True)
 
     with col3:
-        st.markdown("### 발주 추천")
-        st.warning("재고와 판매량 기준으로 발주를 추천하는 기본 시스템입니다.")
+        st.markdown("### 📦 주요 공장별 재고 현황")
 
-        merged_df = pd.merge(
-            stock_df,
-            sales_df.groupby("차종")["판매량"].sum().reset_index(),
-            on="차종",
-            how="left"
-        ).fillna(0)
+        shown_models = set()
+        saved_models = [st.session_state.get(f"saved_recommend_{i}") for i in range(1, 4)]
+        saved_models = list(filter(None, saved_models))
+        saved_models = list(dict.fromkeys(saved_models))
 
-        merged_df["판매재고비"] = merged_df["판매량"] / (merged_df["재고수량"] + 1)
-        reorder_recommend = merged_df.sort_values(by="판매재고비", ascending=False).head(3)
+        if saved_models:
+            for model in saved_models:
+                if model in shown_models:
+                    continue
+                shown_models.add(model)
+                match = stock_df[(stock_df["차종"] == model.split(" ")[0]) &(stock_df["트림명"] == model.split(" ")[1])]
 
-        # 카드뷰 형태 출력
-        for _, row in reorder_recommend.iterrows():
+                if not match.empty:
+                    # 가까운 공장 순서 (임의 기준: 이름순)
+                    match = match.sort_values(by="공장명").head(3)
+                    for _, row in match.iterrows():
+                        st.markdown(f"""
+                            <div style="border:1px solid #ccc; border-radius:12px; padding:10px; margin-bottom:10px;
+                                        background-color:#f9f9f9;">
+                                <strong>{row['차종']} @ {row['공장명']}</strong><br>
+                                현재 재고: <strong>{int(row['재고수량'])}대</strong>
+                            </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.info(f"'{model}'에 대한 재고 정보 없음")
+        else:
+            inv_df["차종"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
+            sample_df = (
+                inv_df.groupby(['공장명', '차종'], as_index=False)['재고량']
+                .sum()
+                .rename(columns={'재고량': '재고수량'})
+                .sample(n=min(6, len(inv_df)), random_state=42)
+            )
+            for _, row in sample_df.iterrows():
+                st.markdown(f"""
+                    <div style="border:1px solid #ccc; border-radius:12px; padding:10px; margin-bottom:10px;
+                                background-color:#f9f9f9;">
+                        <strong>{row['차종']} @ {row['공장명']}</strong><br>
+                        현재 재고: <strong>{int(row['재고수량'])}대</strong>
+                    </div>
+                """, unsafe_allow_html=True)
+
+    # -------------------------------
+    # 하단: 컬럼3 (발주 추천) / 컬럼M (발주 등록) / 컬럼4 (발주 등록)
+    st.markdown("---")
+    col3, col3M, colM, col4M, col4 = st.columns([1, 0.1, 1.5, 0.1, 1.5])
+
+    with col3:
+        st.markdown("### 🏭 재고 부족 알림")
+        
+        inv_df["차종트림"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
+        low_inventory_df = (
+            inv_df.groupby(['공장명', '차종트림'], as_index=False)['재고량']
+            .sum()
+            .rename(columns={'차종트림': '차종', '재고량': '재고수량'})
+            .sort_values(by='재고수량', ascending=True)
+            .head(3)
+        )
+
+        # 카드 스타일 출력
+        st.markdown("""
+            <style>
+            .scroll-container {
+                max-height: 500px;
+                overflow-y: auto;
+                padding-right: 8px;
+            }
+            .inventory-card {
+                border: 1px solid #ccc;
+                border-radius: 12px;
+                padding: 14px;
+                margin-bottom: 12px;
+                text-align: center;
+                box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
+                background-color: #fff;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
+        st.markdown('<div class="scroll-container">', unsafe_allow_html=True)
+        for _, row in low_inventory_df.iterrows():
             st.markdown(f"""
-                <div style="border:1px solid #ccc; border-radius:12px; padding:14px; margin-bottom:12px;
-                            box-shadow:2px 2px 6px rgba(0,0,0,0.05); text-align:center;">
+                <div class="inventory-card">
                     <h4>{row['차종']}</h4>
-                    <p>재고: <strong>{int(row['재고수량'])}대</strong></p>
-                    <p>판매: <strong>{int(row['판매량'])}대</strong></p>
-                    <p style="color:#d9534f;"><strong>➜ 추가 발주 권장</strong></p>
+                    <p>공장: <strong>{row['공장명']}</strong></p>
+                    <p>현재 재고: <strong>{int(row['재고수량'])}대</strong></p>
+                    <p style="color:#d9534f;"><strong>⚠️ 재고 부족 주의</strong></p>
                 </div>
             """, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    with col4:
-        st.markdown("### 발주 등록")
-        st.caption("필요한 차량을 선택해 발주를 등록하세요.")
-
-        with st.form("order_form_col4"):  # ✅ 키를 유니크하게 변경
-            st.markdown(
-                """
-                <div style="border:1px solid #e1e1e1; border-radius:12px; padding:20px; background-color:#fafafa;">
-                """,
-                unsafe_allow_html=True,
+    with colM:
+        st.markdown("### 🔍 재고 검색")
+        st.markdown("#### 공장을 선택하여 재고 현황을 확인하세요.")
+        
+        selected_factory = st.selectbox("🏭 공장 선택", sorted(inv_df["공장명"].unique()))
+        stock_filter = st.selectbox(
+                "재고 보기 옵션",
+                ["전체", "재고 부족", "재고 과잉"]
             )
 
-            vehicle = st.selectbox("차종 선택", stock_df["차종"].unique())
-            size = st.radio("사이즈", ["소형", "중형", "대형"], horizontal=True)
-            color = st.selectbox("색상", ["흰색", "검정", "회색", "파랑", "빨강"])
-            quantity = st.number_input("수량", min_value=1, step=1)
+        result = inv_df[inv_df["공장명"] == selected_factory]
+        result_grouped = result.groupby(["공장명", "모델명", "트림명"], as_index=False)["재고량"].sum()
 
-            submitted = st.form_submit_button("발주 등록")
+        if stock_filter == "재고 부족":
+            result_grouped = result_grouped[result_grouped["재고량"] < 1000]
+        elif stock_filter == "재고 과잉":
+            result_grouped = result_grouped[result_grouped["재고량"] >= 8000]
 
-            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("#### 🔎 검색 결과")
+        if not result_grouped.empty:
+            st.dataframe(result_grouped.rename(columns={"재고량": "재고수량"}), use_container_width=True, hide_index=True)
+        else:
+            st.info("선택한 조건에 해당하는 재고가 없습니다.")
+
+    with col4:
+        st.markdown("### 📋 발주 등록")
+        st.caption("필요한 차량을 선택해 발주를 등록하세요.")
+
+        with st.form("order_form_col4"):
+            vehicle_models = sorted(inv_df["모델명"].unique())
+            selected_model = st.selectbox("🚗 차종 선택", vehicle_models)
+
+            available_trims = inv_df[inv_df["모델명"] == selected_model]["트림명"].unique()
+            selected_trim = st.selectbox("🔧 트림 선택", sorted(available_trims))
+            vehicle = f"{selected_model} {selected_trim}"
+            color = st.selectbox("🎨 색상", ["흰색", "검정", "회색", "파랑", "빨강"])
+            quantity = st.number_input("🔢 수량", min_value=1, step=1)
+            requestor = st.text_input("👤 요청자", value=st.session_state.get("manager_name", "홍길동"), disabled=True)
+            urgency = st.radio("📌 긴급도", ["보통", "긴급", "매우 긴급"], horizontal=True)
+
+            submitted = st.form_submit_button("✅ 발주 등록")
 
             if submitted:
-                st.success(f"`{vehicle}` ({size}, {color}) {quantity}대 발주 완료되었습니다.")
-
+                st.success(
+                    f"{vehicle} ({color}) {quantity}대 발주가 등록되었습니다.\n\n"
+                    f"요청자: {requestor} / 긴급도: {urgency}"
+                )
 
     # -------------------------------
     # 전체 테이블 익스펜더
     with st.expander("전체 재고 테이블 보기"):
-        st.dataframe(df.reset_index(drop=True))
+        st.dataframe(stock_df.pivot_table(index="차종", columns="공장명", values="재고수량", fill_value=0))

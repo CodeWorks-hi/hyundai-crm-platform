@@ -20,3 +20,4 @@ df_customer = pd.read_csv(customer_path)
 def domestic_performance_ui():
     st.subheader(" 국내 실적 요약")
     st.write("고객의 전체 구매 실적 및 기본 통계 정보를 표시합니다.")
+     
