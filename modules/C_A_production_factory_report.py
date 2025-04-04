@@ -31,11 +31,7 @@ def report_ui(df_inv):
         total_prod = prod_capacity.groupby('공장명').sum().reset_index(name='생산가능수량')
         prod_capacity = df_inv.groupby(['공장명', '모델명', '트림명'])['재고량'].min().reset_index()
         prod_capacity.rename(columns={'재고량': '생산가능수량'}, inplace=True)
-
-        # 2. 계층별 집계
-        factory_cap = prod_capacity.groupby('공장명')['생산가능수량'].sum().reset_index()
-        model_cap = prod_capacity.groupby('모델명')['생산가능수량'].sum().reset_index()
-        trim_cap = prod_capacity.groupby(['모델명','트림명'])['생산가능수량'].sum().reset_index()
+        
 
         # 재고 분석
         inventory_analysis = df_inv.groupby('공장명').agg(
@@ -81,5 +77,3 @@ def report_ui(df_inv):
             )
             fig2.update_traces(marker=dict(size=14))
             st.plotly_chart(fig2, use_container_width=True)
-
-            

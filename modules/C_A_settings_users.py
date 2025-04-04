@@ -126,30 +126,30 @@ def users_ui():
                     st.success(f"{row['직원이름']} 님이 삭제되었습니다.")
                     st.rerun()
 
-    # 얼굴 매칭
-    st.markdown("### 얼굴 사진 일치 여부 확인")
-    upload = st.file_uploader("비교할 얼굴 사진을 업로드하세요", type=["jpg", "jpeg", "png"], key="match")
+    # # 얼굴 매칭
+    # st.markdown("### 얼굴 사진 일치 여부 확인")
+    # upload = st.file_uploader("비교할 얼굴 사진을 업로드하세요", type=["jpg", "jpeg", "png"], key="match")
 
-    if upload:
-        temp_path = os.path.join("temp.jpg")
-        with open(temp_path, "wb") as f:
-            f.write(upload.getbuffer())
+    # if upload:
+    #     temp_path = os.path.join("temp.jpg")
+    #     with open(temp_path, "wb") as f:
+    #         f.write(upload.getbuffer())
 
-        test_encoding = encode_face(temp_path)
+    #     test_encoding = encode_face(temp_path)
 
-        if test_encoding is None:
-            st.error("❌ 사진에서 얼굴을 인식할 수 없습니다.")
-        else:
-            encodings = df_employees["인코딩"].dropna().apply(eval).tolist()
-            names = df_employees["직원이름"].tolist()
-            result = is_same_person(test_encoding, encodings, names)
+    #     if test_encoding is None:
+    #         st.error("❌ 사진에서 얼굴을 인식할 수 없습니다.")
+    #     else:
+    #         encodings = df_employees["인코딩"].dropna().apply(eval).tolist()
+    #         names = df_employees["직원이름"].tolist()
+    #         result = is_same_person(test_encoding, encodings, names)
 
-            if result:
-                st.success(f"✅ 등록된 직원 중 **{result}** 님과 얼굴이 일치합니다.")
-            else:
-                st.warning("⚠️ 일치하는 직원이 없습니다.")
+    #         if result:
+    #             st.success(f"✅ 등록된 직원 중 **{result}** 님과 얼굴이 일치합니다.")
+    #         else:
+    #             st.warning("⚠️ 일치하는 직원이 없습니다.")
 
-        os.remove(temp_path)
+    #     os.remove(temp_path)
 
     # MediaPipe 얼굴 탐지 (웹캠)
     # st.markdown("###  실시간 웹캠 얼굴 탐지 (MediaPipe)")
