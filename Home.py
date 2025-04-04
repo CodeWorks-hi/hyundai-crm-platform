@@ -8,12 +8,6 @@ import logging
 import traceback
 import datetime
 
-try:
-    import fredapi
-except ImportError:
-    with st.spinner("fredapi 설치 중..."):
-        os.system("pip install pandas fredapi==0.4.0")
-        st.success("설치 완료. 앱을 다시 실행해주세요.")
 
 
 # ✅ 접속 로그 기록
