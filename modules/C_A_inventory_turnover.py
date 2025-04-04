@@ -71,7 +71,7 @@ def turnover_ui():
     df_inv = load_data()
     
     # 헤더 영역 (검색 결과 [1]의 KPI 보고 구조 반영)
-    st.header(" 현대기아 글로벌 재고 관리 대시보드")
+    st.markdown("### 현대기아 글로벌 재고 관리 대시보드")
     with st.container(border=True):
         cols = st.columns([2,1,1,2])
         with cols[0]:
