@@ -53,11 +53,11 @@ def app():
 
     for i, (module_path, function_name) in enumerate(tab_modules):
         with tabs[i]:
-            try:
-                module = importlib.import_module(module_path)
-                getattr(module, function_name)()
-            except Exception as e:
-                st.error(f"모듈 로딩 오류: `{module_path}.{function_name}`\n\n**{e}**")
+            # try:
+            module = importlib.import_module(module_path)
+            getattr(module, function_name)()
+            # except Exception as e:
+            #     st.error(f"모듈 로딩 오류: `{module_path}.{function_name}`\n\n**{e}**")
 
 
         # ✔ 안전한 방식: 세션 상태로 페이지 전환
