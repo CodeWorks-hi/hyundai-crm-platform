@@ -153,7 +153,7 @@ def consult_ui():
                     elif i == "성능" :
                         car_df = car_df.loc[car_df["배기량"] >= car_df["배기량"].mean(), :]
                     elif i == "공간" :
-                        if j is not None :
+                        if purp is not None :
                             for j in purp :
                                 if j == "출퇴근":
                                     car_df = car_df.loc[(car_df["연비"] >= car_df["연비"].mean()) & (car_df["차량구분"].isin(["소형", "준중형", "중형"])), :]
