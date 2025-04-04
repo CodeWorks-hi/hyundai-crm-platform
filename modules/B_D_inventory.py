@@ -234,7 +234,7 @@ def inventory_ui():
             inv_df.to_csv("data/inventory_data.csv", index=False)
 
             st.success(
-                f"{vehicle} @ {selected_factory} 공장에서 {quantity}대 발주가 등록되었습니다.\n\n"
+                f"{selected_factory}에서 {vehicle} {quantity}대 발주가 등록되었습니다.\n\n"
                 f"요청자: {requestor}"
             )
 
