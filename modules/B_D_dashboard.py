@@ -15,7 +15,7 @@ TEXT_MODEL_ID = "google/gemma-2-9b-it"
 
 def get_huggingface_token(model_type):
     tokens = {"gemma": st.secrets.get("HUGGINGFACE_API_TOKEN_GEMMA")}
-    return tokens.get(model_type)
+    return 'hf_' + tokens.get(model_type)
 
 def generate_text_via_api(request: str, keywords: str, model_name: str = TEXT_MODEL_ID) -> str:
     token = get_huggingface_token("gemma")
