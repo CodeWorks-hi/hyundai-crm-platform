@@ -22,9 +22,13 @@ def load_data():
     df_plant = pd.read_csv(hyundai_plant_path)
 
     # 컬럼 정제
-    for df in [df_list, df_inv, df_plant]:
+    def clean_df(df):
         df.columns = df.columns.str.strip()
-        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+        return df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+
+    df_list = clean_df(df_list)
+    df_inv = clean_df(df_inv)
+    df_plant = clean_df(df_plant)
     
     # 생산상태 결측치 처리
     df_plant['생산상태'] = df_plant['생산상태'].fillna('미확인')
@@ -147,4 +151,3 @@ def trend_ui():
             st.dataframe(df_inv, use_container_width=True)
         with tab3:
             st.dataframe(df_plant, use_container_width=True)
-
