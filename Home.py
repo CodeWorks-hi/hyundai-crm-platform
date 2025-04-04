@@ -65,7 +65,7 @@ if st.session_state.current_page == "home":
 
 # ✅ 라우팅 처리
 else:
-    # try:
+    try:
         page = st.session_state.get("current_page")
 
         if page == "A_U_main":
@@ -81,9 +81,9 @@ else:
             import C_A_main as admin
             admin.app()
 
-    # except Exception as e:
-    #     st.error("페이지 로딩 중 오류가 발생했습니다.")
-    #     st.exception(e)
+    except Exception as e:
+        st.error("페이지 로딩 중 오류가 발생했습니다.")
+        st.exception(e)
 
 # ✅ 푸터
 st.markdown("---")
