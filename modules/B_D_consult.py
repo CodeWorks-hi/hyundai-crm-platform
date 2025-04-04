@@ -265,7 +265,7 @@ def consult_ui():
             cr_df = pd.read_csv("data/consult_log.csv")
             mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact)
             
-            if cr_df.loc[mask, "완료여부"] == 0:
+            if (cr_df.loc[mask, "완료여부"] == 0).any():
                 if mask.any():
                     cr_df.loc[mask, "상담내용"] = memo
                     cr_df.loc[mask, "완료여부"] = 1
