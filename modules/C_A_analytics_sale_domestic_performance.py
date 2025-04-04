@@ -18,6 +18,17 @@ def domestic_performance_ui():
     st.title("🚗 국내 판매 실적 분석")
     st.write("고객 구매 실적 및 주요 통계를 한눈에 확인하세요.")
 
+    df_customer['통합 연령대'] = df_customer['연령대'].replace(
+            {
+                '20대 초반': '20대', '20대 중반': '20대', '20대 후반': '20대',
+                '30대 초반': '30대', '30대 중반': '30대', '30대 후반': '30대',
+                '40대 초반': '40대', '40대 중반': '40대', '40대 후반': '40대',
+                '50대 초반': '50대', '50대 중반': '50대', '50대 후반': '50대',
+                '60대 초반': '60대 이상', '60대 중반': '60대 이상', 
+                '60대 후반': '60대 이상', '70대 초반': '60대 이상'
+            }
+        )
+
     # 선택 연도
     years = sorted(df_customer['최근 구매 연도'].unique())
     default_year = 2024
@@ -41,6 +52,7 @@ def domestic_performance_ui():
         YoY_growth = round(((total_sales - last_year_sales) / last_year_sales) * 100, 2) if last_year_sales > 0 else "-"
     else:
         YoY_growth = "-"
+        
 
     # 주요 지표 표시 (카드 스타일)
     st.markdown("### 📊 주요 지표")
@@ -50,139 +62,88 @@ def domestic_performance_ui():
     col3.metric("전년대비 판매 증가율", f"{YoY_growth}%")
     col4.metric("총 판매량", f"{total_sales} 대")
 
+
     # 분포 시각화 (깔끔한 레이아웃)
     st.markdown("---")
     st.markdown("### 🎨 고객 분포 시각화")
     
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.write("**연령대 분포**")
-        age_counts = df_filtered['연령대'].value_counts()
-        fig, ax = plt.subplots()
-        colors = plt.cm.Set3.colors[:len(age_counts)]  # 고유한 옅은 색상 사용 (Set3 팔레트)
-        ax.pie(age_counts, colors=colors, startangle=90)
-        ax.legend(sorted(age_counts.index), title="연령대", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
-        st.pyplot(fig)
-
-    with col2:
-        st.write("**고객 그룹 분포**")
-        group_counts = df_filtered['고객 그룹'].value_counts()
-        fig, ax = plt.subplots()
-        colors = plt.cm.Set3.colors[:len(group_counts)]  # 고유한 옅은 색상 사용 (Set3 팔레트)
-        ax.pie(group_counts, colors=colors, startangle=90)
-        ax.legend(sorted(group_counts.index), title="고객 그룹", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
-        st.pyplot(fig)
-
-    with col3:
-        st.write("**거주 지역 분포**")
-        region_counts = df_filtered['거주 지역'].value_counts()
-        fig, ax = plt.subplots()
-        colors = plt.cm.Set3.colors[:len(region_counts)]  # 고유한 색상 사용
-        ax.bar(region_counts.index, region_counts.values, color=colors)
-        ax.set_title("거주 지역별 고객 수")
-        ax.set_xlabel("거주 지역")
-        ax.set_ylabel("고객 수")
-        plt.xticks(rotation=45)  # 지역명이 길 경우 회전
-        st.pyplot(fig)
-
-
-    # 판매된 모델 및 구매 트렌드 시각화
-    st.markdown("---")
-    st.markdown("### 🚘 판매된 모델 및 구매 트렌드")
-
     col1, col2 = st.columns(2)
 
     with col1:
-        # 연령대 통합 (20대, 30대 등으로 묶음)
-        df_filtered['통합 연령대'] = df_filtered['연령대'].replace(
-            {
-                '20대 초반': '20대', '20대 중반': '20대', '20대 후반': '20대',
-                '30대 초반': '30대', '30대 중반': '30대', '30대 후반': '30대',
-                '40대 초반': '40대', '40대 중반': '40대', '40대 후반': '40대',
-                '50대 초반': '50대', '50대 중반': '50대', '50대 후반': '50대',
-                '60대 초반': '60대 이상', '60대 중반': '60대 이상', 
-                '60대 후반': '60대 이상', '70대 초반': '60대 이상'
-            }
-        )
+        col1_1, col1_2 = st.columns(2)
+        with col1_1:
+            # 연령대 선택 셀렉박스 (전체 옵션 포함)
+            age_options = sorted(df_customer['통합 연령대'].unique().tolist())
+            selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0)
+        with col1_2:
+            # 성별 선택 셀렉박스 (전체 옵션 포함)
+            gender_options = df_customer['성별'].unique().tolist()
+            selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0)
 
-        # Streamlit UI: 연령대 선택
-        age_options = df_filtered['통합 연령대'].unique()  # 고유한 통합 연령대를 가져옴
-        age_choice = st.selectbox('연령대를 선택하세요:', sorted(age_options))  # 사용자 인터페이스 생성
+        # 필터링 로직 수정
+        if selected_age == '전체' and selected_gender == '전체':
+            df_filtered = df_customer.copy()  # 전체 데이터 사용
+            chart_data = df_filtered['통합 연령대'].value_counts()
+            legend_title = "연령대"  # 범례 제목 설정 (연령대 기준)
+        elif selected_age == '전체':
+            df_filtered = df_customer[df_customer['성별'] == selected_gender]  # 성별만 필터링
+            chart_data = df_filtered['통합 연령대'].value_counts()
+            legend_title = "연령대"  # 범례 제목 설정 (연령대 기준)
+        elif selected_gender == '전체':
+            df_filtered = df_customer[df_customer['통합 연령대'] == selected_age]  # 연령대만 필터링
+            chart_data = df_filtered['성별'].value_counts()
+            legend_title = "성별"  # 범례 제목 설정 (성별 기준)
+        else:
+            df_filtered = df_customer[(df_customer['통합 연령대'] == selected_age) & (df_customer['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
+            chart_data = df_filtered['성별'].value_counts()
+            legend_title = "성별"  # 범례 제목 설정 (성별 기준)
 
-        # 선택한 연령대로 데이터 필터링
-        filtered_data = df_filtered[df_filtered['통합 연령대'] == age_choice]
-
-        # 차량 모델별 구매 수 계산
-        model_counts = filtered_data['최근 구매 제품'].value_counts()
-
-        # 원형 차트 그리기 (크기 조정)
-        fig, ax = plt.subplots(figsize=(4, 4))  # 그래프 크기를 4x4로 설정
-        colors = plt.cm.Set3.colors[:len(model_counts)]  # 색상 설정
-        ax.pie(model_counts, colors=colors)
-        ax.set_title(f"{age_choice} 구매 차량 모델 분포", fontsize=10)
-        ax.legend(sorted(model_counts.index), title="차량 모델", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
-        st.pyplot(fig)
-
-
+        # 데이터가 없는 경우 처리
+        if chart_data.empty:
+            st.write("필터링된 데이터가 없습니다.")
+        else:
+            st.write("**연령대/성별 분포**")
+            fig, ax = plt.subplots(figsize=(6, 6))  # 그래프 크기 설정
+            colors = plt.cm.Set3.colors[:len(chart_data)]  # 고유한 옅은 색상 사용 (Set3 팔레트)
+            ax.pie(chart_data, colors=colors, startangle=90)  # 비율 표시 추가
+            ax.legend(sorted(chart_data.index), title=legend_title, loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
+            st.pyplot(fig)
 
     with col2:
-        trend_options = ['월별', '분기별', '요일별', '계절별']
-        trend_choice = st.selectbox('구매 트렌드 선택', trend_options)
+        col1, col2 = st.columns(2)
+        with col1:
+            # 연령대 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
+            age_options = sorted(df_customer['통합 연령대'].unique().tolist())
+            selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox")
+        with col2:
+            # 성별 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
+            gender_options = df_customer['성별'].unique().tolist()
+            selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox")
 
-        if not pd.api.types.is_datetime64_any_dtype(df_filtered['최근 구매 날짜']):
-            df_filtered['최근 구매 날짜'] = pd.to_datetime(df_filtered['최근 구매 날짜'], errors='coerce')
+        # 필터링 로직
+        if selected_age == '전체' and selected_gender == '전체':
+            df_filtered = df_customer.copy()  # 필터링 해제
+        elif selected_age == '전체':
+            df_filtered = df_customer[df_customer['성별'] == selected_gender]  # 성별만 필터링
+        elif selected_gender == '전체':
+            df_filtered = df_customer[df_customer['통합 연령대'] == selected_age]  # 연령대만 필터링
+        else:
+            df_filtered = df_customer[(df_customer['통합 연령대'] == selected_age) & (df_customer['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
 
-        if trend_choice == '월별':
-            monthly_sales = df_filtered.groupby(df_filtered['최근 구매 날짜'].dt.strftime('%Y-%m'))['아이디'].count()
-            fig, ax = plt.subplots(figsize=(6, 4))  # 그래프 크기를 6x4로 설정
-            ax.plot(monthly_sales.index, monthly_sales.values, marker='o', linestyle='-', color=plt.cm.Set3.colors[0])
-            ax.set_title("월별 구매 트렌드", fontsize=10)
-            ax.set_xlabel("월")
-            ax.set_ylabel("판매량")
-            plt.xticks(rotation=45)
+        # 차량 모델별 구매 수량 계산
+        model_counts = df_filtered['최근 구매 제품'].value_counts()
+
+        # 시각화 데이터 준비
+        if model_counts.empty:
+            st.write("필터링된 데이터가 없습니다.")
+        else:
+            st.write("**선택된 조건에 따른 차량 모델 구매 비율**")
+            
+            # 원형 차트 시각화
+            fig, ax = plt.subplots(figsize=(6, 6))
+            colors = plt.cm.Set3.colors[:len(model_counts)]  # 고유한 색상 사용 (Set3 팔레트)
+            ax.pie(model_counts, startangle=90, colors=colors)
+            ax.legend(sorted(model_counts.index), title=legend_title, loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
+            
             st.pyplot(fig)
-
-        elif trend_choice == '분기별':
-            df_filtered['분기'] = df_filtered['최근 구매 날짜'].dt.quarter
-            fig, ax = plt.subplots(figsize=(6, 4))  # 그래프 크기를 6x4로 설정
-            sb.countplot(data=df_filtered, x='분기', palette=ListedColormap(plt.cm.Set3.colors).colors[:4], ax=ax)
-            ax.set_title('분기별 고객 수', fontsize=10)
-            ax.set_xlabel('분기')
-            ax.set_ylabel('고객 수')
-            plt.xticks(rotation=45)
-            st.pyplot(fig)
-
-        elif trend_choice == '요일별':
-            df_filtered['요일'] = df_filtered['최근 구매 날짜'].dt.day_name()
-            weekday_sales = df_filtered.groupby('요일')['아이디'].count()
-            weekday_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-            weekday_sales = weekday_sales.reindex(weekday_order)
-            fig, ax = plt.subplots(figsize=(6, 4))  # 그래프 크기를 6x4로 설정
-            ax.bar(weekday_sales.index, weekday_sales.values, color=plt.cm.Set3.colors[:7])
-            ax.set_title("요일별 구매 트렌드", fontsize=10)
-            ax.set_xlabel("요일")
-            ax.set_ylabel("판매량")
-            st.pyplot(fig)
-
-        elif trend_choice == '계절별':
-            def get_season(month):
-                if month in [12, 1, 2]:
-                    return "겨울"
-                elif month in [3, 4, 5]:
-                    return "봄"
-                elif month in [6, 7, 8]:
-                    return "여름"
-                else:
-                    return "가을"
-
-            df_filtered['계절'] = df_filtered['최근 구매 날짜'].dt.month.apply(get_season)
-            season_sales = df_filtered.groupby('계절')['아이디'].count()
-            season_order = ['봄', '여름', '가을', '겨울']
-            season_sales = season_sales.reindex(season_order)
-            fig, ax = plt.subplots(figsize=(6, 4))  # 그래프 크기를 6x4로 설정
-            ax.bar(season_sales.index, season_sales.values, color=plt.cm.Set3.colors[:4])
-            ax.set_title("계절별 구매 트렌드", fontsize=10)
-            ax.set_xlabel("계절")
-            ax.set_ylabel("판매량")
-            st.pyplot(fig)
+    
