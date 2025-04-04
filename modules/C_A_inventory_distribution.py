@@ -92,12 +92,12 @@ def distribution_ui():
         filtered = summary[
             (summary["브랜드"] == brand_filter) & (summary["모델명"] == model_filter)
         ]
-        st.dataframe(filtered, use_container_width=True)
+        st.dataframe(filtered, use_container_width=True, hide_index=True)
 
     # [5] 전체 요약 보기
     with st.expander(" 브랜드/모델/부품별 재고 요약 보기", expanded=True):
-        st.dataframe(summary, use_container_width=True)
+        st.dataframe(summary, use_container_width=True, hide_index=True)
 
     # [6] 원본 데이터 보기
     with st.expander(" 원본 데이터 보기", expanded=False):
-        st.dataframe(df_list, use_container_width=True)
+        st.dataframe(df_list, use_container_width=True, hide_index=True)
