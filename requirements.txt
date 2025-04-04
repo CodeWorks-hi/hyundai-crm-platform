@@ -34,6 +34,7 @@ plotly.express
 # mediapipe==0.10.7
 
 
+
 ## dlib/face_recognition 설치 시 추가 설정 필요:
 # bash
 # Ubuntu/Debian

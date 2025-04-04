@@ -65,25 +65,22 @@ if st.session_state.current_page == "home":
 
 # ✅ 라우팅 처리
 else:
-    try:
-        page = st.session_state.get("current_page")
 
-        if page == "A_U_main":
-            import A_U_main as auto
-            auto.app()       
-        
-        # 딜러 페이지 전환 ( 수정하면 안됩니다.) - 수정시 페이지 전환 안됨
-        elif page == "dealer_main":  
-            import B_D_main as dealer
-            dealer.app()
-        # 어드민 페이지 전환 ( 수정하면 안됩니다.) - 수정시 페이지 전환 안됨
-        elif page == "admin_main":  
-            import C_A_main as admin
-            admin.app()
+    page = st.session_state.get("current_page")
 
-    except Exception as e:
-        st.error("페이지 로딩 중 오류가 발생했습니다.")
-        st.exception(e)
+    if page == "A_U_main":
+        import A_U_main as auto
+        auto.app()       
+    
+    # 딜러 페이지 전환 ( 수정하면 안됩니다.) - 수정시 페이지 전환 안됨
+    elif page == "dealer_main":  
+        import B_D_main as dealer
+        dealer.app()
+    # 어드민 페이지 전환 ( 수정하면 안됩니다.) - 수정시 페이지 전환 안됨
+    elif page == "admin_main":  
+        import C_A_main as admin
+        admin.app()
+
 
 # ✅ 푸터
 st.markdown("---")

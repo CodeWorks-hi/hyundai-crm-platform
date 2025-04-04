@@ -18,13 +18,10 @@ def generate_html_table(df: pd.DataFrame) -> str:
     <div class="scroll-wrapper">
     <table class="compare-table">
     """
-    headers = ["항목"] + df["트림명"].tolist()
-    html += "<tr>" + "".join(f"<th>{col}</th>" for col in headers) + "</tr>"
     filtered_df = df.drop(columns=["img_url"], errors="ignore")  # img_url 제거
-    transpose_df = filtered_df.set_index("트림명").T.reset_index()
-    transpose_df.columns = ["항목"] + df["트림명"].tolist()
-    for _, row in transpose_df.iterrows():
-        html += "<tr>" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>"
+    html += "<tr><th>트림명</th>" + "".join(f"<th>{col}</th>" for col in filtered_df.columns if col != "트림명") + "</tr>"
+    for _, row in filtered_df.iterrows():
+        html += f"<tr><td>{row['트림명']}</td>" + "".join(f"<td>{row[col]}</td>" for col in filtered_df.columns if col != "트림명") + "</tr>"
     html += "</table></div>"
     return html
 
