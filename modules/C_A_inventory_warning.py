@@ -105,10 +105,6 @@ def send_slack_alert(model_name, turnover_rate, plant=None, status=None, link=No
 
     response = requests.post(SLACK_WEBHOOK_URL, json=payload)
 
-    if response.status_code != 200:
-        raise Exception(f"Slack 전송 실패: {response.status_code}, {response.text}")
-
-
 # 메인 UI
 def warning_ui():
     # 데이터 로드 및 전처리
@@ -298,3 +294,14 @@ def warning_ui():
                     link=f"https://example.com/cars/{row['모델명']}"
                 )
             st.success("✅ 선택된 모델이 슬랙으로 전송되었습니다.")
+
+            # 슬랙 알림 예시 이미지 표시
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.image("data/salack_photos/salack_1.png", caption="슬랙 알림 요약 예시", use_column_width=True)
+
+            with col2:
+                st.image("data/salack_photos/salack_2.png", caption="슬랙 경고 상세 예시", use_column_width=True)
+
+            st.markdown("---")
