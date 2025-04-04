@@ -23,6 +23,16 @@ if 'sync_log' not in st.session_state:
     st.session_state.sync_log = pd.DataFrame({"날짜": dates, "동기화 여부": statuses})
 
 def sync_ui():
+    if 'sync_count' not in st.session_state:
+        st.session_state.sync_count = 0
+    if 'last_sync_time' not in st.session_state:
+        st.session_state.last_sync_time = datetime.now().strftime("%Y-%m-%d %H:%M")
+    if 'sync_log' not in st.session_state:
+        today = datetime.today()
+        dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(6, -1, -1)]
+        statuses = [random.choice([1, 1, 1, 0]) for _ in dates]
+        st.session_state.sync_log = pd.DataFrame({"날짜": dates, "동기화 여부": statuses})
+
     st.subheader("🔄 데이터 동기화 상태")
 
     st.info("데이터 동기화 시스템 상태를 확인하고, 오류 로그 및 마지막 동기화 일시를 확인합니다.")
