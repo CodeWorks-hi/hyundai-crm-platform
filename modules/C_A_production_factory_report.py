@@ -28,10 +28,8 @@ def load_data():
 def report_ui(df_inv):
     with st.spinner("생산 분석 데이터 처리 중..."):
         # 생산 가능 수량 계산
+        prod_capacity = df_inv.groupby(['공장명', '모델명', '트림명'])['재고량'].min()
         total_prod = prod_capacity.groupby('공장명').sum().reset_index(name='생산가능수량')
-        prod_capacity = df_inv.groupby(['공장명', '모델명', '트림명'])['재고량'].min().reset_index()
-        prod_capacity.rename(columns={'재고량': '생산가능수량'}, inplace=True)
-        
 
         # 재고 분석
         inventory_analysis = df_inv.groupby('공장명').agg(

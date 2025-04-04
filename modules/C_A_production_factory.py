@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.express as px
 from .C_A_production_factory_report import report_ui
 from .C_A_production_factory_treemap import treemap_ui
+from .C_A_production_capacity_analysis import capacity_analysis_ui
 
 # 데이터 로드 함수
 @st.cache_data
@@ -39,20 +40,28 @@ def factory_ui():
         })
         st.subheader("현대자동차 생산 현황 실시간 모니터링 시스템")
 
-        cols = st.columns(4)
+        cols = st.columns(5)
         st.markdown("""<style>.stMetric {padding: 20px; background-color: #f8f9fa; border-radius: 10px;}</style>""", unsafe_allow_html=True)
 
-        cols[0].metric("총 부품 재고", f"{int(report['총재고량'].sum()):,}개", help="전체 공장의 부품 재고 총합")
-        cols[1].metric("최대 생산 가능", f"{int(report['생산가능수량'].max()):,}대", report.loc[report['생산가능수량'].idxmax(), '공장명'])
-        cols[2].metric("최고 생산 효율", f"{float(report['생산효율'].max()):.2f}%", report.loc[report['생산효율'].idxmax(), '공장명'])
-        cols[3].metric("평균 회전율", f"{float(report['생산효율'].mean()):.1f}%", help="전체 공장의 평균 재고 회전율")
+        cols[0].metric("최다 재고", f"{report['총재고량'].max():,}개", report.loc[report['총재고량'].idxmax(), '공장명'])
+        cols[1].metric("신규 부품", f"{report['고유부품수'].sum():,}종", "2025년 4월 기준")
+        cols[2].metric("최대 생산 가능", f"{int(report['생산가능수량'].max()):,}대", report.loc[report['생산가능수량'].idxmax(), '공장명'])
+        cols[3].metric("최고 생산 효율", f"{float(report['생산효율'].max()):.2f}%", report.loc[report['생산효율'].idxmax(), '공장명'])
+        cols[4].metric("평균 회전율", f"{float(report['생산효율'].mean()):.1f}%", help="전체 공장의 평균 재고 회전율")
+
 
     # 탭 구성
-    tab1, tab2, tab3 = st.tabs(["공장별 상세 리포트", "생산 능력 분석", "부품 재고 현황"])
+    tab1, tab2, tab3 ,tab4= st.tabs(["부품 재고 현황"," 생산 가능 수량" ,"공장별 리포트","생산 능력 분석"])
 
-    #  TAB 1 - 공장별 상세 리포트
+    # TAB 2 - 생산 능력 분석 (트리맵)
     with tab1:
+        treemap_ui(df_inv)
 
+    with tab2:
+        capacity_analysis_ui()
+        
+    #  TAB 1 -  공장별 재고 현황
+    with tab3:
 
         st.markdown("---")
 
@@ -103,11 +112,10 @@ def factory_ui():
                 st.dataframe(df_inv, height=400, use_container_width=True, hide_index=True)
 
 
-    # TAB 2 - 생산 능력 분석 (트리맵)
-    with tab2:
-        treemap_ui(df_inv)
-
 
     # TAB 3 - 부품 재고 현황 (종합 분석)
-    with tab3:
+    with tab4:
         report_ui(df_inv)
+
+
+
