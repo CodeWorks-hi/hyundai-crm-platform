@@ -105,6 +105,7 @@ def consult_ui():
                 unique_colors = list(dict.fromkeys(colors))
                 st.selectbox("선호 색상", unique_colors)
 
+            
             purp = st.multiselect("운전 용도", ["출퇴근", "아이 통학", "주말여행", "레저활동", "업무차량"])
 
             colC, colD = st.columns(2)
@@ -125,6 +126,7 @@ def consult_ui():
                 st.session_state["show_recommendation"] = True
 
                 car_df = pd.read_csv("data/hyundae_car_list.csv")
+                car_df = car_df.loc[car_df["브랜드"] != "기아", :]
 
                 # 예산에 따라 추천 차량 필터링
                 car_df = car_df.loc[car_df["기본가격"] <= budget * 15000, :]
@@ -143,7 +145,7 @@ def consult_ui():
                 car_df = car_df.loc[car_df["차량구분"] == comp_car, :]
 
                 # 우선 순위별 필터링
-                prior_list = list(set[prior1, prior2, prior3])
+                prior_list = list(set([prior1, prior2, prior3]))
                 for i in prior_list :
                     if i == "연비" :
                         car_df = car_df.loc[car_df["연비"] >= car_df["연비"].mean(), :]
@@ -152,7 +154,7 @@ def consult_ui():
                     elif i == "성능" :
                         car_df = car_df.loc[car_df["배기량"] >= car_df["배기량"].mean(), :]
                     elif i == "공간" :
-                        if j is not None :
+                        if purp is not None :
                             for j in purp :
                                 if j == "출퇴근":
                                     car_df = car_df.loc[(car_df["연비"] >= car_df["연비"].mean()) & (car_df["차량구분"].isin(["소형", "준중형", "중형"])), :]
@@ -238,7 +240,7 @@ def consult_ui():
             unsafe_allow_html=True
         )
         default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
-        selected_tags = st.multiselect("상담 태그 선택", default_tags)
+        selected_tags = st.multiselect("상담 태그 선택", default_tags, key="consult_tags")
         custom_tag = st.text_input("기타 태그 직접 입력")
         if custom_tag and custom_tag not in selected_tags:
             selected_tags.append(custom_tag)

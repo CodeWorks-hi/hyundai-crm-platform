@@ -77,7 +77,7 @@ def inventory_ui():
                 
                 if not match.empty:
                     # 가까운 공장 순서 (임의 기준: 이름순)
-                    match = match.sort_values(by="공장명").head(3)
+                    match = match.sort_values(by="공장명").head(2)
                     for _, row in match.iterrows():
                         st.markdown(f"""
                             <div style="border:1px solid #ccc; border-radius:12px; padding:10px; margin-bottom:10px;
@@ -177,9 +177,7 @@ def inventory_ui():
                 .min()
                 .rename(columns={"재고량": "생산 가능 수량"})
             )
-            st.dataframe(grouped_result[["공장명", "모델명", "트림명", "생산 가능 수량"]].sort_values("생산 가능 수량", ascending=False),
-                         use_container_width=True, hide_index=True)
-            
+
             colA, colB, colC = st.columns(3)
             with colA:
                 st.metric("공장 수", grouped_result['공장명'].nunique())
@@ -187,6 +185,10 @@ def inventory_ui():
                 st.metric("총 생산 가능 수량", int(grouped_result["생산 가능 수량"].sum()))
             with colC:
                 st.metric("최소 생산 가능 수량", int(grouped_result["생산 가능 수량"].min()))
+
+            st.dataframe(grouped_result[["공장명", "모델명", "트림명", "생산 가능 수량"]].sort_values("생산 가능 수량", ascending=False),
+                         use_container_width=True, hide_index=True)
+            
         else:
             st.info("선택한 조건에 해당하는 결과가 없습니다.")
 
@@ -232,7 +234,7 @@ def inventory_ui():
             inv_df.to_csv("data/inventory_data.csv", index=False)
 
             st.success(
-                f"{vehicle} @ {selected_factory} 공장에서 {quantity}대 발주가 등록되었습니다.\n\n"
+                f"{selected_factory}에서 {vehicle} {quantity}대 발주가 등록되었습니다.\n\n"
                 f"요청자: {requestor}"
             )
 
