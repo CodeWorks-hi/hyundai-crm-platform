@@ -263,13 +263,27 @@ def consult_ui():
         
         if st.button("✅ 저장", use_container_width=True, key='save_memo'):
             cr_df = pd.read_csv("data/consult_log.csv")
-            mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact) & (cr_df["완료여부"] == 0)
+            mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact)
             
-            if mask.any():
-                cr_df.loc[mask, "상담내용"] = memo
-                cr_df.loc[mask, "완료여부"] = 1
-                cr_df.loc[mask, "상담태그"] = ', '.join(selected_tags)
-                cr_df.to_csv("data/consult_log.csv", index=False)
-                st.success("✅ 상담 내용이 저장되었습니다.")
+            if cr_df.loc[mask, "완료여부"] == 0:
+                if mask.any():
+                    cr_df.loc[mask, "상담내용"] = memo
+                    cr_df.loc[mask, "완료여부"] = 1
+                    cr_df.loc[mask, "상담태그"] = ', '.join(selected_tags)
+                    cr_df.to_csv("data/consult_log.csv", index=False)
+                    st.success("✅ 상담 내용이 저장되었습니다.")
+                else:
+                    st.warning("해당 조건에 맞는 미완료 상담이 없습니다.")
             else:
-                st.warning("해당 조건에 맞는 미완료 상담이 없습니다.")
+                # 새로운 상담 로그 행 추가
+                new_log = {
+                    "이름": selected_name,
+                    "전화번호": selected_contact,
+                    "상담내용": memo,
+                    "상담날짜": pd.Timestamp.now().strftime("%Y-%m-%d"),
+                    "상담시간": pd.Timestamp.now().strftime("%H:%M"),
+                    "상담태그": ', '.join(selected_tags),
+                    "완료여부": 1
+                }
+                cr_df = cr_df.append(new_log, ignore_index=True)
+                cr_df.to_csv("data/consult_log.csv", index=False)
