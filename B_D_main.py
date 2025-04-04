@@ -71,15 +71,15 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 def app():
     tabs = st.tabs([
-        "딜러 대시보드",
-        "방문고객 설문조사",
-        "고객 상담",
-        "재고 현황", 
-        "리드 관리", 
-        "판매 등록",
-        "AI 수요 예측",
-        "서비스 일정", 
-        "판매 인텔리전스"
+        "대시보드",     # Overview 대체 – 직관적이고 고급스러움
+        "고객 피드백",   # Surveys – 응답보다 더 부드러운 표현
+        "상담 이력",     # Consults – 상담 + 기록 의미
+        "재고 현황",     # Inventory – 관리보다 직관적
+        "리드 추적",     # Leads – 동적 느낌
+        "판매 등록",     # Orders – 그대로 유지 가능
+        "수요 예측",     # Forecast – 간결하게 핵심만
+        "서비스 일정",   # Schedules – 명확함
+        "데이터 뷰"      # Data Lab – 원본 확인보다 더 모던함
     ])
 
     tab_modules = [
@@ -91,7 +91,8 @@ def app():
         ("modules.B_D_sales_registration", "sales_registration_ui"),         # 판매 등록
         ("modules.B_D_demand_forecast", "demand_forecast_ui"),          # AI 수요 예측
         ("modules.B_D_service", "service_ui"),                 # 서비스 일정, 고객 충성도 관리
-        ("modules.B_D_eco", "eco_ui")                           # 경제 지표 기반 판매 인텔리전스, 금융 상품 최적화
+        # ("modules.B_D_eco", "eco_ui"),                           # 경제 지표 기반 판매 인텔리전스, 금융 상품 최적화
+        ("modules.B_D_data", "data_preview_ui")                # 데이터 미리보기
     ]
 
 # 각 탭에 대응하는 함수 실행
