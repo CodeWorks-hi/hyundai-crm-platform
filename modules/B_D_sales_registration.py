@@ -45,9 +45,8 @@ def sales_registration_ui():
             (plant_df["공장명"] == selected_factory)
         ]["재고량"].min()
 
-        st.success(f"**📦 현재 생산 가능 수량:** {int(stock_qty) if not pd.isna(stock_qty) else 'N/A'} 대")
-
         customer = st.text_input("👤 고객명")
+        contact = st.text_input("📞 연락처")
         sale_date = st.date_input("📅 판매일자", value=datetime.today())
 
         if st.button("✅ 판매 등록"):
@@ -56,11 +55,16 @@ def sales_registration_ui():
             elif stock_qty is None or stock_qty < 1 or selected_factory is None:
                 st.error("🚫 해당 차량의 재고가 부족합니다.")
             else:
+                if len(customer) >= 2:
+                    masked_customer = customer[0] + "*" + customer[2:]
+                else:
+                    masked_customer = customer
+
                 new_sale = {
                     "차종": selected_model,
                     "트림명": selected_trim,
                     "공장명": selected_factory,
-                    "고객명": customer,
+                    "고객명": masked_customer,
                     "수량": 1,
                     "판매일자": sale_date.strftime("%Y-%m-%d"),
                 }
@@ -69,7 +73,35 @@ def sales_registration_ui():
                     st.session_state.sales_log = []
                 st.session_state.sales_log.append(new_sale)
 
+                # 판매 고객 정보 및 차량 스펙 저장용 항목 구성
+                car_info = car_df[
+                    (car_df["모델명"] == selected_model) &
+                    (car_df["트림명"] == selected_trim)
+                ].iloc[0]  # assume 1 match
 
+                customer_record = {
+                    "이름": masked_customer,
+                    "성별": st.session_state.get("성별", "미상"),
+                    "현재 나이": st.session_state.get("나이", "미상"),
+                    "연령대": st.session_state.get("연령대", "미상"),
+                    "거주 지역": st.session_state.get("지역", "미상"),
+                    "차량 구매 횟수": st.session_state.get("구매횟수", 1),
+                    "고객 평생 가치": st.session_state.get("LTV", 0),
+                    "브랜드": car_info["브랜드"],
+                    "모델명": car_info["모델명"],
+                    "기본가격": car_info["기본가격"],
+                    "공장명": selected_factory
+                }
+
+                # 파일에 누적 저장
+                csv_path = "data/D_domestic_sales_.csv"
+                try:
+                    existing_df = pd.read_csv(csv_path)
+                    updated_df = pd.concat([existing_df, pd.DataFrame([customer_record])], ignore_index=True)
+                except FileNotFoundError:
+                    updated_df = pd.DataFrame([customer_record])
+
+                # updated_df.to_csv(csv_path, index=False)
 
                 st.success("✅ 판매 등록이 완료되었습니다.")
 
