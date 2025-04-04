@@ -295,3 +295,11 @@ def warning_ui():
                 )
             st.success("✅ 선택된 모델이 슬랙으로 전송되었습니다.")
 
+        # 슬랙 알림 예시 이미지 표시
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image("data/salack_photos/salack_1.png", caption="슬랙 알림 요약 예시", use_container_width=True)
+        with col2:
+            st.image("data/salack_photos/salack_2.png", caption="슬랙 경고 상세 예시", use_container_width=True)
+
+        st.markdown("---")
