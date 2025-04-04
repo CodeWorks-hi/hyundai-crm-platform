@@ -252,11 +252,11 @@ def turnover_ui():
 
     with col1:
         st.markdown("**🔝 상위 10개 부품**")
-        st.dataframe(df.sort_values("재고회전율", ascending=False).head(10)[["공장명", "부품명", "재고회전율", "재고량"]],hide_index=True)
+        st.dataframe(df.sort_values("재고회전율", ascending=False).head(10), hide_index=True[["공장명", "부품명", "재고회전율", "재고량"]])
 
     with col2:
         st.markdown("**🔻 하위 10개 부품**")
-        st.dataframe(df.sort_values("재고회전율", ascending=True).head(10)[["공장명", "부품명", "재고회전율", "재고량"]],hide_index=True)
+        st.dataframe(df.sort_values("재고회전율", ascending=True).head(10), hide_index=True[["공장명", "부품명", "재고회전율", "재고량"]])
 
     st.markdown("""
     ###  재고 효율 극단값 부품 분석
