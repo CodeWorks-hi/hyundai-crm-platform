@@ -36,7 +36,7 @@ def detail_ui():
     비교_대상 = st.session_state.get("비교모델", None)
 
     for 모델 in 모델들:
-        st.subheader(f"📌 {모델}")
+        st.subheader(f"{모델}")
         모델_df = df[df["모델명"] == 모델].reset_index(drop=True)
 
         for i in range(0, len(모델_df), 4):
