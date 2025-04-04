@@ -126,6 +126,7 @@ def consult_ui():
                 st.session_state["show_recommendation"] = True
 
                 car_df = pd.read_csv("data/hyundae_car_list.csv")
+                car_df = car_df.loc[car_df["브랜드"] != "기아", :]
 
                 # 예산에 따라 추천 차량 필터링
                 car_df = car_df.loc[car_df["기본가격"] <= budget * 15000, :]
