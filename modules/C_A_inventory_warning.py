@@ -156,77 +156,98 @@ def warning_ui():
         st.plotly_chart(fig, use_container_width=True)
 
     # 재고 분석 섹션
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader(" 공장별 부품 재고 현황", divider="blue")
-        fig = px.bar(
-            df_inv.groupby(['공장명', '부품명'])['재고량'].sum().reset_index(),
-            x='공장명',
-            y='재고량',
-            color='부품명',
-            barmode='group',
-            height=400,
-            text_auto=True,
-            labels={'재고량': '총 재고량'}
-        )
-        fig.update_layout(xaxis_title=None, yaxis_title="재고량(개)")
-        st.plotly_chart(fig, use_container_width=True)
-        
-    with col2:
-        st.subheader(" 위험 부품 상세 분석", divider="red")
-        danger_df = df_inv[df_inv['재고량'] < 100]
-        
-        if not danger_df.empty:
-            tab1, tab2 = st.tabs(["분포", "추이"])
-            
-            with tab1:
-                fig = px.pie(
-                    danger_df,
-                    names='부품명',
-                    values='재고량',
-                    hole=0.4,
-                    color_discrete_sequence=px.colors.sequential.Reds_r
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            
-            with tab2:
-                # 데이터 전처리
-                plot_df = danger_df[['부품명', '월평균입고', '월평균출고']]
-                plot_df = plot_df.melt(id_vars='부품명', var_name='구분', value_name='수량')
-                
-                # 그룹형 막대차트
-                fig = px.bar(
-                    plot_df.sort_values('수량', ascending=False),
-                    x='부품명',
-                    y='수량',
-                    color='구분',
-                    barmode='group',
-                    text='수량',
-                    height=400,
-                    labels={'수량': '월평균 물동량'},
-                    title='<b>부품별 월간 입/출고 현황</b>',
-                    color_discrete_sequence=['#FFA07A', '#20B2AA']
-                )
-                
-                # 레이아웃 조정
-                fig.update_layout(
-                    xaxis_tickangle=-45,
-                    uniformtext_minsize=8,
-                    uniformtext_mode='hide',
-                    yaxis=dict(visible=False),
-                    legend=dict(
-                        orientation="h",
-                        yanchor="bottom",
-                        y=1.02,
-                        xanchor="right",
-                        x=1
-                    )
-                )
-                st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.success("✅ 모든 부품 재고가 안전 수준입니다.")
 
+    st.subheader(" 공장별 부품 재고 현황", divider="blue")
+    fig = px.bar(
+        df_inv.groupby(['공장명', '부품명'])['재고량'].sum().reset_index(),
+        x='공장명',
+        y='재고량',
+        color='부품명',
+        barmode='group',
+        height=400,
+        text_auto=True,
+        labels={'재고량': '총 재고량'}
+    )
+    fig.update_layout(xaxis_title=None, yaxis_title="재고량(개)")
+    st.plotly_chart(fig, use_container_width=True)
+        
+
+    st.subheader(" 위험 부품 상세 분석", divider="red")
+    danger_df = df_inv[df_inv['재고량'] < 100]
+            
+    if not danger_df.empty:
+        col1, col2 = st.columns(2)
+
+        with col2:
+            # 도넛형 파이 차트
+            pie_df = danger_df.groupby('부품명')['재고량'].sum().reset_index()
+            total_danger = pie_df['재고량'].sum()
+            
+            fig = px.pie(
+                pie_df,
+                names='부품명',
+                values='재고량',
+                hole=0.6,
+                color='부품명',
+                color_discrete_sequence=px.colors.sequential.Reds_r,
+                title=f'<b>위험 부품 현황 (총 {total_danger}개)</b>'
+            )
+            
+            fig.update_traces(
+                textposition='inside',
+                textinfo='percent+label',
+                texttemplate='%{label}<br>%{percent} (%{value}개)',
+                marker=dict(line=dict(color='white', width=2)),
+                rotation=45
+            )
+            
+            fig.update_layout(
+                uniformtext_minsize=12,
+                showlegend=False,
+                margin=dict(t=50, b=20),
+                title_x=0.5
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col1:
+            # 입출고 차이 분석
+            trend_df = danger_df[['부품명', '월평균입고', '월평균출고']].copy()
+            trend_df['입출고 차이'] = trend_df['월평균입고'] - trend_df['월평균출고']
+            
+            fig = px.bar(
+                trend_df.sort_values('입출고 차이', ascending=False),
+                x='부품명',
+                y=['월평균입고', '월평균출고'],
+                barmode='group',
+                height=400,
+                labels={'value': '월간 물동량(개)', 'variable': '구분'},
+                color_discrete_map={
+                    '월평균입고': '#4B78DB',
+                    '월평균출고': '#F36E6E'
+                },
+                title='<b>월별 입출고 추이 비교</b>'
+            )
+            
+            fig.update_layout(
+                xaxis=dict(title=None, tickangle=-45, type='category'),
+                yaxis=dict(gridcolor='#F0F2F6'),
+                legend=dict(
+                    title='물동량 구분',
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02
+                ),
+                plot_bgcolor='white'
+            )
+            
+            fig.update_traces(
+                texttemplate='%{y}개',
+                textposition='outside',
+                textfont_size=10
+            )
+            st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.success("✅ 모든 부품 재고가 안전 수준입니다.")
     # 경고 관리 섹션
     st.subheader("🚨 실시간 경고 관리 시스템", divider="orange")
     
