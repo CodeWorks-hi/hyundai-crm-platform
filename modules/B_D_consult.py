@@ -239,14 +239,12 @@ def consult_ui():
             unsafe_allow_html=True
         )
         default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
-        selected_tags_input = st.multiselect("상담 태그 선택", default_tags)
-        selected_tags = selected_tags_input.copy() if isinstance(selected_tags_input, list) else []
-
+        selected_tags = []
         custom_tag = st.text_input("기타 태그 직접 입력")
         if custom_tag and custom_tag not in selected_tags:
             selected_tags.append(custom_tag)
         if len(selected_tags) == 0:
-            selected_tags = "-"
+            selected_tags = ["-"]
 
         st.markdown("##### ✅ 선택된 태그")
         st.markdown(
