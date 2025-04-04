@@ -1,3 +1,9 @@
+
+    # 글로벌 재고 최적화, 공급망 관리
+        # 재고 회전율 경고 시스템
+            # 재고 회전율이 임계값 이하인 경우 슬랙으로 경고 메시지 전송
+
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -233,9 +239,7 @@ def warning_ui():
     # 8. 슬랙 전송 UI
     warning_df = df_inv[df_inv["재고회전율"] <= threshold]
     with st.expander("📤 슬랙 경고 전송"):
-        model_options = warning_df["모델명"].dropna().astype(str).unique().tolist()
-        selected_models = st.multiselect("📌 슬랙으로 전송할 모델 선택", model_options, default=model_options)
-
+        selected_models = st.multiselect("📌 슬랙으로 전송할 모델 선택", warning_df["모델명"].unique())
         filtered_df = warning_df[warning_df["모델명"].isin(selected_models)]
 
         if st.button("🚨 슬랙 전송"):
