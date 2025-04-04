@@ -191,15 +191,37 @@ def warning_ui():
                 st.plotly_chart(fig, use_container_width=True)
             
             with tab2:
-                # 필요한 컬럼만 선택
+                # 데이터 전처리
                 plot_df = danger_df[['부품명', '월평균입고', '월평균출고']]
-                fig = px.line(
-                    plot_df.sort_values('월평균입고'),
+                plot_df = plot_df.melt(id_vars='부품명', var_name='구분', value_name='수량')
+                
+                # 그룹형 막대차트
+                fig = px.bar(
+                    plot_df.sort_values('수량', ascending=False),
                     x='부품명',
-                    y=['월평균입고', '월평균출고'],
-                    markers=True,
-                    height=300,
-                    labels={'value': '수량', 'variable': '구분'}
+                    y='수량',
+                    color='구분',
+                    barmode='group',
+                    text='수량',
+                    height=400,
+                    labels={'수량': '월평균 물동량'},
+                    title='<b>부품별 월간 입/출고 현황</b>',
+                    color_discrete_sequence=['#FFA07A', '#20B2AA']
+                )
+                
+                # 레이아웃 조정
+                fig.update_layout(
+                    xaxis_tickangle=-45,
+                    uniformtext_minsize=8,
+                    uniformtext_mode='hide',
+                    yaxis=dict(visible=False),
+                    legend=dict(
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.02,
+                        xanchor="right",
+                        x=1
+                    )
                 )
                 st.plotly_chart(fig, use_container_width=True)
         else:
