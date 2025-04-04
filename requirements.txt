@@ -16,7 +16,7 @@ xlsxwriter
 cmake
 forge
 # dlib
-face_recognition
+# face_recognition
 streamlit-javascript
 folium
 kafka-python==2.0.2
