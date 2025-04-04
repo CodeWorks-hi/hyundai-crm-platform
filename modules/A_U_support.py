@@ -5,41 +5,14 @@
 
 import streamlit as st
 from streamlit.components.v1 import html
-from modules.A_U_kakao_channel import render_kakao_buttons
-
-# 카카오 플로팅 버튼 삽입
-def render_kakao_chat_button():
-    kakao_channel_id = st.secrets["KAKAO_CHANNEL_PUBLIC_ID"]
-
-    kakao_html = f"""
-    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
-    <script>
-      Kakao.init('{st.secrets["KAKAO_API_KEY"]}');
-      Kakao.Channel.createChatButton({{
-        container: '#kakao-chat-button',
-        channelPublicId: '{kakao_channel_id}',
-        title: 'consult',
-        size: 'small',
-        color: 'yellow',
-        shape: 'circle',
-        supportMultipleDensities: true
-      }});
-    </script>
-    <div id="kakao-chat-button"
-         style="position: fixed; bottom: 30px; right: 30px; z-index: 100;">
-    </div>
-    """
-    html(kakao_html, height=0, width=0)
-
-
-
+from modules.A_U_kakao_channel import render_kakao_channel_add_button
 
 def support_ui():
     col1, col2 = st.columns([4,1])
     with col1:
-        st.title("📞 고객 지원 센터")
+        st.title("고객 지원 센터")
     with col2:
-            render_kakao_buttons()
+        render_kakao_channel_add_button()
     st.write("무엇을 도와드릴까요? 실시간 상담을 원하시면 우측 채팅 아이콘을 클릭해주세요.")
     # 자주 묻는 질문
     
