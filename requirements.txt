@@ -15,7 +15,7 @@ scikit-learn
 xlsxwriter
 cmake
 forge
-dlib
+# dlib
 face_recognition
 streamlit-javascript
 folium
