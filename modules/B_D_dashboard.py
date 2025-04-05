@@ -298,8 +298,10 @@ def dashboard_ui():
                 {matched_requests[0]}
                 </div>
                 """, unsafe_allow_html=True)
+            else:
+                st.error("조건에 맞는 문의가 존재하지 않습니다.")
         
-        memo = st.text_area("답변 내용을 입력하세요", height=100, label_visibility="collapsed")
+        memo = st.text_area("답변 내용을 입력하세요", height=50, label_visibility="collapsed")
 
         if st.button("✅ 저장", use_container_width=True):
             cr_df = pd.read_csv("data/consult_log.csv")
