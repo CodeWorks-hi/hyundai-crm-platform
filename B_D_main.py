@@ -71,16 +71,15 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 def app():
     tabs = st.tabs([
-        "대시보드",
-        "고객 설문조사",
-        "고객 상담",
-        "재고 관리 ", 
-        "리드 관리", 
-        "판매 등록",
-        "AI 수요 예측",
-        "서비스 일정", 
-        # "판매 인텔리전스",
-        "원본 데이터 확인"
+        "대시보드",     # Overview 대체 – 직관적이고 고급스러움
+        "고객 피드백",   # Surveys – 응답보다 더 부드러운 표현
+        "상담 이력",     # Consults – 상담 + 기록 의미
+        "재고 현황",     # Inventory – 관리보다 직관적
+        "리드 추적",     # Leads – 동적 느낌
+        "판매 등록",     # Orders – 그대로 유지 가능
+        "수요 예측",     # Forecast – 간결하게 핵심만
+        "서비스 일정",   # Schedules – 명확함
+        "데이터 뷰"      # Data Lab – 원본 확인보다 더 모던함
     ])
 
     tab_modules = [
