@@ -136,22 +136,32 @@ def ltv_demand_ui():
     st.dataframe(df_parts[["공장명", "부품명", "재고량", "예상 소요량", "남은 재고"]], use_container_width=True)
     st.info(f" 전체 예측 수요량 (90일): **{int(total_demand):,} 대**")
 
-    # 발주 기준 설정
+    #  발주 기준 설정
     st.markdown("###  자동 발주 제안")
-    min_threshold = st.number_input(" 재고 최소 임계값", min_value=0, value=200)
+    min_threshold = st.number_input(" 재고 최소 임계값 (예: 200)", min_value=0, value=200)
 
+    #  발주 수량 계산 공식:
+    # - 재고가 임계값보다 작고,
+    # - 향후 예상 소요량보다 부족한 경우, 부족한 만큼 발주 수량으로 설정
+    df_parts["남은 재고"] = df_parts["재고량"] - df_parts["예상 소요량"]
     df_parts["발주 필요 여부"] = df_parts["남은 재고"] < min_threshold
-    df_parts["발주 수량"] = (df_parts["예상 소요량"] - df_parts["재고량"]).clip(lower=0).round()
 
-    # 발주 대상 필터링
-    df_order = df_parts[df_parts["발주 필요 여부"] == True]
+    #  발주 수량 예측: 예상 소요량 + 임계값 - 현재 재고량
+    df_parts["발주 수량"] = ((df_parts["예상 소요량"] + min_threshold) - df_parts["재고량"]).clip(lower=0).round()
+
+    # 발주 대상만 필터링
+    df_order = df_parts[df_parts["발주 필요 여부"]]
 
     if df_order.empty:
         st.success("✅ 모든 부품의 재고가 충분합니다.")
     else:
         st.warning(f"🚨 총 {len(df_order)}건의 부품에 대해 발주가 필요합니다.")
-        st.dataframe(df_order[["공장명", "부품명", "재고량", "예상 소요량", "남은 재고", "발주 수량"]], use_container_width=True)
+        st.dataframe(
+            df_order[["공장명", "부품명", "재고량", "예상 소요량", "남은 재고", "발주 수량"]],
+            use_container_width=True
+        )
 
+        # 📥 다운로드 버튼
         csv = df_order.to_csv(index=False).encode("utf-8-sig")
         st.download_button(
             label="📥 발주 목록 다운로드 (CSV)",
