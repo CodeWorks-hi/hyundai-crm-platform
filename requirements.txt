@@ -32,6 +32,7 @@ streamlit-aggrid
 kaleido
 plotly.express 
 # mediapipe==0.10.7
+shap
 
 
 
