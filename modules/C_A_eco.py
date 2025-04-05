@@ -9,12 +9,8 @@ import numpy as np
 
 
 # 차량리스트 데이터 불러오기
-car_list_path = "data/hyundae_car_list.csv"
-df_list = pd.read_csv(car_list_path)
-
-# 부품 재고 데이터 불러오기
-inventory_path = "data/inventory_data.csv"
-df_inv = pd.read_csv(inventory_path)
+df_inv = pd.read_csv("data/inventory_data.csv")
+df_list = pd.read_csv("data/hyundae_car_list.csv")
 
 def load_data():
     for col in ['모델명', '트림명']:

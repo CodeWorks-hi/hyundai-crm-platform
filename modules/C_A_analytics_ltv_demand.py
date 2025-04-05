@@ -7,6 +7,7 @@ import streamlit as st
 import pandas as pd
 from prophet import Prophet
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 @st.cache_data
 def load_data():
@@ -57,11 +58,79 @@ def ltv_demand_ui():
 
     # 시각화
     st.markdown(f"###  {selected_model}  수요 예측(향후 90일)")
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=forecast["ds"], y=forecast["yhat"], name="예측 수요량"))
-    fig.add_trace(go.Bar(x=df_model["ds"], y=df_model["y"], name="실제 판매량"))
-    st.plotly_chart(fig, use_container_width=True)
+    # 이중 축 레이아웃 생성
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
 
+    # 실제 판매량 (히스토그램)
+    fig.add_trace(
+        go.Bar(
+            x=df_model["ds"],
+            y=df_model["y"],
+            name="실제 판매량",
+            marker_color='#1f77b4',
+            opacity=0.7,
+            hovertemplate="날짜: %{x}<br>판매량: %{y}개<extra></extra>"
+        ),
+        secondary_y=False
+    )
+
+    # 예측 수요량 (라인 차트)
+    fig.add_trace(
+        go.Scatter(
+            x=forecast["ds"],
+            y=forecast["yhat"],
+            name="예측 수요량",
+            line=dict(color='#ff7f0e', width=3, dash='dot'),
+            mode='lines+markers',
+            hovertemplate="날짜: %{x}<br>예측: %{y:.0f}개<extra></extra>"
+        ),
+        secondary_y=True
+    )
+
+    # 신뢰구간 추가
+    fig.add_trace(
+        go.Scatter(
+            x=forecast["ds"].tolist() + forecast["ds"].tolist()[::-1],
+            y=forecast["yhat_upper"].tolist() + forecast["yhat_lower"].tolist()[::-1],
+            fill='toself',
+            fillcolor='rgba(255,127,14,0.2)',
+            line=dict(color='rgba(255,255,255,0)'),
+            name="신뢰구간",
+            hoverinfo="skip"
+        ),
+        secondary_y=True
+    )
+
+    # 레이아웃 설정
+    fig.update_layout(
+        title='<b>월별 판매 현황 및 수요 예측</b>',
+        xaxis=dict(
+            title='날짜',
+            tickformat='%Y-%m',
+            gridcolor='lightgray'
+        ),
+        yaxis=dict(
+            title='실제 판매량 (개)',
+            gridcolor='lightgray'
+        ),
+        yaxis2=dict(
+            title='예측 수요량 (개)',
+            overlaying='y',
+            side='right'
+        ),
+        hovermode="x unified",
+        template='plotly_white',
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+    # 스트림릿에 표시
+    st.plotly_chart(fig, use_container_width=True)
     # 소요량 테이블
     st.markdown("###  공장별 부품 소요량 예측")
     st.dataframe(df_parts[["공장명", "부품명", "재고량", "예상 소요량", "남은 재고"]], use_container_width=True)

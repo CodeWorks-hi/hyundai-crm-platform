@@ -22,19 +22,19 @@ def factory_ui():
 
     # 검색 결과 [2] 첨부 파일 구조에 따른 컬럼명 수정
     try:
-        # 실제 컬럼명 확인 (Plant → 생산공장, Production Capacity → 생산가능수량)
+        # 실제 컬럼명 확인 (Plant → 공장명, Production Capacity → 생산가능수량)
         trim_list = trim_list.rename(columns={
-            'Plant': '생산공장',
+            'Plant': '공장명',
             'Production Capacity': '생산가능수량'
         })
         
         # 필수 컬럼 존재 여부 검증
-        required_columns = ['생산공장', '생산가능수량']
+        required_columns = ['공장명', '생산가능수량']
         if not all(col in trim_list.columns for col in required_columns):
             missing = [col for col in required_columns if col not in trim_list.columns]
             raise KeyError(f"필수 컬럼 누락: {missing}")
 
-        prod_capacity = trim_list.groupby('생산공장')['생산가능수량'].sum().reset_index()
+        prod_capacity = trim_list.groupby('공장명')['생산가능수량'].sum().reset_index()
 
     except KeyError as e:
         st.error(f"❌ 데이터 구조 불일치: {str(e)}")
@@ -44,17 +44,17 @@ def factory_ui():
     # 생산 분석 리포트 생성 (검색 결과 [2] IGIS 시스템 반영)
     with st.spinner("IGIS 시스템 데이터 처리 중..."):
         # 생산가능수량 계산 (첨부 파일 [3] 기준)
-        prod_capacity = trim_list.groupby('생산공장')['생산가능수량'].sum().reset_index()
+        prod_capacity = trim_list.groupby('공장명')['생산가능수량'].sum().reset_index()
         
         # 재고 분석 (검색 결과 [2] 인벤토리 관리 기준)
-        inventory_analysis = df_inv.groupby('생산공장').agg(
+        inventory_analysis = df_inv.groupby('공장명').agg(
             총재고량=('재고량', 'sum'),
             평균재고=('재고량', 'mean'),
             고유부품수=('부품명', 'nunique')
         ).reset_index()
 
         # 리포트 통합 (검색 결과 [2] KPI 지표 반영)
-        report = pd.merge(prod_capacity, inventory_analysis, on='생산공장')
+        report = pd.merge(prod_capacity, inventory_analysis, on='공장명')
         report['생산효율'] = (report['생산가능수량'] / report['총재고량'] * 100).round(2)
 
         # 데이터 타입 변환
@@ -73,7 +73,7 @@ def factory_ui():
     with cols[0]:
         st.metric("최다 재고", 
                  f"{report['총재고량'].max():,}개", 
-                 report.loc[report['총재고량'].idxmax(), '생산공장'],
+                 report.loc[report['총재고량'].idxmax(), '공장명'],
                  help="단일 공장 최대 재고 보유량")
     
     with cols[1]:
@@ -86,13 +86,13 @@ def factory_ui():
         max_prod = report['생산가능수량'].max()
         st.metric("최대 생산 가능", 
                  f"{max_prod:,}대", 
-                 report.loc[report['생산가능수량'].idxmax(), '생산공장'],
+                 report.loc[report['생산가능수량'].idxmax(), '공장명'],
                  help="IGIS 시스템 예측 최대 생산량")
     
     with cols[3]:
         st.metric("최고 생산 효율", 
                  f"{report['생산효율'].max():.2f}%", 
-                 report.loc[report['생산효율'].idxmax(), '생산공장'],
+                 report.loc[report['생산효율'].idxmax(), '공장명'],
                  delta_color="inverse")
     
     with cols[4]:
@@ -119,12 +119,12 @@ def factory_ui():
         # 공장 선택 (검색 결과 [2] 사용자 인터페이스 가이드)
         selected_factory = st.selectbox(
             '공장 선택',
-            df_inv['생산공장'].unique(),
+            df_inv['공장명'].unique(),
             key='factory_select',
             help="분석할 공장을 선택하세요"
         )
         
-        factory_data = df_inv[df_inv['생산공장'] == selected_factory]
+        factory_data = df_inv[df_inv['공장명'] == selected_factory]
 
         # 부품 현황 분석 (검색 결과 [2] 재고 관리 기준)
         parts_summary = factory_data.groupby('부품명')['재고량']\
