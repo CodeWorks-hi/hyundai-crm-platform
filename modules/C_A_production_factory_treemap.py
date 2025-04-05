@@ -12,6 +12,7 @@ import pandas as pd
 def load_data():
     df_inv = pd.read_csv("data/inventory_data.csv")
     df_list = pd.read_csv("data/hyundae_car_list.csv")
+    trim_list = pd.read_csv("data/model_trim_capacity.csv")
 
     # 데이터 정제
     df_inv['트림명'] = df_inv['트림명'].astype(str).str.strip()
