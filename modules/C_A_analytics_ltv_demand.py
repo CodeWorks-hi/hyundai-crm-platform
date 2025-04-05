@@ -8,6 +8,9 @@ import pandas as pd
 from prophet import Prophet
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import joblib
+
+
 
 @st.cache_data
 def load_data():
@@ -15,6 +18,14 @@ def load_data():
     df_export = pd.read_csv("data/export_customer_data.csv")
     df_inventory = pd.read_csv("data/inventory_data.csv")
     return df_customer, df_export, df_inventory
+
+# 업로드된 모델 파일 경로
+domestic_model_path = "/mnt/data/xgb_domestic_ltv_model.pkl"
+export_model_path = "/mnt/data/xgb_export_ltv_model.pkl"
+
+# 모델 불러오기
+domestic_model = joblib.load(domestic_model_path)
+export_model = joblib.load(export_model_path)
 
 def ltv_demand_ui():
     # 데이터 불러오기

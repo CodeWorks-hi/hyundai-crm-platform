@@ -23,13 +23,17 @@ def clean_html_tags(text):
     return re.sub(r'<[^>]+>', '', text)
 
 # 📌 자동차 정보 생성 함수
-def get_car_info_based_on_question(user_input: str, model_name: str = TEXT_MODEL_ID) -> str:
+def get_car_info_based_on_question(user_input: str) -> str:
     token = get_huggingface_token("gemma")
     if not token:
         return "❗ Hugging Face API 토큰이 설정되어 있지 않습니다."
 
     try:
-        client = InferenceClient(model=model_name, token=token)
+        # 올바른 클라이언트 초기화 방식
+        client = InferenceClient(model=TEXT_MODEL_ID, token=token)
+
+
+
 
         prompt = f"""
 당신은 자동차 전문 상담 AI입니다. 아래 사용자 질문에 대해 친절하고 구체적으로 자동차 정보를 제공하세요.
@@ -42,15 +46,14 @@ def get_car_info_based_on_question(user_input: str, model_name: str = TEXT_MODEL
 - 트림/옵션별 가격 차이와 장단점을 요약하세요.
 - 비교가 필요한 경우 유사 모델과 차이점도 함께 제공하세요.
 
-[예시]
-1. 전륜구동(FWD): 연비 효율이 좋고 도심 주행에 유리함.
-2. 후륜구동(RWD): 주행 안정성과 핸들링이 뛰어나 고급차에 사용.
-3. 사륜구동(AWD): 험로, 눈길 등에서도 안정적.
-
 답변:
 """
         # 생성 요청
-        response = client.text_generation(prompt=prompt, max_new_tokens=512, temperature=0.7)
+        response = client.text_generation(
+            prompt=prompt, 
+            max_new_tokens=512, 
+            temperature=0.7
+        )
 
         return clean_html_tags(response).strip()
 
