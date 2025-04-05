@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import importlib
 
-
 # 페이지 전환 함수 (공통)
 def switch_page(page):
     st.session_state.current_page = page
@@ -29,6 +28,7 @@ def switch_page(page):
 
 # 일반회원 홈화면 UI
 def app():
+
     tabs = st.tabs([
         "홈화면", 
         "모델 확인", 
