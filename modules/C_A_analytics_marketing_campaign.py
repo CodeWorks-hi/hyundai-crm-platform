@@ -72,7 +72,7 @@ def campaign_ui():
     # 📉 뉴스심리지수 vs 응답률 (시계열 비교)
     st.subheader(" 뉴스심리지수 vs 캠페인 응답률 추이")
 
-    dates = pd.date_range(start="2023-01-01", periods=12, freq="M")
+    dates = pd.date_range(start="2023-01-01", periods=12, freq="MS")
     news_sentiment = pd.Series([95, 90, 88, 92, 97, 85, 82, 78, 80, 87, 91, 94], index=dates, name="뉴스심리지수")
     response_rate = pd.Series([4.2, 4.0, 3.8, 4.1, 4.6, 3.5, 3.3, 3.1, 3.2, 3.8, 4.0, 4.3], index=dates, name="응답률 (%)")
 

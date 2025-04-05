@@ -24,7 +24,7 @@ def load_data():
     # 컬럼 정제
     def clean_df(df):
         df.columns = df.columns.str.strip()
-        return df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+        return df.df.map(lambda x: x.strip() if isinstance(x, str) else x)
 
     df_list = clean_df(df_list)
     df_inv = clean_df(df_inv)
