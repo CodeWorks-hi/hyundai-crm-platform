@@ -259,7 +259,7 @@ def consult_ui():
             "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
             unsafe_allow_html=True,
         )
-        memo = st.text_area("상담 내용을 입력하세요", height=200, label_visibility="collapsed")
+        memo = st.text_area("상담 내용을 입력하세요", height=150, label_visibility="collapsed")
         
         if st.button("✅ 저장", use_container_width=True, key='save_memo'):
             cr_df = pd.read_csv("data/consult_log.csv")
@@ -267,7 +267,7 @@ def consult_ui():
             
             if (cr_df.loc[mask, "완료여부"] == 0).any():
                 if mask.any():
-                    cr_df.loc[mask, "상담내용"] = memo
+                    cr_df.loc[mask, "상담내용"] = memo.replace("\n", " ")
                     cr_df.loc[mask, "완료여부"] = 1
                     cr_df.loc[mask, "상담태그"] = ', '.join(selected_tags)
                     cr_df.to_csv("data/consult_log.csv", index=False)

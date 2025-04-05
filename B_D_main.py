@@ -72,7 +72,7 @@ def generate_html_table(df: pd.DataFrame) -> str:
 def app():
     tabs = st.tabs([
         "대시보드",     # Overview 대체 – 직관적이고 고급스러움
-        "고객 피드백",   # Surveys – 응답보다 더 부드러운 표현
+        "고객 설문",   # Surveys – 응답보다 더 부드러운 표현
         "상담 이력",     # Consults – 상담 + 기록 의미
         "재고 현황",     # Inventory – 관리보다 직관적
         "리드 추적",     # Leads – 동적 느낌
