@@ -11,7 +11,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import urllib3
 import re
-import ace_tools_open as tools
+
 
 # 수출관리 
 
@@ -37,19 +37,10 @@ def load_and_merge_export_data(hyundai_path="data/processed/total/hyundai-by-reg
     if df is None:
         return None
 
-    # 브랜드 컬럼 추가
-    if "브랜드" not in df.columns:
-        df["브랜드"] = "현대"
-
-    # 차량 구분 컬럼 추가
-    if "차량 구분" not in df.columns:
-        df["차량 구분"] = "기타"
-
     # 연도 컬럼 추가
     df = extract_year_column(df)
     
     return df
-
 
 # 월별 컬럼 추출 함수
 def extract_month_columns(df):
@@ -93,33 +84,26 @@ def extract_year_column(df):
 
 # 필터링 UI 생성 함수
 def get_filter_values(df, key_prefix):
-    col1, col2, col3 = st.columns(3)
+    col1, col2= st.columns(2)  # 2열로 변경
     
     with col1:
-        brand = st.selectbox(
-            "브랜드 선택",
-            options=df["브랜드"].dropna().unique(),
-            key=f"{key_prefix}_brand"
-        )
-    
-    with col2:
         year_list = extract_year_list(df)
         year = st.selectbox(
             "연도 선택",
-            options=year_list[::-1],  # 역순으로 정렬
+            options=year_list[::-1],
             index=1,
             key=f"{key_prefix}_year"
         )
     
-    with col3:
-        country_list = df[df["브랜드"] == brand]["지역명"].dropna().unique()
+    with col2:
+        country_list = df["지역명"].dropna().unique()
         country = st.selectbox(
             "국가 선택",
             options=country_list if len(country_list) > 0 else ["선택 가능한 국가 없음"],
             key=f"{key_prefix}_country"
         )
     
-    return brand, year, country
+    return year, country  # 브랜드 제외
 
 # 수출 UI ======================== 메인화면 시작 함수 
 def export_goal_ui():
@@ -132,45 +116,34 @@ def export_goal_ui():
     month_cols = extract_month_columns(df)
     year_list = extract_year_list(df)
 
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        brand = st.selectbox(
-            "브랜드 선택",
-            options=df["브랜드"].dropna().unique(),
-            key="t3_brand"
-        )
+    col1, col2, col3 = st.columns(3)  # 3열로 변경
         
-    with col2:
-        year_list = extract_year_list(df)
+    with col1:
         start_year = st.selectbox(
             "시작 연도 선택",
             options=year_list,
             key="t3_start_year"
         )
         
-    with col3:
-        year_list = extract_year_list(df)
+    with col2:
         end_year = st.selectbox(
             "끝 연도 선택",
-            options=year_list[::-1],  # 역순으로 정렬
+            options=year_list[::-1],
             index=1,
             key="t3_end_year"
         )
         
-    with col4:
-        country_list = df[df["브랜드"] == brand]["지역명"].dropna().unique()
+    with col3:
         country = st.selectbox(
             "국가 선택",
-            options=country_list if len(country_list) > 0 else ["선택 가능한 국가 없음"],
+            options=df["지역명"].dropna().unique(),
             key="t3_country"
         )
 
-    # st.dataframe(df)
     if start_year >= end_year :
         st.error("시작 연도는 끝 연도보다 작아야 합니다.")
     else:
-        yearly = df[(df["브랜드"] == brand) & (df["지역명"] == country)]
+        yearly = df[df["지역명"] == country]  # 브랜드 필터 제거
 
         # 연도 추출
         all_years = sorted({col[:4] for col in df.columns if "-" in col and col[:4].isdigit()})
@@ -186,10 +159,7 @@ def export_goal_ui():
 
         # 데이터프레임으로 변환
         export_df = pd.DataFrame(total_export_by_year)
-        export_df.insert(0, "지역명", country)
-        export_df.insert(0, "브랜드", brand)
-
-        # st.dataframe(export_df)
+        export_df.insert(0, "지역명", country)  # 브랜드 컬럼 제거
 
         # 1. 연도별 총수출 컬럼만 추출
         year_columns = [
@@ -204,9 +174,10 @@ def export_goal_ui():
 
         # 2. melt (wide → long)
         line_df = export_df.melt(
-            id_vars=["브랜드", "지역명"],
+            id_vars=["지역명"],  # 브랜드 제외
             value_vars=year_columns,
-            var_name="연도", value_name="총수출"
+            var_name="연도", 
+            value_name="총수출"
         )
 
         # 3. '연도' 컬럼에서 '2016-총수출' → '2016' 형태로 정리
@@ -216,10 +187,9 @@ def export_goal_ui():
         line_chart = alt.Chart(line_df).mark_line(point=True).encode(
             x=alt.X("연도:O", title="연도"),
             y=alt.Y("총수출:Q", title="총수출"),
-            color="지역명:N",  # 여러 지역 비교 시 대비용 (단일 지역이면 무시됨)
             tooltip=["연도", "총수출"]
         ).properties(
-            title=f"{export_df.iloc[0]['지역명']} 연도별 총 수출량 추이",
+            title=f"{country} 연도별 총 수출량 추이",  # 제목에서 브랜드 제거
             width=700,
             height=400
         )
