@@ -339,7 +339,7 @@ def consult_ui():
 
         if st.button("✅ 저장", use_container_width=True, key='save_memo'):
             cr_df = pd.read_csv("data/consult_log.csv")
-            mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact)
+            mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact) & (cr_df["목적"] == "방문")
             
             if (cr_df.loc[mask, "완료여부"] == 0).any():
                 if mask.any():

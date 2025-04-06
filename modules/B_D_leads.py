@@ -1,6 +1,8 @@
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
+import numpy as np
+
 
 def leads_ui():
     st.markdown("### 👥 고객 리드 관리 대시보드")
@@ -39,6 +41,8 @@ def leads_ui():
             sales_df = sales_df.loc[(sales_df['이름'] == selected_name) & (sales_df['연락처'] == selected_contact), :]
 
             sales_cnt = sales_df["차량 구매 횟수"].max()
+            if sales_cnt is np.nan:
+                sales_cnt = 0
             sales_point += sales_cnt * 30
 
             sales_amount = sales_df["기본가격"].sum()
@@ -53,7 +57,7 @@ def leads_ui():
             elif sales_amount >= 50000000 :
                 sales_point += 10
 
-            age_group = sales_df["연령대"].min()
+            age_group = str(sales_df["연령대"].min())
             if age_group.split(' ')[0] in ["20대", "30대", "40대"]:
                 sales_point += 30
             elif age_group.split(' ')[0] in ["10대", "50대"]:
@@ -83,8 +87,12 @@ def leads_ui():
             else :
                 grade = 1
 
-            st.markdown("##### ")
-            st.markdown(f"#### {selected_name} 고객님은 {grade}등급 고객입니다.")
+            st.markdown(f"""
+                <div style="margin: 20px 0; padding: 15px; background-color: #f0f8ff; border-left: 6px solid #1f77b4; border-radius: 6px;">
+                    <h4 style="color:#1f77b4; margin: 0;">👤 {selected_name} 고객님은 <span style='color:#e67e22;'>등급 {grade}</span> 고객입니다.</h4>
+                </div>
+            """, unsafe_allow_html=True)
+            st.write(" ")
 
             grade_descriptions = {
                 1: "브랜드에 대한 충성도가 매우 높고, 장기 고객으로 관리가 필요한 핵심 VIP입니다.",
@@ -95,15 +103,15 @@ def leads_ui():
             }
 
             followup_checklist = {
-                1: ["✔ VIP 감사 혜택 제공", "✔ 신차 출시 시 우선 안내"],
-                2: ["✔ 재구매 프로모션 안내", "✔ 모델 업그레이드 제안"],
-                3: ["✔ 다음 방문 시 추가 제품 소개", "✔ 구매 혜택 프로모션 안내"],
-                4: ["✔ 니즈 파악 상담 예약 권장", "✔ 방문 유도 프로모션 제공"],
-                5: ["✔ 제품 브로셔 및 샘플 제공", "✔ 브랜드 소개 및 첫 방문 유도"]
+                1: ["✔ VIP 감사 혜택 제공", "✔ 신차 출시 시 우선 안내", "✔ 전담 컨설턴트 배정"],
+                2: ["✔ 재구매 프로모션 안내", "✔ 모델 업그레이드 제안", "✔ 맞춤 금융 상품 제안"],
+                3: ["✔ 다음 방문 시 추가 제품 소개", "✔ 구매 혜택 프로모션 안내", "✔ 시승 예약 유도"],
+                4: ["✔ 니즈 파악 상담 예약 권장", "✔ 방문 유도 프로모션 제공", "✔ 초기 관심모델 비교 제공"],
+                5: ["✔ 제품 브로셔 및 샘플 제공", "✔ 브랜드 소개 및 첫 방문 유도", "✔ 온라인 상담 연결"]
             }
 
             # 컬럼 구성
-            col1, col2, col3 = st.columns([1.2, 2, 2])
+            col1, col2, col3, col4, col5 = st.columns([1.2, 0.1, 2, 0.1, 2])
 
             with col1:
                 progress_ratio = (6 - grade) / 5
@@ -129,16 +137,36 @@ def leads_ui():
 
                 st.markdown("##### ")
 
-            with col2:
+            with col3:
                 st.info(f"**등급 {grade}**: \n\n{grade_descriptions.get(grade, '')}")
 
                 st.success(f"✅ 차량 구매: {sales_cnt}회\n\n✅ 상담 내역: {consult_cnt}회\n\n✅ 매장 방문: {visit_cnt}회")
 
-            with col3:
+            with col5:  
+                st.markdown(f"""
+                    <div style="margin-top: 8px;">
+                        <strong>누적 충성도 점수: {sales_point}점</strong>
+                        <div style="background-color: #eee; border-radius: 8px; height: 18px; margin-top: 5px;">
+                            <div style="width: {min(sales_point,100)}%; background: linear-gradient(to right, #1f77b4, #4fa3e3); height: 100%; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
                 
-                # 점수 데이터
-                st.metric("누적 충성도 점수", f"{sales_point}점")
+                st.write(" ")
 
-                st.markdown("##### * 📌 고객 맞춤 팔로업 제안")
-                for item in followup_checklist.get(grade, []):
-                    st.checkbox(item)
+                with st.expander("📌 고객 맞춤 팔로업 제안 보기", expanded=True):
+                    for item in followup_checklist.get(grade, []):
+                        st.checkbox(item)
+
+            if not consult_df.empty:
+                recent_logs = consult_df.sort_values("상담날짜", ascending=False).head(3)
+                st.markdown("### 🗂️ 최근 문의 및 방문 상담 내역")
+                for _, row in recent_logs.iterrows():
+                    st.markdown(f"""
+                        <div style='padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; background-color: #fafafa;'>
+                            <b>📅 {row['상담날짜']}</b><br>
+                            목적: {row['목적']}<br>
+                            상담 내용: {row['상담내용']}
+                        </div>
+                    """, unsafe_allow_html=True)
+                
