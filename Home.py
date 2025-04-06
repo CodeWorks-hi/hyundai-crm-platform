@@ -82,13 +82,3 @@ else:
         admin.app()
 
 
-# ✅ 푸터
-st.markdown("---")
-st.markdown(
-    """
-    <div style='text-align: center; color: gray; font-size: 0.9rem; margin-top: 30px;'>
-    © 2025 Hyundai & Kia Export Dashboard. All rights reserved.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
