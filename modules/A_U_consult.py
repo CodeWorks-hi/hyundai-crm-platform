@@ -74,9 +74,9 @@ def consult_ui():
 
                 col3, col4 = st.columns(2)
                 with col3:
-                    date = st.date_input("문의 날짜", key="inq_date")
+                    date = st.date_input("문의 날짜", key="inq_date", disabled=True)
                 with col4:
-                    time = st.time_input("문의 시간", key="inq_time")
+                    time = st.time_input("문의 시간", key="inq_time", disabled=True)
 
                 content = st.text_area("문의 내용", key="inq_content")
 
