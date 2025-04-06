@@ -68,9 +68,16 @@ def demand_forecast_ui():
         <h3 style='color: #003366; margin-bottom: 20px;'>🚗 고객 기본 정보 입력</h3>
     """, unsafe_allow_html=True)
     default_budget = st.session_state["recom_budget"]
-    default_gender = st.session_state["고객정보"]["성별"][0]
+    default_gender = st.session_state["고객정보"]["성별"]
+    if default_gender not in ["남", "여"]:
+        default_gender = "남"
     default_region = st.session_state["고객정보"]["거주지역"]
     default_age = st.session_state["고객정보"]["나이"]                               
+
+    try:
+        default_age = int(default_age)
+    except (ValueError, TypeError):
+        default_age = 30
 
     budget = st.number_input("구매 예산 (만원)", value=default_budget, step=500)
     gender = st.selectbox("성별", ["남", "여"], index=["남", "여"].index(default_gender))
@@ -79,6 +86,8 @@ def demand_forecast_ui():
         '인천광역시', '광주광역시', '부산광역시', '전라남도', '경기도', '울산광역시', '서울특별시', '경상남도',
         '전라북도', '충청북도', '경상북도', '강원도', '충청남도', '대구광역시', '대전광역시', '제주특별자치도'
     ]
+    if default_region not in regions:
+        default_region = "서울특별시"
     region = st.selectbox("거주 지역", regions, index=regions.index(default_region))
     preference = st.selectbox("선호 브랜드", ["현대", "제네시스"])
 
@@ -162,7 +171,7 @@ def demand_forecast_ui():
         with tab1:
             if len(recom_list) != 0:
                 st.subheader("추천 차량 리스트")
-                columns_per_row = 3  
+                columns_per_row = 3
                 num_cars = len(recom_list)
 
                 header_titles = [f"추천 차량 {i+1}" for i in range(min(columns_per_row, num_cars))]
