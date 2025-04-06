@@ -20,8 +20,8 @@ def load_data():
     return df_customer, df_export, df_inventory
 
 # 업로드된 모델 파일 경로
-domestic_model_path = "/mnt/data/xgb_domestic_ltv_model.pkl"
-export_model_path = "/mnt/data/xgb_export_ltv_model.pkl"
+domestic_model_path = "model/xgb_domestic_ltv_model.pkl"
+export_model_path = "model/xgb_export_ltv_model.pkl"
 
 # 모델 불러오기
 domestic_model = joblib.load(domestic_model_path)
