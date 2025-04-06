@@ -131,11 +131,10 @@ def inventory_ui():
     # -------------------------------
     # 하단: 컬럼3 (발주 추천) / 컬럼M (발주 등록) / 컬럼4 (발주 등록)
     st.markdown("---")
-    col3, col3M, colM, col4M, col4 = st.columns([1.3, 0.1, 1.5, 0.1, 1.1])
+    col3, col3M, colM, col4M, col4 = st.columns([1.5, 0.1, 1.5, 0.1, 1.1])
 
     with col3:
         st.markdown("### 🏭 출고 이슈")
-        st.markdown("<div style='margin-top: 4px;'></div>", unsafe_allow_html=True)
         
         inv_df["차종트림"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
         low_inventory_df = (
@@ -175,9 +174,11 @@ def inventory_ui():
         st.markdown("""
             <style>
             .scroll-container {
-                max-height: 500px;
+                max-height: 520px;
                 overflow-y: auto;
                 padding-right: 8px;
+                margin-bottom: 10px;
+                scrollbar-width: thin;
             }
             .inventory-card {
                 border: 1px solid #ccc;
@@ -296,10 +297,17 @@ def inventory_ui():
             # 저장
             inv_df.to_csv("data/inventory_data.csv", index=False)
 
-            st.success(
-                f"{selected_factory}에서 {vehicle} {quantity}대 발주가 등록되었습니다.\n\n"
-                f"요청자: {requestor}"
-            )
+            st.markdown(f"""
+                <div style="margin-top: 25px; padding: 20px; background-color: #f0f9ff; border-left: 6px solid #1890ff; border-radius: 8px;">
+                    <h4 style="color: #1a73e8;">📦 발주 등록 완료</h4>
+                    <p style="margin: 6px 0;">차량이 성공적으로 발주되었습니다.</p>
+                    <ul style="margin-left: 1rem; padding-left: 0.5rem;">
+                        <li><b>차종:</b> {vehicle}</li>
+                        <li><b>공장:</b> {selected_factory}</li>
+                        <li><b>요청자:</b> {requestor}</li>
+                    </ul>
+                </div>
+            """, unsafe_allow_html=True)
 
     # -------------------------------
     # 전체 테이블 익스펜더

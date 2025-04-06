@@ -58,14 +58,14 @@ def demand_forecast_ui():
         <h3 style='color: #003366; margin-bottom: 20px;'>🚗 고객 기본 정보 입력</h3>
     """, unsafe_allow_html=True)
 
-    budget = st.number_input("💰 구매 예산 (만원)", step=500, value=5000)
-    gender = st.selectbox("👤 성별", ["남", "여"])
-    age = st.number_input("🎂 나이", min_value=30, max_value=100, step=1)
-    region = st.selectbox("🏠 거주 지역", [
+    budget = st.number_input("구매 예산 (만원)", step=500, value=5000)
+    gender = st.selectbox("성별", ["남", "여"])
+    age = st.number_input("나이", min_value=30, max_value=100, step=1)
+    region = st.selectbox("거주 지역", [
         '인천광역시', '광주광역시', '부산광역시', '전라남도', '경기도', '울산광역시', '서울특별시', '경상남도',
         '전라북도', '충청북도', '경상북도', '강원도', '충청남도', '대구광역시', '대전광역시', '제주특별자치도'
     ])
-    preference = st.selectbox("🚙 선호 브랜드", ["현대", "제네시스"])
+    preference = st.selectbox("선호 브랜드", ["현대", "제네시스"])
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -184,7 +184,6 @@ def demand_forecast_ui():
 
                         st.markdown("</div>", unsafe_allow_html=True)
                         img_rows, text_rows = [], []
-                st.markdown(table_header, unsafe_allow_html=True)
             else:
                 custom_message("😢 죄송합니다. 예산 내에 맞는 차량이 없습니다. 조건을 확인해주세요!", "error")
                 custom_message("🔍 전기차는 어떠신가요? '전기차 추천' 탭을 클릭해 확인해보세요!", "question")
@@ -240,6 +239,5 @@ def demand_forecast_ui():
 
                         st.markdown("</div>", unsafe_allow_html=True)
                         img_rows, text_rows = [], []
-                st.markdown(table_header, unsafe_allow_html=True)
             else:
                 custom_message("😢 죄송합니다. 예산 내에 맞는 차량이 없습니다. 조건을 확인해주세요!", "error")
