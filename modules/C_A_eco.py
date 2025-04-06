@@ -88,8 +88,8 @@ def eco_ui():
     restriction_df = load_restriction_data()
     st.dataframe(restriction_df, use_container_width=True, hide_index=True)
 
-    # 원본 데이터 섹션
-    with st.expander("📁 원본 데이터 확인", expanded=False):
+    # 🗂 원본 데이터 섹션
+    with st.expander("🗂 원본 데이터 확인", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
             st.write("차량 마스터 데이터")

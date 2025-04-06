@@ -25,8 +25,8 @@ def analytics_ui():
     """, unsafe_allow_html=True)
 
     tab_names = [
-        "국내",
         "해외",
+        "국내",
         "LTV 예측",
         "글로벌 경제",
         "마케팅 캠페인"
@@ -36,22 +36,23 @@ def analytics_ui():
     selected_tab = st.tabs(tab_names)
 
     with selected_tab[0]:
-        domestic_ui()      # "국내 판매 관리"   
+        export_ui()    # 해외 판매 관리
 
     with selected_tab[1]:   
-        export_ui()    # "국내/해외 판매 관리"
+
+        domestic_ui()      # 국내 판매 관리  
 
         
     with selected_tab[2]:
-        ltv_ui()    # "LTV 및 시장 예측 분석"
+        ltv_ui()    # LTV 및 시장 예측 분석
 
 
     with selected_tab[3]:
-        economy_ui()      # "글로벌 경제 인사이트내"
+        economy_ui()      # 글로벌 경제 인사이트내
 
    
     with selected_tab[4]:     
-        marketing_ui()    # "마케팅 캠페인 성과"
+        marketing_ui()    # 마케팅 캠페인 성과
 
 
 

@@ -98,6 +98,6 @@ def distribution_ui():
     with st.expander(" 브랜드/모델/부품별 재고 요약 보기", expanded=True):
         st.dataframe(summary, use_container_width=True, hide_index=True)
 
-    # [6] 원본 데이터 보기
-    with st.expander(" 원본 데이터 보기", expanded=False):
+    # [6] 🗂 원본 데이터 보기
+    with st.expander(" 🗂 원본 데이터 보기", expanded=False):
         st.dataframe(df_list, use_container_width=True, hide_index=True)

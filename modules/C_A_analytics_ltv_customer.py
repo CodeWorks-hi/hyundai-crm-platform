@@ -11,6 +11,19 @@ from reportlab.pdfgen import canvas
 import matplotlib.pyplot as plt
 import plotly.express as px
 
+
+# 모델 파일 경로
+DOMESTIC_MODEL_PATH = "model/xgb_domestic_ltv_model.pkl"
+EXPORT_MODEL_PATH = "model/xgb_export_ltv_model.pkl"
+
+# 모델 로드
+try:
+    domestic_model = joblib.load(DOMESTIC_MODEL_PATH)
+    export_model = joblib.load(EXPORT_MODEL_PATH)
+except Exception as e:
+    st.error(f"LTV 모델 로드 오류: {e}")
+
+
 np.random.seed(42) 
 
 @st.cache_data
@@ -18,8 +31,11 @@ def load_data():
     df_customer = pd.read_csv("data/customer_data.csv")
     df_export = pd.read_csv("data/export_customer_data.csv")
     df_domestic = pd.read_csv("data/domestic_customer_data.csv")
-    df_list = pd.read_csv("data/customers.csv")  # 파일명 수정됨
+    df_list = pd.read_csv("data/customers.csv") 
     return df_customer, df_export, df_domestic, df_list
+
+
+
 
 
 def preprocess_and_train_model(df):
@@ -211,9 +227,9 @@ def ltv_customer_ui():
         st.warning("연령대 또는 거주 지역 정보가 부족합니다.")
 
 
-    # 📌 원본 데이터 확인
-    st.markdown("###  원본 데이터 확인")
-    with st.expander(" 원본 데이터 확인"):
+    # 📌 🗂 원본 데이터 확인
+    st.markdown("###  🗂 원본 데이터 확인")
+    with st.expander(" 🗂 원본 데이터 확인"):
         tab1, tab2, tab3 = st.tabs(["딜러 상담 리스트", "국내 판매 고객데이터", "해외 판매 고객데이터"])
 
         with tab1:

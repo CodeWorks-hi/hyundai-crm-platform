@@ -4,25 +4,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-
-#  데이터 불러오기
+# 데이터 경로 설정
 real_path = "extra_data/processed/경제 성장 관련/GDP_GNI_real.csv"
 nom_path = "extra_data/processed/경제 성장 관련/GDP_GNI_nom.csv"
 sen_path = "extra_data/processed/소비 심리 관련/econ_senti_index.csv"
 news_path = "extra_data/processed/소비 심리 관련/news_senti_index.csv"
+list_path = "data/customers.csv"
 
-df_real = pd.read_csv(real_path)
-df_nom = pd.read_csv(nom_path)
-df_sen = pd.read_csv(sen_path)
-df_news = pd.read_csv(news_path)
+# 데이터 로드
+@st.cache_data
+def load_data():
+    df_real = pd.read_csv(real_path)
+    df_nom = pd.read_csv(nom_path)
+    df_sen = pd.read_csv(sen_path)
+    df_news = pd.read_csv(news_path)
+    df_list = pd.read_csv(list_path)
+    return df_real, df_nom, df_sen, df_news, df_list
 
 
-
-#  Streamlit UI 구성
 def strategies_ui():
+    df_real, df_nom, df_sen, df_news, df_list = load_data()
+
+    st.markdown(" ### 마케팅 전략 분석 및 캠페인 제안")
 
     # 캠페인 전략 Top 5
-    st.header(" 캠페인 전략 Top 5")
+    st.markdown(" #### 캠페인 전략 Top 5")
 
     with st.expander("① 금리/환율 기반 실시간 트리거"):
         st.markdown("**조건**: 기준금리 < 3%, 환율 > 1300원")
@@ -46,9 +52,8 @@ def strategies_ui():
         st.code("if gdp_growth > 1.0:\n    send_retargeting(segment='침체기 미구매자')", language="python")
         st.success("ROI 4.8배 달성")
 
-    #  확장 캠페인 전략
-    st.header("추가 전략 제안")
-
+    # 확장 전략
+    st.markdown(" #### 추가 전략 제안")
     with st.expander("⑥ 제조업 회복 → B2B 캠페인"):
         st.write("제조업 실질 GDP 상승 시 법인 고객 대상 프로모션")
 
@@ -64,25 +69,18 @@ def strategies_ui():
     with st.expander("⑩ 글로벌 성장률 상승기 수출형 모델 강조"):
         st.write("해외 GDP 상승기 수출전략 모델 중심 캠페인")
 
-
-
-    #  GDP 실질 성장률 추이 시각화
-    st.subheader(" 국내총생산(GDP) 실질 추이")
-
+    # GDP 실질 성장률 시각화
+    st.markdown(" #### 국내총생산(GDP) 실질 추이")
     df_gdp = df_real[df_real["계정항목"] == "국내총생산(시장가격, GDP)"].copy()
     df_gdp = df_gdp.set_index("계정항목").T
     df_gdp.columns = ["GDP"]
     df_gdp = df_gdp.applymap(lambda x: float(str(x).replace(",", "")))
     df_gdp["분기"] = df_gdp.index
-
     fig_gdp = px.line(df_gdp, x="분기", y="GDP", title="국내총생산(GDP) 실질 추이", markers=True)
     st.plotly_chart(fig_gdp, use_container_width=True)
 
-
-
-    #  소비자심리지수 vs 마케팅 반응률
-    st.subheader(" 소비자심리지수 vs 마케팅 반응률")
-
+    # 소비자심리지수 vs 마케팅 반응률
+    st.markdown(" #### 소비자심리지수 vs 마케팅 반응률")
     dates = pd.date_range(start="2022-01-01", periods=24, freq="M")
     consumer_sentiment = np.random.normal(loc=90, scale=5, size=len(dates))
     response_rate = 5 + (consumer_sentiment - np.mean(consumer_sentiment)) * 0.1 + np.random.normal(0, 0.5, len(dates))
@@ -112,19 +110,24 @@ def strategies_ui():
     ax2.tick_params(axis='y', labelcolor="tab:green")
     st.pyplot(fig)
 
+    # 고객 인사이트 (from customers.csv)
+    st.markdown(" #### 고객 성향 분석")
+    df_list = df_list.dropna(subset=['예상예산_만원'])
+    df_list['예상예산_만원'] = df_list['예상예산_만원'].astype(float)
+    fig = px.histogram(df_list, x="예상예산_만원", nbins=30, color_discrete_sequence=["#4B8BBE"])
+    fig.update_layout(title="예상예산 분포", xaxis_title="예상예산 (만원)", yaxis_title="고객 수")
+    st.plotly_chart(fig, use_container_width=True)
 
-
-    # 원본 데이터 확인
-    st.subheader(" 원본 데이터 확인")
-
-    with st.expander("원본 GDP 실질 데이터"):
+    # 데이터 확인
+    st.subheader("🗂 원본 데이터 확인")
+    with st.expander("GDP 실질 데이터"):
         st.dataframe(df_real.head())
-
     with st.expander("경제심리지수"):
         st.dataframe(df_sen.head())
-
     with st.expander("뉴스심리지수"):
         st.dataframe(df_news.head())
-
+    with st.expander("고객 데이터"):
+        st.dataframe(df_list.head())
     with st.expander("반응률/심리지수 통합 데이터"):
         st.dataframe(df_response)
+

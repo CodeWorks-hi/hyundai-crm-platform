@@ -116,7 +116,7 @@ def trend_ui():
     plant_status = df_plant.groupby(['공장명', '생산상태']).size().unstack(fill_value=0)
     st.dataframe(plant_status.style.background_gradient(cmap='YlGnBu'), use_container_width=True, hide_index=True)
 
-    with st.expander(" 원본 데이터 확인"):
+    with st.expander(" 🗂 원본 데이터 확인"):
         tab1, tab2, tab3 = st.tabs(["차량정보", "재고데이터", "공장데이터"])
         with tab1:
             st.dataframe(df_list, use_container_width=True, hide_index=True)
