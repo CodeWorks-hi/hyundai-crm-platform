@@ -59,6 +59,14 @@ def inventory_ui():
                 color_discrete_sequence=["#E74C3C"]
             )
             st.plotly_chart(fig_top10, use_container_width=True)
+            st.markdown(f"""
+                <div style="margin-top: 12px; font-size: 0.9rem; background-color: #f8f9fa;
+                            border-left: 4px solid #E74C3C; padding: 10px 14px; border-radius: 6px;">
+                    <b>상위 판매 차종 분석:</b><br>
+                    <u>{top10['차종'].iloc[0]}</u>, <u>{top10['차종'].iloc[1]}</u>, <u>{top10['차종'].iloc[2]}</u> 모델이 최근 3개월 동안 가장 많이 판매되었습니다.
+                    해당 차종에 대한 <b>수요 집중 현상</b>이 두드러지며, <b>재고 확보 및 프로모션 강화</b>가 권장됩니다.
+                </div>
+            """, unsafe_allow_html=True)
 
         with colB:
             bottom10 = sal_df.groupby("차종")["최근 3개월 판매량"].sum()
@@ -71,6 +79,14 @@ def inventory_ui():
                 title="판매 저조 Top 3 (최근 3개월, 판매량 0 제외)"
             )
             st.plotly_chart(fig_bottom10, use_container_width=True)
+            st.markdown(f"""
+                <div style="margin-top: 12px; font-size: 0.9rem; background-color: #fcfcfc;
+                            border-left: 4px solid #999; padding: 10px 14px; border-radius: 6px;">
+                    <b>판매 저조 차종 분석:</b><br>
+                    <u>{bottom10['차종'].iloc[0]}</u>, <u>{bottom10['차종'].iloc[1]}</u>, <u>{bottom10['차종'].iloc[2]}</u> 모델은 판매량이 낮은 차종으로 나타났습니다.
+                    <b>공장별 생산 조정</b> 또는 <b>전환 마케팅</b> 전략 검토가 필요합니다.
+                </div>
+            """, unsafe_allow_html=True)
 
     with col3:
         st.markdown("### 📦 주요 공장별 생산 가능 수량 현황")
