@@ -9,7 +9,7 @@
 
 import streamlit as st
 import plotly.graph_objects as go
-from utils_export import load_and_merge_export_data, get_filter_values
+from .utils_export import load_and_merge_export_data, get_filter_values
 
 def export_goal_ui():
     st.header("🎯 목표 달성률 분석")

@@ -162,10 +162,10 @@ def strategies_ui():
     st.markdown("---")
     col1, _, col2, _, col3 = st.columns([2, 0.1, 2, 0.1, 2])
     with col1:
-        st.markdown("### 📢 이벤트")
+        st.markdown("###  이벤트")
         render_paginated_list(df_event, "이벤트", "이벤트_page")
     with col2:
-        st.markdown("### 📋 공지사항")
+        st.markdown("###  공지사항")
         render_paginated_list(df_event, "공지사항", "공지_page")
     with col3:
         st.markdown("### ⚙️ 점검안내")

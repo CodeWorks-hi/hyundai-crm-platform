@@ -66,7 +66,7 @@ def domestic_performance_ui():
         default_index = years.index(default_year)
     else:
         default_index = len(years) - 1
-    year = st.selectbox("📅 연도 선택", years, index=default_index)
+    year = st.selectbox(" 연도 선택", years, index=default_index)
 
     # 데이터 필터링
     df_filtered = df_customer[df_customer['최근 구매 연도'] == year]
@@ -85,7 +85,7 @@ def domestic_performance_ui():
         
 
     # 주요 지표 표시 (카드 스타일)
-    st.markdown("### 📊 주요 지표")
+    st.markdown("###  주요 지표")
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("총 고객 수", f"{total_customers} 명")
     col2.metric("평균 연령", f"{avg_age:.1f} 세")
@@ -95,7 +95,7 @@ def domestic_performance_ui():
 
     # 분포 시각화 (깔끔한 레이아웃)
     st.markdown("---")
-    st.markdown("### 🎨 고객 분포 시각화")
+    st.markdown("### 고객 분포 시각화")
     
     col1, col2 = st.columns(2)
 

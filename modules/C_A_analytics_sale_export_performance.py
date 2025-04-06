@@ -10,7 +10,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from utils_export import load_and_merge_export_data, get_filter_values
+from .utils_export import load_and_merge_export_data, get_filter_values
 
 def export_performance_ui():
     st.header("🌍 수출 실적 대시보드")

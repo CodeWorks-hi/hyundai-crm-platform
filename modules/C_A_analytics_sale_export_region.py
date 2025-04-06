@@ -10,7 +10,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from utils_export import load_and_merge_export_data
+from .utils_export import load_and_merge_export_data
 
 def export_region_ui():
     st.header("🗺️ 국가별 시장 비교 분석")

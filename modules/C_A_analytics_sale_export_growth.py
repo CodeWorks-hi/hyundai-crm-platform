@@ -10,7 +10,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-from utils_export import load_and_merge_export_data
+from .utils_export import load_and_merge_export_data
 
 def export_growth_ui():
     st.header("📈 성장률 트렌드 분석")

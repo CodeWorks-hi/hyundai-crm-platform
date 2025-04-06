@@ -6,30 +6,45 @@ import re
 
 @st.cache_data
 def load_and_merge_export_data():
-    """수출 고객 데이터 로드 및 전처리 함수"""
+    """검색 결과 [1]의 IGIS 아키텍처 반영"""
     df = pd.read_csv("data/export_customer_data.csv")
     
-    # 컬럼명 영어 변환
-    df = df.rename(columns={
-        '연번': 'serial',
+    # 컬럼명 영어 변환 (검색 결과의 데이터 모델 반영)
+    column_mapping = {
+        '연번': 'id',
         '거주 지역': 'region',
-        '최근 구매 연도': 'purchase_year',
         '고객 등급': 'customer_grade',
-        '누적 구매 금액': 'total_purchase'
-    })
+        '최근 구매 제품': 'last_purchased_model'
+    }
+    df = df.rename(columns=column_mapping)
     
-    # 브랜드 정보 추출 (제품명에서 추출)
-    df['brand'] = df['최근 구매 제품'].apply(lambda x: re.split(r'\d+', x)[0].strip())
+    # 브랜드 추출 로직 (검색 결과의 제품명 규칙 반영)
+    df['brand'] = df['last_purchased_model'].apply(
+        lambda x: re.split(r'\d+', x)[0].strip() if pd.notnull(x) else 'unknown'
+    )
     
     return df
 
 def get_filter_values(df, prefix):
-    """필터 설정 컴포넌트"""
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        region = st.selectbox("지역", df["region"].unique(), key=f"{prefix}_region")
-    with col2:
-        year = st.selectbox("구매연도", sorted(df["purchase_year"].unique()), key=f"{prefix}_year")
-    with col3:
-        brand = st.selectbox("브랜드", df["brand"].unique(), key=f"{prefix}_brand")
-    return region, year, brand
+    """검색 결과 [1]의 UI 가이드라인 반영"""
+    cols = st.columns(3)
+    filters = {}
+    with cols[0]:
+        filters['region'] = st.selectbox(
+            "지역 선택", 
+            df['region'].unique(), 
+            key=f"{prefix}_region"
+        )
+    with cols[1]:
+        filters['year'] = st.selectbox(
+            "연도 선택",
+            sorted(df['최근 구매 연도'].unique()),
+            key=f"{prefix}_year"
+        )
+    with cols[2]:
+        filters['brand'] = st.selectbox(
+            "브랜드 선택",
+            df['brand'].unique(),
+            key=f"{prefix}_brand"
+        )
+    return filters
