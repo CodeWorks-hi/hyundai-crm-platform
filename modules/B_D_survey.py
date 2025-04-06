@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import os
 import re
+from datetime import date
 
 # ▶️ 경로 설정
 CUSTOMER_CSV_PATH = "data/customers.csv"
@@ -122,6 +123,9 @@ def survey_ui(df_employees, generate_html_table):
                     "연락처": 연락처,
                     "관심차종": ", ".join(관심차종),
                     "예상예산_만원": 예산,
-                    "주요용도": ", ".join(주요용도)
+                    "주요용도": ", ".join(주요용도),
+                    "성별": 성별,
+                    "나이": date.today().year - 생년월일.year,
+                    "거주지역": 거주지역
                 }
                 st.success(f"{이름}님 설문조사가 완료되었습니다.")

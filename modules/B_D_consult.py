@@ -195,6 +195,8 @@ def consult_ui():
                 st.text_input("최근 보유 차량", survey_result["최근보유차종"], disabled=True)
                 
             if st.button("🚘 추천받기", use_container_width=True):
+                st.session_state["recom_budget"] = budget
+
                 st.session_state["show_recommendation"] = True
 
                 car_df = pd.read_csv("data/hyundae_car_list.csv")
