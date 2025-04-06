@@ -34,12 +34,12 @@ def leads_ui():
         else:
             st.markdown(f"#### {selected_name} 고객님")
 
-            st.warning("##### * 리드 등급 게이지. 고객의 충성도 및 구매의사, 이탈 가능성 등 판단 가능한 탭")
-            grade = 4  # 1~5 중 현재 고객 등급 (예시)
+            grade = 3  # 1~5 중 현재 고객 등급 (예시)
 
-            st.markdown("**고객 리드 등급 (1~5)**")
+            st.markdown("**고객 리드 등급**")
             progress_percent = int(((grade - 1) / 4) * 100)
             st.progress(progress_percent)
+            
 
             # 레이블 시각화
             st.markdown("""
@@ -54,11 +54,11 @@ def leads_ui():
             }
             </style>
             <div class="label-bar">
-            <span>1단계</span>
-            <span>2단계</span>
-            <span>3단계</span>
-            <span>4단계</span>
-            <span>5단계</span>
+            <span>유입</span>
+            <span>관심/검토</span>
+            <span>욕구</span>
+            <span>구매/전환</span>
+            <span>유지/확산</span>
             </div>
             """, unsafe_allow_html=True)
             
