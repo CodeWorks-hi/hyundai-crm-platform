@@ -170,8 +170,10 @@ def app():
 
 
     st.markdown("---")
-    col11, col12 =  st.columns([1, 8])
+    col11, col12, col13 =  st.columns([1, 6, 1])
     # ✔ 안전한 방식: 세션 상태로 페이지 전환
+    with col13:
+        pass
     with col11:
         if st.button("← 메인으로 돌아가기"):
             st.session_state.current_page = "home"
