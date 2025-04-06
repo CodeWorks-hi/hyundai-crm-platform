@@ -7,7 +7,7 @@ TEXT_MODEL_ID = "google/gemma-2-9b-it"
 
 def get_huggingface_token(model_type):
     tokens = {"gemma": st.secrets.get("HUGGINGFACE_API_TOKEN_GEMMA")}
-    return 'hf_' + tokens.get(model_type)
+    return tokens.get(model_type)
 
 def generate_tag(request: str, model_name: str = TEXT_MODEL_ID) -> list:
     token = get_huggingface_token("gemma")
@@ -84,13 +84,13 @@ def consult_ui():
     if "show_recommendation" not in st.session_state:
         st.session_state["show_recommendation"] = False
     if "고객정보" not in st.session_state or not isinstance(st.session_state["고객정보"], dict):
-        st.session_state["고객정보"] = {"이름": "", "연락처": ""}
+        st.session_state["고객정보"] = {"상담자명": "", "연락처": ""}
     else:
-        st.session_state["고객정보"].setdefault("이름", "")
+        st.session_state["고객정보"].setdefault("상담자명", "")
         st.session_state["고객정보"].setdefault("연락처", "")
 
     customer_df = pd.read_csv("data/customers.csv")
-    customer_df["이름"] = customer_df["이름"].astype(str).str.strip()
+    customer_df["상담자명"] = customer_df["상담자명"].astype(str).str.strip()
     customer_df["연락처"] = customer_df["연락처"].astype(str).str.strip()
 
     consult_log_df = pd.read_csv("data/consult_log.csv")
@@ -99,7 +99,7 @@ def consult_ui():
     col1, col2, col3, col4, col5 = st.columns([1.2, 0.1, 1.3, 0.1, 2])
 
     with col1:
-        default_name = st.session_state["고객정보"].get("이름", "")
+        default_name = st.session_state["고객정보"].get("상담자명", "")
         default_contact = st.session_state["고객정보"].get("연락처", "")
         selected_name = st.text_input("고객 성명 입력", value=default_name)
         selected_contact = st.text_input("고객 연락처 입력", value=default_contact)    
@@ -107,13 +107,13 @@ def consult_ui():
         if selected_name and selected_contact :
             clicked = True
             st.markdown("---")
-            customer_info = customer_df.loc[(customer_df["이름"] == selected_name) & (customer_df["연락처"] == selected_contact), :]
+            customer_info = customer_df.loc[(customer_df["상담자명"] == selected_name) & (customer_df["연락처"] == selected_contact), :]
             if not customer_info.empty:
                 st.markdown(f"""
                 <div style="background-color: #e9f3fc; border: 2px solid #1570ef; padding: 18px 24px; border-radius: 10px; margin-top: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
                     <div style="font-size: 20px; font-weight: 700; color: #0f3c73; margin-bottom: 10px;">👤 고객 기초 정보</div>
                     <ul style="list-style-type: none; padding-left: 0; font-size: 15px; color: #1d2c3b;">
-                        <li><strong>📛 이름:</strong> {customer_info['이름'].values[0]}</li>
+                        <li><strong>📛 이름:</strong> {customer_info['상담자명'].values[0]}</li>
                         <li><strong>📱 연락처:</strong> {customer_info['연락처'].values[0]}</li>
                         <li><strong>🎂 생년월일:</strong> {customer_info['생년월일'].values[0]}</li>
                         <li><strong>🗺️ 거주지역:</strong> {customer_info['거주지역'].values[0]}</li>
@@ -144,7 +144,7 @@ def consult_ui():
                 st.info("❕ 상담 요청 정보가 없습니다.")
 
     with col3:
-        matched_survey = customer_df[(customer_df["이름"] == selected_name) & (customer_df["연락처"] == selected_contact)]
+        matched_survey = customer_df[(customer_df["상담자명"] == selected_name) & (customer_df["연락처"] == selected_contact)]
         if matched_survey.empty:
             st.error("❗ 설문조사 결과를 찾을 수 없습니다. 이름과 연락처를 확인해주세요.")
             return
@@ -305,24 +305,15 @@ def consult_ui():
         
         st.write("")
 
-    with col_mid:
-        st.markdown("#### 📝 상담 내용 메모")
-        st.markdown(
-            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
-            unsafe_allow_html=True,
-        )
-        memo = st.text_area("상담 내용을 입력하세요", height=150, label_visibility="collapsed")
-        st.write(memo)
-
     with col_right:
         st.markdown("#### 🏷️ 상담 태그 분류")
         st.markdown(
             "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>상담 내용을 분류하기 위한 태그를 선택하거나 직접 입력하세요.</div>",
             unsafe_allow_html=True
         )
-        default_tags = generate_tag(memo, model_name=TEXT_MODEL_ID) if memo.strip() else []
-        st.write("📥 생성된 태그:", default_tags)
-        # default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
+        # default_tags = generate_tag(memo, model_name=TEXT_MODEL_ID) if memo.strip() else []
+        # st.write("📥 생성된 태그:", default_tags)
+        default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
         selected_tags = st.multiselect("상담 태그 선택", default_tags, key="consult_tags")
         custom_tag = st.text_input("기타 태그 직접 입력")
         if custom_tag and custom_tag not in selected_tags:
@@ -337,6 +328,13 @@ def consult_ui():
         )
 
     with col_mid:
+        st.markdown("#### 📝 상담 내용 메모")
+        st.markdown(
+            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
+            unsafe_allow_html=True,
+        )
+        memo = st.text_area("상담 내용을 입력하세요", height=150, label_visibility="collapsed")
+
         if st.button("✅ 저장", use_container_width=True, key='save_memo'):
             cr_df = pd.read_csv("data/consult_log.csv")
             mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact)
@@ -356,7 +354,7 @@ def consult_ui():
                 else:
                     # 새로운 상담 로그 행 추가
                     new_log = {
-                        "이름": selected_name,
+                        "상담자명": selected_name,
                         "전화번호": selected_contact,
                         "상담내용": memo,
                         "요청사항": "-",

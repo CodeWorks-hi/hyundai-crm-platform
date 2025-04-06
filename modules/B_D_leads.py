@@ -29,7 +29,7 @@ def leads_ui():
 
         df = pd.read_csv("data/customers.csv")
 
-        if df.loc[(df['이름'] == selected_name) & (df['연락처'] == selected_contact)].empty:
+        if df.loc[(df['상담자명'] == selected_name) & (df['연락처'] == selected_contact)].empty:
             st.error('회원 정보가 존재하지 않습니다.')
         else:
             st.markdown(f"#### {selected_name} 고객님")
@@ -40,7 +40,6 @@ def leads_ui():
             progress_percent = int(((grade - 1) / 4) * 100)
             st.progress(progress_percent)
             
-
             # 레이블 시각화
             st.markdown("""
             <style>
