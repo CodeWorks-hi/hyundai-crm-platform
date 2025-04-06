@@ -96,7 +96,7 @@ def ltv_customer_ui():
     st.dataframe(top10.style.format({'예측 LTV': '{:,.0f}원'}), height=400)
 
     st.markdown("---")
-    
+
     st.markdown("###  예측 결과 시각화")
 
     col1, col2 = st.columns(2)
@@ -135,6 +135,45 @@ def ltv_customer_ui():
                 - 고객 순위가 높을수록(= 더 가치 있는 고객일수록), 예측값과 실제값 간 차이가 커질 가능성이 있습니다.
                 - 특히 상위 5~10명에서 예측값이 일관되게 낮거나 높은 경우, 해당 구간에 대한 **모델 개선의 여지**가 존재합니다.
                     """)
+
+    col1, col2,col3 = st.columns(3)
+    #  Boxplot: 예측 vs 실제 LTV
+    with col1:
+        st.markdown("####  예측 vs 실제 LTV Boxplot 비교")
+        fig_box, ax_box = plt.subplots()
+        ax_box.boxplot(
+            [df_with_pred["고객 평생 가치"], df_with_pred["예측 LTV"]],
+            labels=["실제 LTV", "예측 LTV"],
+            patch_artist=True,
+            boxprops=dict(facecolor="lightblue"),
+        )
+        ax_box.set_title("실제 vs 예측 LTV Boxplot")
+        st.pyplot(fig_box)
+
+    with col2:
+        #  잔차(오차) vs 예측값 산점도
+        st.markdown("####  예측값에 따른 오차 산점도 (잔차)")
+        df_with_pred["잔차"] = df_with_pred["고객 평생 가치"] - df_with_pred["예측 LTV"]
+        fig_residual, ax_residual = plt.subplots()
+        ax_residual.scatter(df_with_pred["예측 LTV"], df_with_pred["잔차"], alpha=0.5, color='orange')
+        ax_residual.axhline(0, color='gray', linestyle='--')
+        ax_residual.set_xlabel("예측 LTV")
+        ax_residual.set_ylabel("잔차 (실제 - 예측)")
+        ax_residual.set_title("예측값에 따른 잔차 분포")
+        st.pyplot(fig_residual)
+
+    with col3:
+    # 👥 고객 등급별 평균 오차 시각화
+        st.markdown("#### 👥 고객 등급별 평균 오차")
+        if "고객 등급" in df_with_pred.columns:
+            grade_error = df_with_pred.groupby("고객 등급")["잔차"].mean().reset_index()
+            fig_grade, ax_grade = plt.subplots()
+            ax_grade.bar(grade_error["고객 등급"], grade_error["잔차"], color='mediumseagreen')
+            ax_grade.set_ylabel("평균 잔차")
+            ax_grade.set_title("고객 등급별 평균 예측 오차")
+            st.pyplot(fig_grade)
+        else:
+            st.warning("고객 등급 정보가 없어 등급별 분석을 생략합니다.")
 
     st.markdown("---")
 
