@@ -1,5 +1,77 @@
 import streamlit as st
 import pandas as pd
+from huggingface_hub import InferenceClient
+
+
+TEXT_MODEL_ID = "google/gemma-2-9b-it"
+
+def get_huggingface_token(model_type):
+    tokens = {"gemma": st.secrets.get("HUGGINGFACE_API_TOKEN_GEMMA")}
+    return 'hf_' + tokens.get(model_type)
+
+def generate_tag(request: str, model_name: str = TEXT_MODEL_ID) -> list:
+    token = get_huggingface_token("gemma")
+    if not token:
+        st.error("Hugging Face API 토큰이 없습니다.")
+        return []
+
+    system_prompt = """
+    [시스템 지시 사항]
+    ### 상담 내용 분석
+    - 입력된 글의 핵심 키워드 추출
+    - 키워드 기반으로 태그 생성
+    
+    [입력 예시 및 태그 출력 예시]
+    각 상담 내용에는 고객의 관심사/상황에 따라 다음과 같은 카테고리로 태그를 지정하세요:
+    - 구매단계: 관심, 구매 가능성 있음, 구매 결정, 구매 미정
+    - 방문여부: 첫방문, 재방문 예정, 재방문 완료
+    - 관심사: 전기차 관심, SUV 관심, 혜택 관심, 시승 희망, 안전 우선, 연비 중시, 공간 우선
+    - 기타: 1인용, 가족용, 부모님 동승, 예산 3000 이하, 상담 지속, 피드백 요청
+    
+    상담 내용: "재방문 의사 강함. 차량 구매는 아직 미정이나 혜택 관련해서 설명 더 드리면 구매하실 듯. 재방문 일자는 1주 내로 말씀해주시기로 함."
+    태그: 재방문 예정, 구매 가능성 있음, 구매 미정, 혜택 관심, 상담 지속
+
+    상담 내용: "차량 시승 완료, 다음 주 방문하시고 계약 예정, 차량 색상만 고민."
+    태그: 구매 결정, 재방문 예정, 시승 완료, 색상 고민
+
+    상담 내용: "아이 등하교용으로 안전한 SUV 필요, 트렁크 공간 중요, 시승 희망하시는 듯."
+    태그: 관심, SUV 관심, 가족용, 아이 통학, 안전 우선, 공간 우선, 시승 희망
+
+    상담 내용: "주말마다 캠핑을 다니시는 고객님. 짐이 많아서 공간이 중요함. 레저용으로 연비보단 공간이 우선."
+    태그: 관심, 레저용, 공간 우선, 주말 여행, 짐 많음
+
+    상담 내용: "출퇴근 용도의 저렴한 전기차 필요. 1인 운전 예정이심. 예산은 3000만원 이하라고 하심."
+    태그: 전기차 관심, 출퇴근, 저예산, 1인용, 예산 3000 이하
+    
+    ----------------------------
+    
+    아래 상담 내용을 분석해 위와 같은 형식으로 쉼표로 구분된 태그들을 생성하세요.
+    """
+
+    full_prompt = f"{system_prompt}\n\n[상담 내용]\n\n{request.strip()}"
+
+    try:
+        client = InferenceClient(model=model_name, token=token)
+        response = client.text_generation(
+            prompt=(f"""
+                다음 상담 내용에 대한 태그들을 현대자동차 전문가 입장에서 쉼표로 구분된 한 줄의 문자열로 만들어줘.
+                입력된 상담 내용을 바탕으로 핵심 키워드를 분석하고, 고객의 관심사나 요구 사항에 기반한 태그를 생성해.
+                절대로 줄 바꿈 없이 출력해줘.\n\n{full_prompt}
+            """),
+            max_new_tokens=1000,
+            temperature=0.3
+        )
+        st.write("📤 상담내용:", request)
+        st.write("🔑 사용된 토큰:", token)
+        st.write("📡 호출된 모델:", model_name)
+        st.write("🧠 모델 응답 원문:", response)
+ 
+        tag_line = response.strip().split("\n")[0]
+        return [tag.strip() for tag in tag_line.split(",") if tag.strip()]
+    except Exception as e:
+        st.error(f"텍스트 생성 오류: {e}")
+        return []
+
 
 def consult_ui():
     st.title("🧾 고객 상담 페이지")
@@ -233,13 +305,24 @@ def consult_ui():
         
         st.write("")
 
+    with col_mid:
+        st.markdown("#### 📝 상담 내용 메모")
+        st.markdown(
+            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
+            unsafe_allow_html=True,
+        )
+        memo = st.text_area("상담 내용을 입력하세요", height=150, label_visibility="collapsed")
+        st.write(memo)
+
     with col_right:
         st.markdown("#### 🏷️ 상담 태그 분류")
         st.markdown(
             "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>상담 내용을 분류하기 위한 태그를 선택하거나 직접 입력하세요.</div>",
             unsafe_allow_html=True
         )
-        default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
+        default_tags = generate_tag(memo, model_name=TEXT_MODEL_ID) if memo.strip() else []
+        st.write("📥 생성된 태그:", default_tags)
+        # default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
         selected_tags = st.multiselect("상담 태그 선택", default_tags, key="consult_tags")
         custom_tag = st.text_input("기타 태그 직접 입력")
         if custom_tag and custom_tag not in selected_tags:
@@ -254,13 +337,6 @@ def consult_ui():
         )
 
     with col_mid:
-        st.markdown("#### 📝 상담 내용 메모")
-        st.markdown(
-            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
-            unsafe_allow_html=True,
-        )
-        memo = st.text_area("상담 내용을 입력하세요", height=150, label_visibility="collapsed")
-        
         if st.button("✅ 저장", use_container_width=True, key='save_memo'):
             cr_df = pd.read_csv("data/consult_log.csv")
             mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact)
