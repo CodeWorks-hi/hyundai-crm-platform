@@ -53,14 +53,21 @@ def demand_forecast_ui():
 
     st.markdown("---")
 
-    budget = st.number_input("구매 예산을 입력하세요. (단위: 만원)", step=500, value=5000)
-    gender = st.selectbox("성별이 어떻게 되시나요?", ["남", "여"])
-    age = st.number_input("나이를 입력하세요.", min_value=30, max_value=100, step=1)
-    region = st.selectbox("거주 지역이 어떻게 되시나요?", [
+    st.markdown("""
+    <div style='background-color: #ffffff; padding: 30px 25px 20px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 30px;'>
+        <h3 style='color: #003366; margin-bottom: 20px;'>🚗 고객 기본 정보 입력</h3>
+    """, unsafe_allow_html=True)
+
+    budget = st.number_input("💰 구매 예산 (만원)", step=500, value=5000)
+    gender = st.selectbox("👤 성별", ["남", "여"])
+    age = st.number_input("🎂 나이", min_value=30, max_value=100, step=1)
+    region = st.selectbox("🏠 거주 지역", [
         '인천광역시', '광주광역시', '부산광역시', '전라남도', '경기도', '울산광역시', '서울특별시', '경상남도',
-       '전라북도', '충청북도', '경상북도', '강원도', '충청남도', '대구광역시', '대전광역시', '제주특별자치도'
+        '전라북도', '충청북도', '경상북도', '강원도', '충청남도', '대구광역시', '대전광역시', '제주특별자치도'
     ])
-    preference = st.selectbox("선호하시는 브랜드는 무엇인가요?", ["현대", "제네시스"])
+    preference = st.selectbox("🚙 선호 브랜드", ["현대", "제네시스"])
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
     st.write("")
 
@@ -166,9 +173,16 @@ def demand_forecast_ui():
                     img_rows.append(img_tag)
                     text_rows.append(summary)
                     if (idx + 1) % columns_per_row == 0 or idx == num_cars - 1:
+                        st.markdown("""
+                        <div style='padding: 25px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.06); margin-bottom: 20px;'>
+                        """, unsafe_allow_html=True)
+
                         img_row = "| " + " | ".join(img_rows) + " |\n"
                         text_row = "| " + " | ".join(text_rows) + " |\n"
                         table_header += img_row + text_row
+                        st.markdown(table_header, unsafe_allow_html=True)
+
+                        st.markdown("</div>", unsafe_allow_html=True)
                         img_rows, text_rows = [], []
                 st.markdown(table_header, unsafe_allow_html=True)
             else:
@@ -215,9 +229,16 @@ def demand_forecast_ui():
                     img_rows.append(img_tag)
                     text_rows.append(summary)
                     if (idx + 1) % columns_per_row == 0 or idx == num_cars - 1:
+                        st.markdown("""
+                        <div style='padding: 25px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.06); margin-bottom: 20px;'>
+                        """, unsafe_allow_html=True)
+
                         img_row = "| " + " | ".join(img_rows) + " |\n"
                         text_row = "| " + " | ".join(text_rows) + " |\n"
                         table_header += img_row + text_row
+                        st.markdown(table_header, unsafe_allow_html=True)
+
+                        st.markdown("</div>", unsafe_allow_html=True)
                         img_rows, text_rows = [], []
                 st.markdown(table_header, unsafe_allow_html=True)
             else:
