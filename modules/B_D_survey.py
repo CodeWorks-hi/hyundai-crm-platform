@@ -109,8 +109,8 @@ def survey_ui(df_employees, generate_html_table):
             기타 = 기타.strip() if 기타 and 기타.strip() else "-"
 
             customer_info = [
-                str(uuid.uuid4()), 상담자ID, st.session_state["직원이름"], today,
-                이름, 연락처, 성별, 생년월일.isoformat(), 연령대,
+                str(uuid.uuid4()), 상담자ID, 이름, today,
+                st.session_state["직원이름"], 연락처, 성별, 생년월일.isoformat(), 연령대,
                 거주지역, ", ".join(관심차종), 방문목적,
                 월주행거리, ", ".join(주요용도), 예산, 선호색상,
                 동승구성, 중요1, 중요2, 중요3, 보유차종, 기타
