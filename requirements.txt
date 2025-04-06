@@ -48,7 +48,7 @@ cmake
 # ✅ 기타 유틸
 geopy
 reportlab       # PDF 리포트용
-ace_tools_open 
+
 
 # ✅ 필요시 설치 (설치 전 시스템 설정 필요)
 # dlib
