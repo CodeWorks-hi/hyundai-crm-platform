@@ -86,6 +86,7 @@ def leads_ui():
                 grade = 2
             else :
                 grade = 1
+                
 
             st.markdown(f"""
                 <div style="margin: 20px 0; padding: 15px; background-color: #f0f8ff; border-left: 6px solid #1f77b4; border-radius: 6px;">
