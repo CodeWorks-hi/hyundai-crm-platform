@@ -52,7 +52,7 @@ def event_ui():
         pass
     with cola:
         st.image("images/event/event5.png", use_container_width=True)
-        st.markdown("#### 현대카드 제휴 이벤트")
+        st.markdown("#### 현대 Spring Go! 주유 걱정 없이 떠나봄")
         st.caption("현대카드로 차량을 구매하면 슈퍼콘서트 티켓 2매 증정! 자동차와 함께 특별한 경험까지 함께 드립니다.")
         with st.expander("이벤트 - 상세보기"):
             st.markdown("""
