@@ -19,7 +19,7 @@ def event_ui():
     with col5:
         pass
     with col1:
-        st.image("images/event/event4.png", use_container_width=True)
+        st.image("images/event/event4.png", use_column_width=True)
         st.markdown("#### 현대카 클럽 프로그램")
         st.caption("장기 이용 고객을 위한 프리미엄 프로그램! 50개월 이상 사용 후 차량 반납 시 중고차 시세 보상과 신차 구매금액의 5%를 지원해드립니다.")
         with st.expander("프로그램 - 상세보기"):
@@ -35,7 +35,7 @@ def event_ui():
         pass
 
     with col3:
-        st.image("images/event/event3.jpg", use_container_width=True)
+        st.image("images/event/event3.jpg", use_column_width=True)
         st.markdown("#### 현대카드 제휴 이벤트")
         st.caption("현대카드로 차량을 구매하면 슈퍼콘서트 티켓 2매 증정! 자동차와 함께 특별한 경험까지 함께 드립니다.")
         with st.expander("이벤트 - 상세보기"):
@@ -51,7 +51,7 @@ def event_ui():
     with cold:
         pass
     with cola:
-        st.image("images/event/event5.png", use_container_width=True)
+        st.image("images/event/event5.png", use_column_width=True)
         st.markdown("#### 현대 Spring Go! 주유 걱정 없이 떠나봄")
         st.caption("현대카드로 차량을 구매하면 슈퍼콘서트 티켓 2매 증정! 자동차와 함께 특별한 경험까지 함께 드립니다.")
         with st.expander("이벤트 - 상세보기"):
@@ -61,7 +61,7 @@ def event_ui():
                 - **참여 방법**: 차량 구매 시 현대카드 사용
             """)
     with colc:
-        st.image("images/event/event6.png", use_container_width=True)
+        st.image("images/event/event6.png", use_column_width=True)
         st.markdown("#### 현대 EV: FLEX 페이백 시즌")
         st.caption("현대카드로 차량을 구매하면 슈퍼콘서트 티켓 2매 증정! 자동차와 함께 특별한 경험까지 함께 드립니다.")
         with st.expander("이벤트 - 상세보기"):
@@ -71,7 +71,7 @@ def event_ui():
                 - **참여 방법**: 차량 구매 시 현대카드 사용
             """)
     with cole:
-        st.image("images/event/event7.png", use_container_width=True)
+        st.image("images/event/event7.png", use_column_width=True)
         st.markdown("#### 현대 Spring Go! 주유 걱정 없이 떠나봄")
         st.caption("현대카드로 차량을 구매하면 슈퍼콘서트 티켓 2매 증정! 자동차와 함께 특별한 경험까지 함께 드립니다.")
         with st.expander("이벤트 - 상세보기"):

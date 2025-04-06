@@ -45,6 +45,16 @@ def custom_message(message, msg_type="success"):
     st.markdown(html_string, unsafe_allow_html=True)
 
 def demand_forecast_ui():
+    if "고객정보" not in st.session_state or not isinstance(st.session_state["고객정보"], dict):
+        st.session_state["고객정보"] = {"나이": "", "성별": "", "거주지역": ""}
+    else:
+        st.session_state["고객정보"].setdefault("나이", "")
+        st.session_state["고객정보"].setdefault("성별", "")
+        st.session_state["고객정보"].setdefault("거주지역", "")
+
+    if "recom_budget" not in st.session_state:
+        st.session_state["recom_budget"] = 1000
+
     c_df = pd.read_csv("data/domestic_customer_data.csv")
     df = pd.read_csv("data/hyundae_car_list.csv")
     df = df.loc[df["브랜드"] != "기아", :]
@@ -57,14 +67,28 @@ def demand_forecast_ui():
     <div style='background-color: #ffffff; padding: 30px 25px 20px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 30px;'>
         <h3 style='color: #003366; margin-bottom: 20px;'>🚗 고객 기본 정보 입력</h3>
     """, unsafe_allow_html=True)
+    default_budget = st.session_state["recom_budget"]
+    default_gender = st.session_state["고객정보"]["성별"]
+    if default_gender not in ["남", "여"]:
+        default_gender = "남"
+    default_region = st.session_state["고객정보"]["거주지역"]
+    default_age = st.session_state["고객정보"]["나이"]                               
 
-    budget = st.number_input("구매 예산 (만원)", step=500, value=5000)
-    gender = st.selectbox("성별", ["남", "여"])
-    age = st.number_input("나이", min_value=30, max_value=100, step=1)
-    region = st.selectbox("거주 지역", [
+    try:
+        default_age = int(default_age)
+    except (ValueError, TypeError):
+        default_age = 30
+
+    budget = st.number_input("구매 예산 (만원)", value=default_budget, step=500)
+    gender = st.selectbox("성별", ["남", "여"], index=["남", "여"].index(default_gender))
+    age = st.number_input("나이", min_value=1, max_value=100, step=1, value=default_age)
+    regions = [
         '인천광역시', '광주광역시', '부산광역시', '전라남도', '경기도', '울산광역시', '서울특별시', '경상남도',
         '전라북도', '충청북도', '경상북도', '강원도', '충청남도', '대구광역시', '대전광역시', '제주특별자치도'
-    ])
+    ]
+    if default_region not in regions:
+        default_region = "서울특별시"
+    region = st.selectbox("거주 지역", regions, index=regions.index(default_region))
     preference = st.selectbox("선호 브랜드", ["현대", "제네시스"])
 
     st.markdown("</div>", unsafe_allow_html=True)
@@ -147,7 +171,7 @@ def demand_forecast_ui():
         with tab1:
             if len(recom_list) != 0:
                 st.subheader("추천 차량 리스트")
-                columns_per_row = 3  
+                columns_per_row = 3
                 num_cars = len(recom_list)
 
                 header_titles = [f"추천 차량 {i+1}" for i in range(min(columns_per_row, num_cars))]
@@ -220,10 +244,10 @@ def demand_forecast_ui():
                 img_rows = []
                 text_rows = []
                 for idx, car_name in enumerate(recom_elec):
-                    image_url = df.loc[df['모델명'] == car_name, 'img_url'].to_numpy()[0]
+                    image_url = df.loc[(df['모델명'] == car_name) & ((df['연료구분'] == '전기') | (df['연료구분'] == '하이브리드')), 'img_url'].to_numpy()[0]
                     img_tag = f'<img src="{image_url}" width="320">' if image_url else "이미지 없음"
                     price = min_price_list.get(car_name, '가격 정보 없음')
-                    mileage = df.loc[df['모델명'] == car_name, '연비'].to_numpy()[0]
+                    mileage = df.loc[(df['모델명'] == car_name) & ((df['연료구분'] == '전기') | (df['연료구분'] == '하이브리드')), '연비'].to_numpy()[0]
                     summary = f"**{car_name}**<br>가격: {price}만원~<br>연비: {mileage}km/kWh"
                     img_rows.append(img_tag)
                     text_rows.append(summary)

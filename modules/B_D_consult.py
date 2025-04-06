@@ -195,6 +195,8 @@ def consult_ui():
                 st.text_input("최근 보유 차량", survey_result["최근보유차종"], disabled=True)
                 
             if st.button("🚘 추천받기", use_container_width=True):
+                st.session_state["recom_budget"] = budget
+
                 st.session_state["show_recommendation"] = True
 
                 car_df = pd.read_csv("data/hyundae_car_list.csv")
@@ -337,7 +339,7 @@ def consult_ui():
 
         if st.button("✅ 저장", use_container_width=True, key='save_memo'):
             cr_df = pd.read_csv("data/consult_log.csv")
-            mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact)
+            mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact) & (cr_df["목적"] == "방문")
             
             if (cr_df.loc[mask, "완료여부"] == 0).any():
                 if mask.any():
