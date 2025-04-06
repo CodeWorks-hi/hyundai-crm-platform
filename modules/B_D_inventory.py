@@ -92,9 +92,14 @@ def inventory_ui():
         st.markdown("### 📦 주요 공장별 생산 가능 수량 현황")
 
         shown_models = set()
-        saved_models = [st.session_state.get(f"saved_recommend_{i}") for i in range(1, 4)]
-        saved_models = list(filter(None, saved_models))
-        saved_models = list(dict.fromkeys(saved_models))
+        saved_models = []
+        for i in range(1, 4):
+            model = st.session_state.get(f"saved_recommend_{i}")
+            trim = st.session_state.get(f"saved_recommend_trim_{i}")
+            if model and trim:
+                full_model = f"{model} {trim}"
+                if full_model not in saved_models:
+                    saved_models.append(full_model)
 
         if saved_models:
             for model in saved_models:
@@ -105,7 +110,7 @@ def inventory_ui():
                 base_model = split_model[0]
                 trim_name = split_model[1] if len(split_model) > 1 else ""
 
-                match = inv_df[inv_df["모델명"] == base_model]
+                match = inv_df[(inv_df["모델명"] == base_model) & (inv_df["트림명"] == trim_name)]
 
                 if not match.empty:
                     match = (
