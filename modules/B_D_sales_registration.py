@@ -13,6 +13,8 @@ def sales_registration_ui():
     car_df = pd.read_csv("data/hyundae_car_list.csv")
     car_df = car_df.loc[car_df["브랜드"] != "기아", :]
     plant_df = pd.read_csv("data/inventory_data.csv")
+    customers_df = pd.read_csv('data/customers.csv')
+    sales_df = pd.read_csv('data/D_domestic_sales_.csv')
     plant_df.columns = plant_df.columns.str.strip()
     plant_df = plant_df[plant_df["생산상태"] == "생산중"]
 
@@ -47,11 +49,16 @@ def sales_registration_ui():
 
         customer = st.text_input("👤 고객명")
         contact = st.text_input("📞 연락처")
+        customer = customers_df[(customers_df['상담자명'] == customer) & (customers_df['연락처'] == contact)]
+        if customer.empty:
+            st.error("해당 고객이 존재하지 않습니다.")
         sale_date = st.date_input("📅 판매일자", value=datetime.today())
 
+        st.write(customer)
+
         if st.button("✅ 판매 등록"):
-            if not customer:
-                st.warning("⚠️ 고객명을 입력해주세요.")
+            if not customer or not contact:
+                st.warning("⚠️ 고객명과 연락처를 입력해주세요.")
             elif stock_qty is None or stock_qty < 1 or selected_factory is None:
                 st.error("🚫 해당 차량의 재고가 부족합니다.")
             else:
@@ -59,6 +66,8 @@ def sales_registration_ui():
                     masked_customer = customer[0] + "*" + customer[2:]
                 else:
                     masked_customer = customer
+
+                st.write(masked_customer)
 
                 new_sale = {
                     "차종": selected_model,
@@ -80,11 +89,11 @@ def sales_registration_ui():
                 ].iloc[0]  # assume 1 match
 
                 customer_record = {
-                    "이름": masked_customer,
-                    "성별": st.session_state.get("성별", "미상"),
-                    "현재 나이": st.session_state.get("나이", "미상"),
-                    "연령대": st.session_state.get("연령대", "미상"),
-                    "거주 지역": st.session_state.get("지역", "미상"),
+                    "상담자명": customer.iloc[0]["상담자명"],
+                    "성별": customer.iloc[0]["성별"],
+                    "현재 나이": datetime.today().year - pd.to_datetime(customer.iloc[0]["생년월일"]).year,
+                    "연령대": customer.iloc[0]["연령대"],
+                    "거주 지역": customer.iloc[0]["거주지역"],
                     "차량 구매 횟수": st.session_state.get("구매횟수", 1),
                     "고객 평생 가치": st.session_state.get("LTV", 0),
                     "브랜드": car_info["브랜드"],
@@ -92,6 +101,8 @@ def sales_registration_ui():
                     "기본가격": car_info["기본가격"],
                     "공장명": selected_factory
                 }
+
+                st.write(customer_record)
 
                 # 파일에 누적 저장
                 csv_path = "data/D_domestic_sales_.csv"
