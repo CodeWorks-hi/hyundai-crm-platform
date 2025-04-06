@@ -35,6 +35,7 @@ plotly.express
 shap
 prophet
 huggingface_hub
+ace_tools_open
 
 
 ## dlib/face_recognition 설치 시 추가 설정 필요:

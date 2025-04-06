@@ -136,5 +136,3 @@ def export_region_ui():
         st.error("❌ 수출 데이터를 불러오지 못했습니다.")
         return
 
-    month_cols = extract_month_columns(df)
-    year_list = extract_year_list(df)    
