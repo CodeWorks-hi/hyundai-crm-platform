@@ -17,7 +17,7 @@ def get_huggingface_token(model_type):
     tokens = {"gemma": st.secrets.get("HUGGINGFACE_API_TOKEN_GEMMA")}
     return 'hf_' + tokens.get(model_type)
 
-def generate_text_via_api(request: str, keywords: str, model_name: str = TEXT_MODEL_ID) -> str:
+def generate_answer(request: str, keywords: str, model_name: str = TEXT_MODEL_ID) -> str:
     token = get_huggingface_token("gemma")
     if not token:
         st.error("Hugging Face API 토큰이 없습니다.")
@@ -301,7 +301,7 @@ def dashboard_ui():
             else:
                 st.error("조건에 맞는 문의가 존재하지 않습니다.")
         
-        memo = st.text_area("답변 내용을 입력하세요", height=50, label_visibility="collapsed")
+        memo = st.text_area("답변 내용을 입력하세요", height=68, label_visibility="collapsed")
 
         if st.button("✅ 저장", use_container_width=True):
             cr_df = pd.read_csv("data/consult_log.csv")
@@ -309,7 +309,7 @@ def dashboard_ui():
  
             if not cr_df.loc[mask & (cr_df["완료여부"] == 0), :].empty:
                 if mask.any():
-                    result_txt = generate_text_via_api(matched_requests[0], memo, model_name=TEXT_MODEL_ID) 
+                    result_txt = generate_answer(matched_requests[0], memo, model_name=TEXT_MODEL_ID) 
                     result_txt = result_txt.replace("[최종 답변]", "")
                     result_txt = result_txt.strip(" ").strip(",").strip(" ").replace("\n", "").replace("\r", "").replace("  ", " ")
 
