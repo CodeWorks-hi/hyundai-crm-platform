@@ -26,9 +26,9 @@ def consult_ui():
 
                 col3, col4 = st.columns(2)
                 with col3:
-                    date = st.date_input("상담 날짜")
+                    date = st.date_input("희망 상담 날짜")
                 with col4:
-                    time = st.time_input("상담 시간")
+                    time = st.time_input("희망 상담 시간")
 
                 content = st.text_area("상담 내용")
 
@@ -224,6 +224,9 @@ def consult_ui():
                                 if pd.isna(답변) or str(답변).strip() == "":
                                     답변 = "답변대기중"
                                 st.info(f"**답변내용:** {답변}")
+                                # st.text_area("고객 피드백", key=f"feedback_{idx}")
+                                # if st.form_submit_button("고객 피드백 제출"):
+                                #     pass
                             elif delete_clicked:
                                 df.drop(index=idx, inplace=True)
                                 df.to_csv("data/consult_log.csv", index=False)
