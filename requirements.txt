@@ -36,7 +36,7 @@ shap
 prophet
 huggingface_hub
 xgboost 
-
+canvas
 
 
 ## dlib/face_recognition 설치 시 추가 설정 필요:
