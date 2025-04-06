@@ -67,7 +67,7 @@ def sales_registration_ui():
 
                 # 기존 구매 횟수 확인
                 try:
-                    existing_sales_df = pd.read_csv("data/D_domestic_sales_.csv")
+                    existing_sales_df = pd.read_csv("data/domestic_customer_data.csv")
                     prior_sales_count = existing_sales_df[
                         existing_sales_df["이름"] == customer_data.iloc[0]["상담자명"]
                     ].shape[0]
@@ -96,7 +96,7 @@ def sales_registration_ui():
 
                 customer_record = {
                     "이름": customer_data.iloc[0]["상담자명"],
-                    "전화번호": customer_data.iloc[0]["연락처"],
+                    "연락처": customer_data.iloc[0]["연락처"],
                     "성별": customer_data.iloc[0]["성별"],
                     "현재 나이": datetime.today().year - pd.to_datetime(customer_data.iloc[0]["생년월일"]).year,
                     "연령대": customer_data.iloc[0]["연령대"],
