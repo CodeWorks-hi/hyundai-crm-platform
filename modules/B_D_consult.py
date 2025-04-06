@@ -305,24 +305,15 @@ def consult_ui():
         
         st.write("")
 
-    with col_mid:
-        st.markdown("#### 📝 상담 내용 메모")
-        st.markdown(
-            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
-            unsafe_allow_html=True,
-        )
-        memo = st.text_area("상담 내용을 입력하세요", height=150, label_visibility="collapsed")
-        st.write(memo)
-
     with col_right:
         st.markdown("#### 🏷️ 상담 태그 분류")
         st.markdown(
             "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>상담 내용을 분류하기 위한 태그를 선택하거나 직접 입력하세요.</div>",
             unsafe_allow_html=True
         )
-        default_tags = generate_tag(memo, model_name=TEXT_MODEL_ID) if memo.strip() else []
-        st.write("📥 생성된 태그:", default_tags)
-        # default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
+        # default_tags = generate_tag(memo, model_name=TEXT_MODEL_ID) if memo.strip() else []
+        # st.write("📥 생성된 태그:", default_tags)
+        default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
         selected_tags = st.multiselect("상담 태그 선택", default_tags, key="consult_tags")
         custom_tag = st.text_input("기타 태그 직접 입력")
         if custom_tag and custom_tag not in selected_tags:
@@ -337,6 +328,13 @@ def consult_ui():
         )
 
     with col_mid:
+        st.markdown("#### 📝 상담 내용 메모")
+        st.markdown(
+            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>고객과 나눈 상담 주요 내용을 기록해 주세요.</div>",
+            unsafe_allow_html=True,
+        )
+        memo = st.text_area("상담 내용을 입력하세요", height=150, label_visibility="collapsed")
+
         if st.button("✅ 저장", use_container_width=True, key='save_memo'):
             cr_df = pd.read_csv("data/consult_log.csv")
             mask = (cr_df['이름'] == selected_name) & (cr_df['전화번호'] == selected_contact)
