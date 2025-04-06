@@ -131,11 +131,10 @@ def inventory_ui():
     # -------------------------------
     # 하단: 컬럼3 (발주 추천) / 컬럼M (발주 등록) / 컬럼4 (발주 등록)
     st.markdown("---")
-    col3, col3M, colM, col4M, col4 = st.columns([1.3, 0.1, 1.5, 0.1, 1.1])
+    col3, col3M, colM, col4M, col4 = st.columns([1.5, 0.1, 1.5, 0.1, 1.1])
 
     with col3:
         st.markdown("### 🏭 출고 이슈")
-        st.markdown("<div style='margin-top: 4px;'></div>", unsafe_allow_html=True)
         
         inv_df["차종트림"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
         low_inventory_df = (
@@ -175,9 +174,11 @@ def inventory_ui():
         st.markdown("""
             <style>
             .scroll-container {
-                max-height: 500px;
+                max-height: 520px;
                 overflow-y: auto;
                 padding-right: 8px;
+                margin-bottom: 10px;
+                scrollbar-width: thin;
             }
             .inventory-card {
                 border: 1px solid #ccc;
