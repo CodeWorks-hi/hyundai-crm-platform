@@ -235,10 +235,10 @@ def demand_forecast_ui():
                 img_rows = []
                 text_rows = []
                 for idx, car_name in enumerate(recom_elec):
-                    image_url = df.loc[df['모델명'] == car_name, 'img_url'].to_numpy()[0]
+                    image_url = df.loc[(df['모델명'] == car_name) & ((df['연료구분'] == '전기') | (df['연료구분'] == '하이브리드')), 'img_url'].to_numpy()[0]
                     img_tag = f'<img src="{image_url}" width="320">' if image_url else "이미지 없음"
                     price = min_price_list.get(car_name, '가격 정보 없음')
-                    mileage = df.loc[df['모델명'] == car_name, '연비'].to_numpy()[0]
+                    mileage = df.loc[(df['모델명'] == car_name) & ((df['연료구분'] == '전기') | (df['연료구분'] == '하이브리드')), '연비'].to_numpy()[0]
                     summary = f"**{car_name}**<br>가격: {price}만원~<br>연비: {mileage}km/kWh"
                     img_rows.append(img_tag)
                     text_rows.append(summary)
