@@ -6,7 +6,8 @@ from sklearn.preprocessing import OneHotEncoder
 from xgboost import XGBRegressor
 from sklearn.model_selection import train_test_split
 import os
-
+from io import BytesIO
+from reportlab.pdfgen import canvas
 
 
 @st.cache_data
@@ -14,10 +15,10 @@ def load_data():
     df_customer = pd.read_csv("data/customer_data.csv")
     df_export = pd.read_csv("data/export_customer_data.csv")
     df_domestic = pd.read_csv("data/domestic_customer_data.csv")
-    df_list = pd.read_csv("data/customer.csv")
+    df_list = pd.read_csv("data/customers.csv")  # 파일명 수정됨
     return df_customer, df_export, df_domestic, df_list
 
-# 모델 학습 및 전처리 함수
+
 def preprocess_and_train_model(df):
     df = df.drop(columns=["이름", "연락처", "브랜드", "모델명", "공장명"], errors="ignore")
 
@@ -29,6 +30,7 @@ def preprocess_and_train_model(df):
     df["누적 구매 금액"] = df["최근 거래 금액"] + np.random.randint(10000000, 30000000, size=len(df))
     df["평균 구매 금액"] = (df["최근 거래 금액"] + df["누적 구매 금액"]) // 2
     df["고객 충성도 지수"] = np.round(np.random.uniform(0.5, 1.0, size=len(df)), 2)
+    df["고객 평생 가치"] = df["누적 구매 금액"] * df["고객 충성도 지수"]
 
     features = [
         "성별", "연령대", "거주 지역", "고객 등급", "차량 유형",
@@ -50,13 +52,33 @@ def preprocess_and_train_model(df):
     model = XGBRegressor(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42)
     model.fit(X_train, y_train)
 
+    os.makedirs("model", exist_ok=True)
     joblib.dump(model, "model/xgb_domestic_ltv_model.pkl")
 
     return model, df, X
 
-# Streamlit 메인 실행 함수
+
+def generate_pdf_report(df_top10):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer)
+    c.setFont("Helvetica", 14)
+    c.drawString(100, 800, "LTV 예측 리포트 상위 고객 10명")
+
+    y = 760
+    for i, row in df_top10.iterrows():
+        line = f"{row['연령대']} / {row['거주 지역']} / 예측 LTV: {row['예측 LTV']:,.0f}원"
+        c.drawString(80, y, line)
+        y -= 20
+        if y < 100:
+            break
+
+    c.save()
+    buffer.seek(0)
+    return buffer
+
+
 def ltv_customer_ui():
-    st.title("📈 LTV 고객 가치 예측 분석")
+    st.title(" LTV 고객 가치 예측 분석")
 
     df_customer, df_export, df_domestic, df_list = load_data()
 
@@ -70,11 +92,8 @@ def ltv_customer_ui():
     top10 = df_with_pred[["연령대", "거주 지역", "고객 평생 가치", "예측 LTV"]].sort_values("예측 LTV", ascending=False).head(10)
     st.dataframe(top10.style.format({'예측 LTV': '{:,.0f}원'}), height=400)
 
-    st.markdown("---")
-    st.markdown("### 📂 전체 데이터 미리보기")
-    st.dataframe(df_with_pred.head(20))
-
-    st.markdown("### 📄 리포트 다운로드")
+    st.markdown("### 리포트 다운로드")
+    pdf_buffer = generate_pdf_report(top10)
     st.download_button(
         label="📥 LTV 예측 리포트 다운로드",
         data=pdf_buffer,
@@ -82,15 +101,38 @@ def ltv_customer_ui():
         mime="application/pdf"
     )
 
-    st.markdown("### 🧠 고객 맞춤 추천")
 
-    selected_age = st.selectbox("연령대 선택", df["연령대"].unique())
-    selected_region = st.selectbox("거주 지역 선택", df["거주 지역"].unique())
+    st.markdown("### 고객 맞춤 추천")
 
-    recommended = df[
-        (df["연령대"] == selected_age) &
-        (df["거주 지역"] == selected_region)
-    ].sort_values("예측 LTV", ascending=False).head(5)
+    if "연령대" in df_with_pred.columns and "거주 지역" in df_with_pred.columns:
+        selected_age = st.selectbox("연령대 선택", df_with_pred["연령대"].unique())
+        selected_region = st.selectbox("거주 지역 선택", df_with_pred["거주 지역"].unique())
 
-    st.markdown(f"**추천 고객 TOP 5 (연령대: {selected_age}, 지역: {selected_region})**")
-    st.dataframe(recommended[["이름", "연령대", "거주 지역", "예측 LTV"]])    
+        recommended = df_with_pred[
+            (df_with_pred["연령대"] == selected_age) &
+            (df_with_pred["거주 지역"] == selected_region)
+        ].sort_values("예측 LTV", ascending=False).head(5)
+
+        st.markdown(f"**추천 고객 TOP 5 (연령대: {selected_age}, 지역: {selected_region})**")
+        st.dataframe(recommended[["연령대", "거주 지역", "예측 LTV"]])
+    else:
+        st.warning("연령대 또는 거주 지역 정보가 부족합니다.")
+
+
+    # 📌 원본 데이터 확인
+    st.markdown("###  원본 데이터 확인")
+    with st.expander(" 원본 데이터 확인"):
+        tab1, tab2, tab3 = st.tabs(["딜러 상담 리스트", "국내 판매 고객데이터", "해외 판매 고객데이터"])
+
+        with tab1:
+            st.dataframe(df_list, use_container_width=True, hide_index=True)
+
+        with tab2:
+            # 임의 재고 데이터 생성 또는 df_customer 사용
+            df_inv = df_customer.copy()
+            st.dataframe(df_inv, use_container_width=True, hide_index=True)
+
+        with tab3:
+            # 임의 공장 데이터 생성 또는 df_export 사용
+            df_plant = df_export.copy()
+            st.dataframe(df_plant, use_container_width=True, hide_index=True)

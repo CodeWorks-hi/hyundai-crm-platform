@@ -30,10 +30,10 @@ def ltv_ui():
         ltv_demand_ui()
         
     with tab2:
-        ltv_market_ui() 
-        
+        ltv_customer_ui() 
+       
         
     with tab3:
+        ltv_market_ui()     
         
-        ltv_customer_ui() 
 
