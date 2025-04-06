@@ -184,19 +184,16 @@ def ltv_market_ui():
 
     market_trend_section()
 
-    # 실시간 지표
-    st.header(" 실시간 생산 현황")
-    cols = st.columns(4)
-    metrics = [
-        ("3,420대", "금일 생산량", "+8.2%"),
-        ("92.4%", "설비 가동률", "최적 상태"),
-        ("0.23%", "불량률", "-0.07%"),
-        ("2,150대", "예측 수요량", "향후 30일")
+
+
+    # 생산 분석 섹션
+    st.markdown("#### 🔹 생산 현황 분석")
+    
+    # 월별 생산량 차트
+    filtered_data = df_domestic_clean[
+        (df_domestic_clean['factory'].isin(selected_factories)) &
+        (df_domestic_clean['구매연도'] == selected_year)
     ]
-    for idx, (value, label, delta) in enumerate(metrics):
-        cols[idx].metric(label, value, delta)
-
-
     
     fig1 = px.histogram(
         filtered_data,
