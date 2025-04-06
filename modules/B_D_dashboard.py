@@ -204,16 +204,19 @@ def dashboard_ui():
     with col_left:
         st.subheader("🎯 개인 목표 달성률")
 
+        goal_df = pd.read_csv("data/employee_goal.csv")
+        goal_df = goal_df.loc[goal_df["직원명"] == st.session_state["직원이름"], :]
+
         view_option = st.selectbox("기간 선택", ["주간", "월간", "연간"])
         target_sales = {
-            "주간": 25,
-            "월간": 150,
-            "연간": 1000
+            "주간": goal_df["주간목표"].values[0],
+            "월간": goal_df["월간목표"].values[0],
+            "연간": goal_df["연간목표"].values[0]
         }
         current_sales = {
-            "주간": 18,
-            "월간": 69,
-            "연간": 840
+            "주간": goal_df["주간실적"].values[0],
+            "월간": goal_df["월간실적"].values[0],
+            "연간": goal_df["연간실적"].values[0]
         }
         selected = view_option
         rate = current_sales[selected] / target_sales[selected] * 100
