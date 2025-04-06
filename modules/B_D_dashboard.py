@@ -85,7 +85,7 @@ def dashboard_ui():
 
         st.session_state.events.append({
             'id': str(uuid.uuid4()),
-            'title': f"{row.get('이름', '이름 없음')} 고객님",
+            'title': f"{row.get('이름', '이름 없음')} 고객님 ({row.get('목적', '목적 미지정')})",
             'start': start_time,
             'contact': row.get('전화번호', '전화번호 없음'),
             'description': row.get("요청사항", ""),
