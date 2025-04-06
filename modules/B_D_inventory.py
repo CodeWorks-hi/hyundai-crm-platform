@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import random
 
 
 def inventory_ui():
@@ -10,6 +11,28 @@ def inventory_ui():
 
     # 데이터 불러오기 예시
     inv_df = pd.read_csv("data/inventory_data.csv")
+    delay_reason_dict = {
+        "배터리팩": "해외 공급망 이슈로 인한 지연",
+        "엔진": "공장 생산 설비 점검 중",
+        "와이퍼 모터": "부품 수입 통관 지연",
+        "에어백 모듈": "품질 검수로 인한 납기 지연",
+        "변속기": "일시적 수요 폭증",
+        "LED 헤드램프": "국내 공급사 생산 차질",
+        "타이어": "물류센터 이송 지연",
+        "제동 시스템": "부품 리콜 대응 조정",
+        "서스펜션": "국내 공급 계약 해지 여파",
+        "기타": "부품 조달 중 예기치 못한 문제",
+        "인포테인먼트 유닛": "소프트웨어 호환성 문제로 공급 지연",
+        "히터 코어": "겨울철 수요 급증으로 인한 부족",
+        "스티어링 휠": "부품 설계 변경으로 인한 생산 중단",
+        "연료 펌프": "리콜 대응 재배정 중",
+        "냉각팬": "모듈 오류 발생으로 생산 지연",
+        "헤드램프": "수입 부품 운송 일정 지연",
+        "모터": "모듈 단위 불량 증가로 인한 생산 중단",
+        "브레이크 패드": "안전성 인증 대기",
+        "배선 하니스": "내부 설계 변경으로 인한 지연",
+        "클러치 디스크": "협력사 생산라인 정비로 납기 지연"
+    }
     inv_df["차종"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
     stock_df = inv_df.groupby(['차종', '공장명'], as_index=False)['재고량'].sum().rename(columns={'재고량': '생산 가능 수량'})
     sal_df = pd.read_csv("data/processed/total/hyundai-by-car.csv")
@@ -108,10 +131,11 @@ def inventory_ui():
     # -------------------------------
     # 하단: 컬럼3 (발주 추천) / 컬럼M (발주 등록) / 컬럼4 (발주 등록)
     st.markdown("---")
-    col3, col3M, colM, col4M, col4 = st.columns([1, 0.1, 1.5, 0.1, 1.5])
+    col3, col3M, colM, col4M, col4 = st.columns([1.3, 0.1, 1.5, 0.1, 1.1])
 
     with col3:
         st.markdown("### 🏭 출고 이슈")
+        st.markdown("<div style='margin-top: 4px;'></div>", unsafe_allow_html=True)
         
         inv_df["차종트림"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
         low_inventory_df = (
@@ -121,6 +145,31 @@ def inventory_ui():
             .sort_values(by='생산 가능 수량', ascending=True)
             .head(3)
         )
+
+        parts_df = inv_df.copy()
+
+        delay_weeks_dict = {
+            "배터리팩": 8,
+            "엔진": 6,
+            "와이퍼 모터": 5,
+            "에어백 모듈": 7,
+            "변속기": 6,
+            "LED 헤드램프": 4,
+            "타이어": 3,
+            "제동 시스템": 6,
+            "서스펜션": 5,
+            "기타": 6,
+            "인포테인먼트 유닛": 7,
+            "히터 코어": 4,
+            "스티어링 휠": 5,
+            "연료 펌프": 6,
+            "냉각팬": 5,
+            "헤드램프": 4,
+            "모터": 6,
+            "브레이크 패드": 5,
+            "배선 하니스": 5,
+            "클러치 디스크": 6
+        }
 
         # 카드 스타일 출력
         st.markdown("""
@@ -143,20 +192,34 @@ def inventory_ui():
         """, unsafe_allow_html=True)
 
         st.markdown('<div class="scroll-container">', unsafe_allow_html=True)
-        for _, row in low_inventory_df.iterrows():
+        for i, (_, row) in enumerate(low_inventory_df.iterrows()):
+            matched_rows = parts_df[
+                (parts_df["공장명"] == row["공장명"]) &
+                (parts_df["모델명"] + " " + parts_df["트림명"] == row["차종"])
+            ]
+            if not matched_rows.empty:
+                part_row = matched_rows.loc[matched_rows["재고량"].idxmin()]
+                part_name = part_row["부품명"]
+                delay_reason = delay_reason_dict.get(part_name, "부품 조달 문제")
+                reason = f"{part_name} 부족 - {delay_reason}"
+            else:
+                reason = "재고 정보 없음"
+                
+            delay_weeks = delay_weeks_dict.get(part_name, 6)
             st.markdown(f"""
                 <div class="inventory-card">
                     <h4>{row['차종']}</h4>
                     <p>공장: <strong>{row['공장명']}</strong></p>
                     <p>생산 가능 수량: <strong>{int(row['생산 가능 수량'])}대</strong></p>
-                    <p style="color:#d9534f;"><strong>⚠️ 부품 조달 필요</strong></p>
+                    <p>출고 지연 이유: <strong>{reason}</strong></p>
+                    <p style="color:#d9534f;"><strong>⏱️ 예상 출고 소요 기간: 약 {delay_weeks}주</strong></p>
                 </div>
             """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with colM:
-        st.markdown("### 🔍 생산 가능 수량 검색")
-        st.markdown("#### 공장을 선택하여 생산 가능 수량을 확인하세요.")
+        st.markdown("### 🔍 발주 가능 수량 검색")
+        st.markdown("#### 공장을 선택하여 발주 가능 수량을 확인하세요.")
         
         selected_model = st.selectbox("🚗 차종 선택", sorted(inv_df["모델명"].unique()))
 
@@ -219,7 +282,7 @@ def inventory_ui():
                 (inv_df["모델명"] == selected_model) &
                 (inv_df["트림명"] == selected_trim) &
                 (inv_df["공장명"] == selected_factory),
-                ["재고량", "생산가능수량"]
+                ["재고량"]
             ] -= 1
 
             # 생산 가능 수량은 재계산
