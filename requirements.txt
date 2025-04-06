@@ -1,42 +1,58 @@
 # pip install -r requirements.txt
 # requirements.txt 의 파일 한번에 설치가 가능한 코드 입니다. 
 
+# ✅ 기본 라이브러리
 streamlit==1.43.0
 pandas>=1.5
+numpy
+python-dateutil
+uuid
+openpyxl
+xlsxwriter
+Pillow
+requests
+
+# ✅ 시각화
+plotly==5.18.0
+plotly-express  # 일부 버전에선 별도 설치 필요
 altair
 pydeck
-requests
-openpyxl
-uuid
-Pillow
-python-dateutil
 matplotlib
-scikit-learn
-xlsxwriter
-cmake
-forge
-# dlib
-# face_recognition
-streamlit-javascript
-folium
-kafka-python==2.0.2
-# fredapi==0.4.0
-eodhd==1.0.32
-plotly==5.18.0
-geopy
 seaborn
+kaleido  # Plotly 이미지 export
+folium
+streamlit-aggrid
+
+# ✅ 머신러닝 / 모델
+scikit-learn
+xgboost
+shap
+prophet
+
+# ✅ 자연어처리 및 API
+huggingface_hub
 bs4
 lxml
 html5lib
-streamlit-aggrid
-kaleido
-plotly.express 
+
+# ✅ Kafka 및 네트워크 통신
+kafka-python==2.0.2
+confluent-kafka==2.2.0  # 권장 Kafka client (옵션)
+
+# ✅ 스트림릿 확장
+streamlit-javascript
+
+# ✅ 시스템 종속 도구
+cmake
+
+# ✅ 기타 유틸
+geopy
+reportlab  # PDF 리포트용
+
+# ✅ 필요시 설치 (설치 전 시스템 설정 필요)
+# dlib
+# face_recognition
 # mediapipe==0.10.7
-shap
-prophet
-huggingface_hub
-xgboost 
-canvas
 
 
 ## dlib/face_recognition 설치 시 추가 설정 필요:
