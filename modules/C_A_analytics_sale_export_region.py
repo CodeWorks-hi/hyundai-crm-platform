@@ -5,19 +5,29 @@
 
 
 
+# modules/C_A_analytics_sale_export_region.py
+
 import streamlit as st
 import pandas as pd
-import altair as alt
 import plotly.express as px
-import plotly.graph_objects as go
-from datetime import datetime, timedelta
-import urllib3
-import re
+from utils_export import load_and_merge_export_data
 
 def export_region_ui():
-    st.subheader("판매·수출 관리")
-    st.write("해외 판매 실적을 분석하는 페이지입니다.")
-    st.write("수출입 국가별 실적 분석")
-    st.write("해외 시장 비교")
+    st.header("🗺️ 국가별 시장 비교 분석")
+    
+    df = load_and_merge_export_data()
+    brand = st.selectbox("브랜드 선택", df["브랜드"].unique())
+    
+    if brand:
+        region_data = df[df["브랜드"] == brand].groupby("지역명").sum(numeric_only=True).reset_index()
+        
+        fig = px.treemap(
+            region_data,
+            path=['지역명'],
+            values='2025-12',  # 최신 월 데이터
+            color='지역명',
+            title=f"{brand} 국가별 시장 점유율"
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
 

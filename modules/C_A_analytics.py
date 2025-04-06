@@ -28,7 +28,6 @@ def analytics_ui():
         "해외",
         "국내",
         "LTV 예측",
-        "글로벌 경제",
         "마케팅 캠페인"
 
     ]
@@ -46,12 +45,8 @@ def analytics_ui():
     with selected_tab[2]:
         ltv_ui()    # LTV 및 시장 예측 분석
 
-
-    with selected_tab[3]:
-        economy_ui()      # 글로벌 경제 인사이트내
-
    
-    with selected_tab[4]:     
+    with selected_tab[3]:     
         marketing_ui()    # 마케팅 캠페인 성과
 
 
