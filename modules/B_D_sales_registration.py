@@ -147,7 +147,7 @@ def sales_registration_ui():
     goal_row = goal_df[goal_df["직원명"] == st.session_state["직원이름"]]
 
     if not goal_row.empty:
-        st.markdown(f"<h4 style='color:#1f77b4;'>📋 {st.session_state["직원이름"]} 매니저님의 판매 실적 현황</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h4 style='color:#1f77b4;'>📋 {st.session_state['직원이름']} 매니저님의 판매 실적 현황</h4>", unsafe_allow_html=True)
         weekly = int(goal_row["주간실적"].values[0])
         monthly = int(goal_row["월간실적"].values[0])
         yearly = int(goal_row["연간실적"].values[0])
