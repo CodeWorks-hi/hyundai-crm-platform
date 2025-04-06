@@ -78,7 +78,7 @@ def app():
         "리드 추적",     # Leads – 동적 느낌
         "판매 등록",     # Orders – 그대로 유지 가능
         "수요 예측",     # Forecast – 간결하게 핵심만
-        "데이터 뷰"      # Data Lab – 원본 확인보다 더 모던함
+        "데이터 뷰",      # Data Lab – 원본 확인보다 더 모던함
         "상담AI테스트"      # 테스트
     ])
 
@@ -91,7 +91,8 @@ def app():
         ("modules.B_D_sales_registration", "sales_registration_ui"),         # 판매 등록
         ("modules.B_D_demand_forecast", "demand_forecast_ui"),          # AI 수요 예측
         # ("modules.B_D_eco", "eco_ui"),                           # 경제 지표 기반 판매 인텔리전스, 금융 상품 최적화
-        ("modules.B_D_test", "app")                # 데이터 미리보기
+        ("modules.B_D_data", "data_preview_ui"),      # 데이터 미리보기
+        ("modules.B_D_test", "app")                 
     ]
 
 # 각 탭에 대응하는 함수 실행
