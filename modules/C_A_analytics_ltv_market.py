@@ -21,7 +21,7 @@ COLUMN_MAPPINGS = {
         '브랜드': 'brand',
         '모델명': 'model',
         '기본가격': 'price',
-        '공장명': 'factory'  # 국내 데이터에만 공장명 매핑
+        '공장명': 'factory'  
     }
 }
 
@@ -150,7 +150,6 @@ def ltv_market_ui():
     market_trend_section()
 
     # 실시간 지표
-    st.header(" 실시간 생산 현황")
     cols = st.columns(4)
     metrics = [
         ("3,420대", "금일 생산량", "+8.2%"),
@@ -160,7 +159,7 @@ def ltv_market_ui():
     ]
     
     # 생산 분석 섹션
-    st.header(" 생산 현황 분석")
+    st.markdown(" ###  생산 현황 분석")
     
     # 월별 생산량 차트 (필터 적용)
     filtered_data = df_domestic_clean[
@@ -179,25 +178,25 @@ def ltv_market_ui():
     st.plotly_chart(fig1, use_container_width=True)
 
     # LTV 분석 (필터 적용)
-    st.header("고객 생애 가치 분석")
-    
+    st.markdown(" ###  고객 생애 가치 분석")
+
     col1, col2 = st.columns([2, 1])
     with col1:
+        # 국내 생산 데이터 사용
         fig2 = px.box(
-            df_customer_clean[df_customer_clean['구매연도'] == selected_year],
+            df_domestic_clean,  # domestic 데이터 사용
             x='factory',
-            y='ltv',
-            color='vehicle_type',
-            title=f"{selected_year}년 차종별 LTV 분포"
+            y='price',
+            color='brand',
+            title="공장별 가격 분포",
+            labels={'price': '가격(만 원)', 'factory': '공장'}
         )
         st.plotly_chart(fig2, use_container_width=True)
-    
+
     with col2:
         st.dataframe(
-            df_customer_clean[df_customer_clean['구매연도'] == selected_year]
-            .groupby(['factory','vehicle_type'])['ltv'].mean()
-            .unstack().style.format("{:,.0f}억 원"),
+            df_domestic_clean.groupby(['factory','brand'])['price'].mean()
+            .unstack().style.format("{:,.0f}만 원"),
             height=400
         )
-
 
