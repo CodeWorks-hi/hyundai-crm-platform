@@ -1,61 +1,62 @@
-# 판매·수출 관리
-    # LTV 모델 결과, 시장 트렌드, 예측 분석
-        # 시장 트렌드
-
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import joblib
 from sklearn.preprocessing import OneHotEncoder
 
+# 데이터 로드
+@st.cache_data
+def load_data():
+    df_customer = pd.read_csv("data/customer_data.csv")
+    df_export = pd.read_csv("data/export_customer_data.csv")
+    df_domestic = pd.read_csv("data/domestic_customer_data.csv")
+    return df_customer, df_export, df_domestic
 
-def preprocess_for_prediction(df):
-    # 예측에 필요 없는 정보만 제거
-    drop_cols = [
-        '연번', '이름', '생년월일', '휴대폰 번호', '이메일', '아이디',
-        '가입일', '주소', '고객 평생 가치'  # 예측 대상 포함
-    ]
-    df = df.drop(columns=[col for col in drop_cols if col in df.columns], errors='ignore')
+# 모델 로드
+try:
+    domestic_model = joblib.load("model/xgb_domestic_ltv_model.pkl")
+    export_model = joblib.load("model/xgb_export_ltv_model.pkl")
+except Exception as e:
+    st.error(f"모델 로드 오류: {e}")
 
-    # 결측값 제거 (모델 학습 시에도 적용했다면 동일하게 적용)
-    df = df.dropna()
+# 데이터 전처리
+def preprocess_data(df):
+    # 실제 데이터 컬럼명 확인
+    print("데이터 컬럼 목록:", df.columns.tolist())
+    
+    # 컬럼명 매핑 (실제 데이터에 맞게 수정)
+    column_mapping = {
+        '구매일자': 'order_date',  # 예시: 실제 컬럼명이 'order_date'인 경우
+        '지역': 'region',
+        '차종': 'car_type'
+    }
+    
+    try:
+        # 컬럼명 변경
+        df = df.rename(columns=column_mapping)
+        
+        # 필수 컬럼 존재 여부 확인
+        required_columns = ['order_date', 'region', 'car_type']
+        for col in required_columns:
+            if col not in df.columns:
+                raise KeyError(f"필수 컬럼 '{col}'가 데이터에 존재하지 않습니다")
 
-    # 범주형 변수 인코딩
-    df = pd.get_dummies(df)
+        # 전처리 로직
+        df = df.drop(columns=['고객ID', '이름', '휴대폰번호'], errors='ignore')
+        df['구매연도'] = pd.to_datetime(df['order_date']).dt.year
+        df = pd.get_dummies(df, columns=['region', 'car_type'])
+        
+        return df
 
-    return df
+    except KeyError as e:
+        st.error(f"데이터 오류: {str(e)}")
+        st.stop()
 
-def ltv_market_ui():
 
-    df = pd.read_csv("data/export_customer_data.csv")
-
-    # 연령대별 평균 LTV 시각화
-    fig1 = px.bar(df.groupby("연령대")["고객 평생 가치"].mean().reset_index(),
-                  x="연령대", y="고객 평생 가치", title="연령대별 평균 고객 생애 가치")
-    st.plotly_chart(fig1, use_container_width=True)
-
-    # 차량 유형별 LTV
-    if "최근 구매 제품" in df.columns:
-        fig = px.box(df, x="최근 구매 제품", y="고객 평생 가치", title="차량 유형별 고객 가치 분포")
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.warning("최근 구매 제품 데이터가 포함되어 있지 않습니다.")
-
-    # 등급별 평균 LTV
-    fig3 = px.bar(df.groupby("고객 등급")["고객 평생 가치"].mean().reset_index(),
-                  x="고객 등급", y="고객 평생 가치", title="고객 등급별 평균 LTV")
-    st.plotly_chart(fig3, use_container_width=True)
-
-        # ====================== 신규 추가된 트렌드 분석 섹션 ======================
+# 시장 트렌드 섹션
+def market_trend_section():
     st.markdown("""
     <style>
-        .trend-header { 
-            color: #2A7FFF; 
-            font-size: 24px; 
-            border-bottom: 3px solid #2A7FFF;
-            padding-bottom: 5px;
-            margin: 30px 0 20px 0;
-        }
         .trend-card {
             background: white;
             padding: 25px;
@@ -70,83 +71,111 @@ def ltv_market_ui():
             display: flex;
             align-items: center;
         }
-        .trend-icon { 
-            font-size: 24px; 
-            margin-right: 10px; 
-        }
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="trend-header">📈 시장 트렌드 분석</div>', unsafe_allow_html=True)
+    # 트렌드 카드
+    with st.container():
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("""
+            <div class="trend-card">
+                <div class="trend-title">🔋 전기차 시장 성장</div>
+                <div>• 2025년 점유율 35% 예상</div>
+                <div>• 국내 판매량 +78%</div>
+                <div>• 충전소 2,300개 설치</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div class="trend-card">
+                <div class="trend-title">🤖 자율주행 기술</div>
+                <div>• L3 시장 연성장 42%</div>
+                <div>• R&D 투자 22%</div>
+                <div>• 안전사고 -35%</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+            <div class="trend-card">
+                <div class="trend-title">🌱 친환경 소재</div>
+                <div>• 재활용률 45% 목표</div>
+                <div>• CO2 배출 -35%</div>
+                <div>• 배터리 수명 +40%</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+# 메인 대시보드
+def ltv_market_ui():
+
     
-    # 트렌드 1: 전기차 시장 성장
-    st.markdown('''
-    <div class="trend-card">
-        <div class="trend-title">
-            <span class="trend-icon">🔋</span>
-            <span>전기차 시장 폭발적 성장</span>
-        </div>
-        <ul style="color:#333;">
-            <li>2025년 글로벌 전기차 시장 점유율 <b>35%</b> 예상 (2030년 65% 전망)</li>
-            <li>국내 판매량 전년 대비 <span style="color:#2A7FFF;">+78%</span> 증가</li>
-            <li>주요 성장 동력: 배터리 기술 발전, 충전 인프라 확대</li>
-        </ul>
-    </div>
-    ''', unsafe_allow_html=True)
+    # 데이터 로드
+    df_customer, df_export, df_domestic = load_data()
+    
+    # 전처리
+    df_customer_clean = preprocess_data(df_customer)
+    df_export_clean = preprocess_data(df_export)
 
-    # 트렌드 2: 자율주행 기술
-    st.markdown('''
-    <div class="trend-card">
-        <div class="trend-title">
-            <span class="trend-icon">🤖</span>
-            <span>자율주행 기술 상용화 가속</span>
-        </div>
-        <ul style="color:#333;">
-            <li>L3 자율주행 차량 시장 규모 <b>연평균 42%</b> 성장 예상</li>
-            <li>우리사 매출 대비 R&D 투자 비중 <span style="color:#2A7FFF;">15% → 22%</span> 확대</li>
-            <li>핵심 기술: AI 기반 경로 예측 시스템, 실시간 도로정보 처리</li>
-        </ul>
-    </div>
-    ''', unsafe_allow_html=True)
+    # 사이드바 필터
+    with st.sidebar:
+        st.header("분석 필터")
+        selected_year = st.selectbox("연도 선택", options=df_customer_clean['구매연도'].unique())
+        selected_region = st.multiselect("지역 선택", options=df_customer_clean['지역'].unique())
 
-    # 트렌드 3: 지속가능성 강화
-    st.markdown('''
-    <div class="trend-card">
-        <div class="trend-title">
-            <span class="trend-icon">🌱</span>
-            <span>친환경 소재 수요 증가</span>
-        </div>
-        <ul style="color:#333;">
-            <li>재활용 소재 사용률 <b>2025년 45%</b> 목표 (현재 28%)</li>
-            <li>배터리 재활용 시스템 구축: 수명 주기 연장 기술 개발 중</li>
-            <li>신규 모델 CO2 배출량 <span style="color:#2A7FFF;">-35%</span> 달성</li>
-        </ul>
-    </div>
-    ''', unsafe_allow_html=True)
-
-    # ====================== 기존 차트 섹션 수정 ======================
+    # 대시보드 헤더
+    st.title("🚗 자동차 시장 분석 & 예측 대시보드")
+    
+    
+    # 주요 지표
+    st.subheader("📊 실시간 생산 지표")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("금일 생산량", "3,420대", "+8.2%")
+    col2.metric("설비 가동률", "92.4%", "최적 상태")
+    col3.metric("불량률", "0.23%", "-0.07%")
+    col4.metric("예측 수요량", "2,150대", "향후 30일")
+    
+    # 생산 분석 섹션
     st.markdown("---")
-    st.subheader("📊 생산 현황 심층 분석")
+    st.subheader("🔍 생산 현황 심층 분석")
     
-    col1, col2 = st.columns([2,1])
-    with col1:
-        # 생산량 예측 대시보드
-        st.markdown("### 🎯 목표 대비 생산량")
-        target_data = pd.DataFrame({
-            '카테고리': ['전기차', 'SUV', '세단', '화물차'],
-            '목표량': [12000, 8500, 6500, 3000],
-            '실적': [11000, 9200, 6000, 2800]
-        })
-        fig = px.bar(target_data, 
-                    x='카테고리', 
-                    y=['목표량', '실적'], 
-                    barmode='group',
-                    color_discrete_sequence=['#2A7FFF', '#00C2FF'])
-        st.plotly_chart(fig, use_container_width=True)
+    # 생산량 예측 차트
+    fig1 = px.line(df_domestic.groupby('월')['생산량'].sum().reset_index(),
+                  x='월', y='생산량', title="월별 생산량 추이")
+    st.plotly_chart(fig1, use_container_width=True)
+    
+    # 재고 분석
+    st.subheader("📦 부품 재고 현황")
+    col5, col6 = st.columns([2,1])
+    
+    with col5:
+        fig2 = px.bar(df_domestic.sort_values('재고량', ascending=False).head(10),
+                     x='부품명', y='재고량', color='공장명',
+                     title="부품별 재고 현황")
+        st.plotly_chart(fig2, use_container_width=True)
+    
+    with col6:
+        st.dataframe(
+            df_domestic[['부품명', '공장명', '재고량', '안전재고량']]
+            .sort_values('재고량', ascending=False)
+            .style.applymap(lambda x: 'color: red' if x < 200 else '', subset=['재고량']),
+            height=400
+        )
 
-    with col2:
-        # 실시간 생산 지표
-        st.markdown("### ⚡ 실시간 생산 지표")
-        st.metric("금일 생산량", "3,420대", "+8.2% vs 전일")
-        st.metric("설비 가동률", "92.4%", "최적 상태 유지")
-        st.metric("불량률", "0.23%", "-0.07% 개선", delta_color="inverse")
+    # LTV 예측 섹션
+    st.markdown("---")
+    st.subheader("💰 고객 생애 가치(LTV) 예측")
+    
+    # 예측 입력 폼
+    with st.form("ltv_prediction"):
+        age = st.number_input("고객 연령", min_value=18, max_value=80)
+        purchase_history = st.number_input("누적 구매 횟수", min_value=1)
+        avg_spending = st.number_input("평균 구매 금액(만원)", min_value=1000)
+        submitted = st.form_submit_button("예측 실행")
+        
+        if submitted:
+            prediction = domestic_model.predict([[age, purchase_history, avg_spending]])
+            st.success(f"예상 LTV: {prediction[0]:,.0f} 만원")
+
+

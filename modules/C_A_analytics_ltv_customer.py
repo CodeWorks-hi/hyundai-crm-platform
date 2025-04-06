@@ -13,8 +13,9 @@ from sklearn.preprocessing import OneHotEncoder
 def load_data():
     df_customer = pd.read_csv("data/customer_data.csv")    # 국내 구매 고객 데이터 
     df_export = pd.read_csv("data/export_customer_data.csv")  # 해외 구매 고객 데이터 
+    df_domestic = "domestic_customer_data.csv"  # 국내 고객 데이터(딜러입력용)
     df_list= pd.read_csv("data/customer.csv")  # 고객 상담데이터 
-    return df_customer, df_export, df_list
+    return df_customer, df_export, df_domestic,df_list
 
 
 # 모델 파일 경로
