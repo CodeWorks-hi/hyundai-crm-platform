@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split
 import os
 from io import BytesIO
 from reportlab.pdfgen import canvas
+import matplotlib.pyplot as plt
+import plotly.express as px
 
 
 @st.cache_data
@@ -88,11 +90,56 @@ def ltv_customer_ui():
 
     st.success("✅ 모델 학습 및 예측 완료")
 
+    # 예측 결과 시각화
     st.markdown("### 🔝 예측 LTV 기준 상위 고객 TOP 10")
     top10 = df_with_pred[["연령대", "거주 지역", "고객 평생 가치", "예측 LTV"]].sort_values("예측 LTV", ascending=False).head(10)
     st.dataframe(top10.style.format({'예측 LTV': '{:,.0f}원'}), height=400)
 
-    st.markdown("### 리포트 다운로드")
+    st.markdown("---")
+    
+    st.markdown("###  예측 결과 시각화")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("#### 🔹 예측 vs 실제 LTV 오차 분포")
+        df_with_pred["LTV 오차"] = df_with_pred["고객 평생 가치"] - df_with_pred["예측 LTV"]
+        fig1, ax1 = plt.subplots()
+        ax1.hist(df_with_pred["LTV 오차"], bins=20, color='salmon', edgecolor='black')
+        ax1.set_title("예측 오차 분포 (실제 - 예측)")
+        ax1.set_xlabel("LTV 오차 (원)")
+        ax1.set_ylabel("고객 수")
+        st.pyplot(fig1)
+
+        st.markdown("""
+        #### 🔸 1. 예측 오차 분포 분석
+        - 위의 **히스토그램은 고객 별 실제 LTV와 예측 LTV 간의 차이**를 보여줍니다.
+        - 분포 중심이 0에 가까울수록 모델이 전반적으로 정확하게 예측하고 있다는 것을 의미합니다.
+        - 만약 오차가 한쪽으로 치우쳐 있다면, 특정 그룹(예: 고소득 고객)에 대해 과소/과대 평가가 이루어지고 있을 가능성이 있습니다.
+        """)
+
+    with col2:
+        st.markdown("#### 🔹 예측 vs 실제 LTV 비교 (상위 20명)")
+        top20 = df_with_pred.sort_values("고객 평생 가치", ascending=False).head(20).reset_index()
+        fig2, ax2 = plt.subplots()
+        ax2.plot(top20.index, top20["고객 평생 가치"], label="실제 LTV", marker='o')
+        ax2.plot(top20.index, top20["예측 LTV"], label="예측 LTV", marker='x')
+        ax2.set_title("상위 20명 고객 LTV 비교")
+        ax2.set_xlabel("고객 순위")
+        ax2.set_ylabel("LTV (원)")
+        ax2.legend()
+        st.pyplot(fig2)
+        st.markdown("""
+                #### 🔸 2. 상위 고객 20명 비교 분석
+                - 실선은 **실제 LTV**, 점선은 **모델이 예측한 LTV**를 나타냅니다.
+                - 고객 순위가 높을수록(= 더 가치 있는 고객일수록), 예측값과 실제값 간 차이가 커질 가능성이 있습니다.
+                - 특히 상위 5~10명에서 예측값이 일관되게 낮거나 높은 경우, 해당 구간에 대한 **모델 개선의 여지**가 존재합니다.
+                    """)
+
+    st.markdown("---")
+
+    # 리포트 다운로드
+    st.markdown("###  리포트 다운로드")
     pdf_buffer = generate_pdf_report(top10)
     st.download_button(
         label="📥 LTV 예측 리포트 다운로드",
