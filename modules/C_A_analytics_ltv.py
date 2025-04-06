@@ -21,16 +21,19 @@ def ltv_ui():
     
     tab1, tab2, tab3 = st.tabs([
         " 수요 및 발주 예측", 
-        " 시장 트렌드", 
-        " LTV(고객생애가치) 분석"
+        " LTV(고객생애가치) 분석",
+        " 시장 트렌드"
+        
     ])
     
     with tab1:
         ltv_demand_ui()
         
     with tab2:
-        ltv_market_ui()
+        ltv_market_ui() 
+        
         
     with tab3:
-        ltv_customer_ui()
+        
+        ltv_customer_ui() 
 

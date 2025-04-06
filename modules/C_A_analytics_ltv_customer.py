@@ -1,154 +1,96 @@
-# 판매·수출 관리
-    # LTV 모델 결과, 시장 트렌드, 예측 분석
-        # LTV 모델 결과
-
-
 import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
+from xgboost import XGBRegressor
+from sklearn.model_selection import train_test_split
+import os
+
+
 
 @st.cache_data
 def load_data():
-    df_customer = pd.read_csv("data/customer_data.csv")    # 국내 구매 고객 데이터 
-    df_export = pd.read_csv("data/export_customer_data.csv")  # 해외 구매 고객 데이터 
-    df_domestic = "domestic_customer_data.csv"  # 국내 고객 데이터(딜러입력용)
-    df_list= pd.read_csv("data/customer.csv")  # 고객 상담데이터 
-    return df_customer, df_export, df_domestic,df_list
+    df_customer = pd.read_csv("data/customer_data.csv")
+    df_export = pd.read_csv("data/export_customer_data.csv")
+    df_domestic = pd.read_csv("data/domestic_customer_data.csv")
+    df_list = pd.read_csv("data/customer.csv")
+    return df_customer, df_export, df_domestic, df_list
 
+# 모델 학습 및 전처리 함수
+def preprocess_and_train_model(df):
+    df = df.drop(columns=["이름", "연락처", "브랜드", "모델명", "공장명"], errors="ignore")
 
-# 모델 파일 경로
-DOMESTIC_MODEL_PATH = "model/xgb_domestic_ltv_model.pkl"
-EXPORT_MODEL_PATH = "model/xgb_export_ltv_model.pkl"
+    df["고객 등급"] = np.random.choice(["VIP", "일반", "신규"], size=len(df))
+    df["차량 유형"] = np.random.choice(["세단", "SUV", "해치백"], size=len(df))
+    df["할부 여부"] = np.random.choice([0, 1], size=len(df))
+    df["구매 경로"] = np.random.choice([0, 1], size=len(df))
+    df["최근 거래 금액"] = np.random.randint(10000000, 40000000, size=len(df))
+    df["누적 구매 금액"] = df["최근 거래 금액"] + np.random.randint(10000000, 30000000, size=len(df))
+    df["평균 구매 금액"] = (df["최근 거래 금액"] + df["누적 구매 금액"]) // 2
+    df["고객 충성도 지수"] = np.round(np.random.uniform(0.5, 1.0, size=len(df)), 2)
 
-# 모델 로드
-try:
-    domestic_model = joblib.load(DOMESTIC_MODEL_PATH)
-    export_model = joblib.load(EXPORT_MODEL_PATH)
-except Exception as e:
-    st.error(f"LTV 모델 로드 오류: {e}")
+    features = [
+        "성별", "연령대", "거주 지역", "고객 등급", "차량 유형",
+        "차량 구매 횟수", "할부 여부", "구매 경로",
+        "최근 거래 금액", "누적 구매 금액", "평균 구매 금액", "고객 충성도 지수"
+    ]
+    target = "고객 평생 가치"
+    categorical_cols = ["성별", "연령대", "거주 지역", "고객 등급", "차량 유형"]
 
+    encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+    encoded = encoder.fit_transform(df[categorical_cols])
+    encoded_df = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(categorical_cols))
 
+    X = pd.concat([df.drop(columns=categorical_cols + [target]), encoded_df], axis=1)
+    y = df[target]
 
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 전처리 파이프라인 (검색 결과 [3] 구조 반영)
-def preprocess_data(df, model_type='domestic'):
-    # 필수 컬럼 검증
-    required_cols = {
-        'domestic': ['연령대', '거주 지역', '고객 등급', '차량 구매 횟수', 
-                    '평균 구매 금액', '구매 경로', '고객 충성도 지수'],
-        'export': ['국가 코드', '환율 정보', '현지 판매 가격', '수출 물류 비용']
-    }
-    
-    # 불필요 컬럼 제거
-    drop_cols = {
-        'domestic': ['연번', '이름', '생년월일', '휴대폰 번호'],
-        'export': ['해외 지사 코드', '현지 유통사 정보']
-    }
-    df_list_cols =  [
-    "고객ID", "상담자ID", "상담자명", "등록일", "딜러명", "연락처", "성별", "생년월일", "연령대", "거주지역", "관심차종", "방문목적",
-    "월주행거리_km", "주요용도", "예상예산_만원", "선호색상", "동승인원구성", "중요요소1", "중요요소2", "중요요소3",
-    "최근보유차종", "기타요청사항"]
-    
-    df = df.drop(columns=drop_cols[model_type], errors='ignore')
-    
-    # 범주형 변수 인코딩 (검색 결과 [2] 방식)
-    categorical_cols = {
-        'domestic': ['연령대', '거주 지역', '구매 경로'],
-        'export': ['국가 코드']
-    }
-    
-    encoder = OneHotEncoder(handle_unknown='ignore')
-    encoded = encoder.fit_transform(df[categorical_cols[model_type]])
-    
-    # 특징 결합
-    numerical_cols = [col for col in required_cols[model_type] if col not in categorical_cols[model_type]]
-    processed_df = pd.concat([
-        df[numerical_cols].reset_index(drop=True),
-        pd.DataFrame(encoded.toarray(), columns=encoder.get_feature_names_out())
-    ], axis=1)
-    
-    return processed_df
+    model = XGBRegressor(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42)
+    model.fit(X_train, y_train)
 
-# LTV 분석 메인 함수
+    joblib.dump(model, "model/xgb_domestic_ltv_model.pkl")
+
+    return model, df, X
+
+# Streamlit 메인 실행 함수
 def ltv_customer_ui():
+    st.title("📈 LTV 고객 가치 예측 분석")
 
-    with st.spinner("모델 로드 중..."):
-        try:
-            domestic_model = joblib.load("model/xgb_domestic_ltv_model.pkl")
-            export_model = joblib.load("model/xgb_export_ltv_model.pkl")
-            st.success("✅ 모델 로드 완료")
-        except Exception as e:
-            st.error(f"❌ 모델 로드 실패: {str(e)}")
-            return
+    df_customer, df_export, df_domestic, df_list = load_data()
 
-    with st.expander("데이터 업로드 가이드", expanded=True):
-        uploaded_file = st.file_uploader("고객 데이터 업로드 (CSV)", type="csv", key="customer_uploader")  # ✅ key 추가
+    with st.spinner("모델 학습 및 예측 중..."):
+        model, df_with_pred, X = preprocess_and_train_model(df_domestic)
+        df_with_pred["예측 LTV"] = model.predict(X)
 
-        if uploaded_file:
-            with st.spinner("데이터 전처리 중..."):
-                try:
-                    df = pd.read_csv(uploaded_file)
-                    domestic_df = preprocess_data(df, 'domestic')
-                    export_df = preprocess_data(df, 'export')
-                    st.success("✅ 데이터 전처리 완료")
-                except Exception as e:
-                    st.error(f"❌ 데이터 처리 오류: {str(e)}")
-                    return
+    st.success("✅ 모델 학습 및 예측 완료")
 
+    st.markdown("### 🔝 예측 LTV 기준 상위 고객 TOP 10")
+    top10 = df_with_pred[["연령대", "거주 지역", "고객 평생 가치", "예측 LTV"]].sort_values("예측 LTV", ascending=False).head(10)
+    st.dataframe(top10.style.format({'예측 LTV': '{:,.0f}원'}), height=400)
 
-            # 예측 진행바
-            progress_bar = st.progress(0)
-            
-            # 국내 예측
-            with st.spinner("국내 고객 분석 중..."):
-                domestic_pred = domestic_model.predict(domestic_df)
-                progress_bar.progress(50)
-                
-            # 해외 예측
-            with st.spinner("해외 고객 분석 중..."):
-                export_pred = export_model.predict(export_df)
-                progress_bar.progress(100)
+    st.markdown("---")
+    st.markdown("### 📂 전체 데이터 미리보기")
+    st.dataframe(df_with_pred.head(20))
 
-            # 결과 시각화
-            st.markdown("### 🏆 VIP 고객 분석 결과")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("##### 🇰🇷 국내 TOP 10")
-                domestic_results = pd.DataFrame({
-                    '고객ID': df['고객ID'][:10],
-                    '예측 LTV': np.round(domestic_pred[:10]/1e6, 2)
-                })
-                st.dataframe(
-                    domestic_results.style.format({'예측 LTV': '{:.2f} M'}), 
-                    height=400
-                )
+    st.markdown("### 📄 리포트 다운로드")
+    st.download_button(
+        label="📥 LTV 예측 리포트 다운로드",
+        data=pdf_buffer,
+        file_name="ltv_report.pdf",
+        mime="application/pdf"
+    )
 
-            with col2:
-                st.markdown("##### 🌍 해외 TOP 10")
-                export_results = pd.DataFrame({
-                    '거래처코드': df['거래처코드'][:10],
-                    '예측 LTV': np.round(export_pred[:10]/1e6, 2)
-                })
-                st.dataframe(
-                    export_results.style.format({'예측 LTV': '{:.2f} M'}), 
-                    height=400
-                )
+    st.markdown("### 🧠 고객 맞춤 추천")
 
-            # Raw 데이터 보기
-            with st.expander("원본 데이터 확인"):
-                st.dataframe(df.head(10))
+    selected_age = st.selectbox("연령대 선택", df["연령대"].unique())
+    selected_region = st.selectbox("거주 지역 선택", df["거주 지역"].unique())
 
-            # 분석 리포트 생성
-            if st.button("📊 전체 리포트 생성"):
-                with st.spinner("리포트 생성 중..."):
-                    # [검색 결과 4] 리포트 생성 로직 추가
-                    st.success("✅ 리포트 생성 완료")
-                    st.download_button(
-                        label="다운로드",
-                        data=open("report.pdf", "rb"),
-                        file_name="ltv_analysis_report.pdf"
-                    )
+    recommended = df[
+        (df["연령대"] == selected_age) &
+        (df["거주 지역"] == selected_region)
+    ].sort_values("예측 LTV", ascending=False).head(5)
 
+    st.markdown(f"**추천 고객 TOP 5 (연령대: {selected_age}, 지역: {selected_region})**")
+    st.dataframe(recommended[["이름", "연령대", "거주 지역", "예측 LTV"]])    
