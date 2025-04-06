@@ -32,8 +32,6 @@ def leads_ui():
         if df.loc[(df['상담자명'] == selected_name) & (df['연락처'] == selected_contact)].empty:
             st.error('회원 정보가 존재하지 않습니다.')
         else:
-            st.markdown(f"#### {selected_name} 고객님")
-            
             sales_point = 0
 
             # 이제 고객 정보 (구매 이력, 서비스 이용 내역, 상담 내역 등 횟수) 가져올 것
@@ -85,12 +83,15 @@ def leads_ui():
             else :
                 grade = 1
 
+            st.markdown("##### ")
+            st.markdown(f"#### {selected_name} 고객님은 {grade}등급 고객입니다.")
+
             grade_descriptions = {
-                1: "브랜드에 대한 충성도가 높으며 재구매 가능성이 높은 고객입니다.",
-                2: "과거 구매 이력이 있으며 재구매 가능성이 있는 우수 고객입니다.",
-                3: "제품에 관심은 있으나 구매까지 추가 정보가 필요한 단계입니다.",
-                4: "상담을 시작한 신규 유입 고객으로, 니즈 파악이 중요합니다.",
-                5: "신규 유입 단계의 고객입니다. 제품 인지도 제고가 필요합니다."
+                1: "브랜드에 대한 충성도가 매우 높고, 장기 고객으로 관리가 필요한 핵심 VIP입니다.",
+                2: "구매 이력이 있으며, 비교적 최근에 거래가 있었던 충성 잠재 고객입니다.",
+                3: "구매 의사는 있으나 아직 충분한 정보 제공 및 설득이 필요한 중간 단계 고객입니다.",
+                4: "초기 유입 고객으로, 명확한 니즈 파악과 신뢰 형성이 우선되어야 합니다.",
+                5: "브랜드에 대한 인식이 낮거나 첫 상담을 진행 중인 신규 고객입니다."
             }
 
             followup_checklist = {
@@ -129,7 +130,7 @@ def leads_ui():
                 st.markdown("##### ")
 
             with col2:
-                st.info(f"**등급 {grade}**: {grade_descriptions.get(grade, '')}")
+                st.info(f"**등급 {grade}**: \n\n{grade_descriptions.get(grade, '')}")
 
                 st.success(f"✅ 차량 구매: {sales_cnt}회\n\n✅ 상담 내역: {consult_cnt}회\n\n✅ 매장 방문: {visit_cnt}회")
 
