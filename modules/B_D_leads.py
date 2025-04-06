@@ -34,6 +34,16 @@ def leads_ui():
         else:
             st.markdown(f"#### {selected_name} 고객님")
 
+            # 이제 고객 정보 (구매 이력, 서비스 이용 내역, 상담 내역 등 횟수) 가져올 것
+            sales_df = pd.read_csv("data/domestic_customer_data.csv")
+            st.dataframe(sales_df)
+            sales_df = sales_df.loc[(sales_df['이름'] == selected_name) & (sales_df['전화번호'] == selected_contact), :]
+            
+            sales_cnt = sales_df["차량 구매 횟수"].max()
+            sales_point = sales_cnt * 30
+
+            sales_df[""]
+
             grade = 3  # 1~5 중 현재 고객 등급 (예시)
 
             st.markdown("**고객 리드 등급**")
