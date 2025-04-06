@@ -297,10 +297,17 @@ def inventory_ui():
             # 저장
             inv_df.to_csv("data/inventory_data.csv", index=False)
 
-            st.success(
-                f"{selected_factory}에서 {vehicle} {quantity}대 발주가 등록되었습니다.\n\n"
-                f"요청자: {requestor}"
-            )
+            st.markdown(f"""
+                <div style="margin-top: 25px; padding: 20px; background-color: #f0f9ff; border-left: 6px solid #1890ff; border-radius: 8px;">
+                    <h4 style="color: #1a73e8;">📦 발주 등록 완료</h4>
+                    <p style="margin: 6px 0;">차량이 성공적으로 발주되었습니다.</p>
+                    <ul style="margin-left: 1rem; padding-left: 0.5rem;">
+                        <li><b>차종:</b> {vehicle}</li>
+                        <li><b>공장:</b> {selected_factory}</li>
+                        <li><b>요청자:</b> {requestor}</li>
+                    </ul>
+                </div>
+            """, unsafe_allow_html=True)
 
     # -------------------------------
     # 전체 테이블 익스펜더
