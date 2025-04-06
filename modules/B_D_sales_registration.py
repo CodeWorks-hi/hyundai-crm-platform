@@ -14,7 +14,7 @@ def sales_registration_ui():
     car_df = car_df.loc[car_df["브랜드"] != "기아", :]
     plant_df = pd.read_csv("data/inventory_data.csv")
     customers_df = pd.read_csv('data/customers.csv')
-    sales_df = pd.read_csv('data/D_domestic_sales_.csv')
+    sales_df = pd.read_csv('data/domestic_customer_data.csv')
     plant_df.columns = plant_df.columns.str.strip()
     plant_df = plant_df[plant_df["생산상태"] == "생산중"]
 
@@ -92,10 +92,11 @@ def sales_registration_ui():
                 car_info = car_df[
                     (car_df["모델명"] == selected_model) &
                     (car_df["트림명"] == selected_trim)
-                ].iloc[0]  # assume 1 match
+                ].iloc[0]
 
                 customer_record = {
                     "이름": customer_data.iloc[0]["상담자명"],
+                    "전화번호": customer_data.iloc[0]["연락처"],
                     "성별": customer_data.iloc[0]["성별"],
                     "현재 나이": datetime.today().year - pd.to_datetime(customer_data.iloc[0]["생년월일"]).year,
                     "연령대": customer_data.iloc[0]["연령대"],
@@ -109,7 +110,7 @@ def sales_registration_ui():
                 }
 
                 # 파일에 누적 저장
-                csv_path = "data/D_domestic_sales_.csv"
+                csv_path = "data/domestic_customer_data.csv"
                 try:
                     existing_df = pd.read_csv(csv_path)
                     updated_df = pd.concat([existing_df, pd.DataFrame([customer_record])], ignore_index=True)
