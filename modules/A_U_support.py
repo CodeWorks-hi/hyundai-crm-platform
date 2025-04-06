@@ -8,22 +8,6 @@ from modules.A_U_kakao_channel import render_kakao_channel_add_button
 import toml
 
 
-# .streamlit/secrets.template.toml 경로
-TEMPLATE_SECRET_PATH = ".streamlit/secrets.template.toml"
-
-# secrets.toml이 없을 경우 template에서 읽어오기
-def get_custom_secret(key):
-    try:
-        if os.path.exists(TEMPLATE_SECRET_PATH):
-            secrets = toml.load(TEMPLATE_SECRET_PATH)
-            return secrets.get(key)
-        else:
-            st.error("❌ secrets.template.toml 파일이 존재하지 않습니다.")
-            return None
-    except Exception as e:
-        st.error(f"❌ 시크릿 로딩 실패: {e}")
-        return None
-
 
 # 모델 및 API 설정
 TEXT_MODEL_ID = "google/gemma-2-9b-it"
