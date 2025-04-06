@@ -9,6 +9,28 @@ import joblib
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
+@st.cache_data
+def load_data():
+    df_customer = pd.read_csv("data/customer_data.csv")    # 국내 구매 고객 데이터 
+    df_export = pd.read_csv("data/export_customer_data.csv")  # 해외 구매 고객 데이터 
+    df_list= pd.read_csv("data/customer.csv")  # 고객 상담데이터 
+    return df_customer, df_export, df_list
+
+
+# 모델 파일 경로
+DOMESTIC_MODEL_PATH = "model/xgb_domestic_ltv_model.pkl"
+EXPORT_MODEL_PATH = "model/xgb_export_ltv_model.pkl"
+
+# 모델 로드
+try:
+    domestic_model = joblib.load(DOMESTIC_MODEL_PATH)
+    export_model = joblib.load(EXPORT_MODEL_PATH)
+except Exception as e:
+    st.error(f"LTV 모델 로드 오류: {e}")
+
+
+
+
 # 전처리 파이프라인 (검색 결과 [3] 구조 반영)
 def preprocess_data(df, model_type='domestic'):
     # 필수 컬럼 검증
@@ -23,6 +45,10 @@ def preprocess_data(df, model_type='domestic'):
         'domestic': ['연번', '이름', '생년월일', '휴대폰 번호'],
         'export': ['해외 지사 코드', '현지 유통사 정보']
     }
+    df_list_cols =  [
+    "고객ID", "상담자ID", "상담자명", "등록일", "딜러명", "연락처", "성별", "생년월일", "연령대", "거주지역", "관심차종", "방문목적",
+    "월주행거리_km", "주요용도", "예상예산_만원", "선호색상", "동승인원구성", "중요요소1", "중요요소2", "중요요소3",
+    "최근보유차종", "기타요청사항"]
     
     df = df.drop(columns=drop_cols[model_type], errors='ignore')
     

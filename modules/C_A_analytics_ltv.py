@@ -22,7 +22,7 @@ def ltv_ui():
     tab1, tab2, tab3 = st.tabs([
         " 수요 및 발주 예측", 
         " 시장 트렌드", 
-        " LTV 분석"
+        " LTV(고객생애가치) 분석"
     ])
     
     with tab1:
