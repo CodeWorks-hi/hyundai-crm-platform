@@ -39,6 +39,7 @@ def leads_ui():
             st.markdown("**고객 리드 등급**")
             progress_percent = int(((grade - 1) / 4) * 100)
             st.progress(progress_percent)
+            
 
             # 레이블 시각화
             st.markdown("""
