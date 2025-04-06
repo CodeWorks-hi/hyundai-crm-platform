@@ -49,15 +49,13 @@ def sales_registration_ui():
 
         customer = st.text_input("👤 고객명")
         contact = st.text_input("📞 연락처")
-        customer = customers_df[(customers_df['상담자명'] == customer) & (customers_df['연락처'] == contact)]
-        if customer.empty:
+        customer_data = customers_df[(customers_df['상담자명'] == customer) & (customers_df['연락처'] == contact)]
+        if customer_data.empty:
             st.error("해당 고객이 존재하지 않습니다.")
         sale_date = st.date_input("📅 판매일자", value=datetime.today())
 
-        st.write(customer)
-
         if st.button("✅ 판매 등록"):
-            if not customer or not contact:
+            if customer_data.empty or not contact:
                 st.warning("⚠️ 고객명과 연락처를 입력해주세요.")
             elif stock_qty is None or stock_qty < 1 or selected_factory is None:
                 st.error("🚫 해당 차량의 재고가 부족합니다.")
@@ -67,7 +65,15 @@ def sales_registration_ui():
                 else:
                     masked_customer = customer
 
-                st.write(masked_customer)
+                # 기존 구매 횟수 확인
+                try:
+                    existing_sales_df = pd.read_csv("data/D_domestic_sales_.csv")
+                    prior_sales_count = existing_sales_df[
+                        existing_sales_df["이름"] == customer_data.iloc[0]["상담자명"]
+                    ].shape[0]
+                    purchase_count = prior_sales_count + 1
+                except FileNotFoundError:
+                    purchase_count = 1
 
                 new_sale = {
                     "차종": selected_model,
@@ -89,20 +95,18 @@ def sales_registration_ui():
                 ].iloc[0]  # assume 1 match
 
                 customer_record = {
-                    "상담자명": customer.iloc[0]["상담자명"],
-                    "성별": customer.iloc[0]["성별"],
-                    "현재 나이": datetime.today().year - pd.to_datetime(customer.iloc[0]["생년월일"]).year,
-                    "연령대": customer.iloc[0]["연령대"],
-                    "거주 지역": customer.iloc[0]["거주지역"],
-                    "차량 구매 횟수": st.session_state.get("구매횟수", 1),
+                    "이름": customer_data.iloc[0]["상담자명"],
+                    "성별": customer_data.iloc[0]["성별"],
+                    "현재 나이": datetime.today().year - pd.to_datetime(customer_data.iloc[0]["생년월일"]).year,
+                    "연령대": customer_data.iloc[0]["연령대"],
+                    "거주 지역": customer_data.iloc[0]["거주지역"],
+                    "차량 구매 횟수": purchase_count,
                     "고객 평생 가치": st.session_state.get("LTV", 0),
                     "브랜드": car_info["브랜드"],
                     "모델명": car_info["모델명"],
                     "기본가격": car_info["기본가격"],
                     "공장명": selected_factory
                 }
-
-                st.write(customer_record)
 
                 # 파일에 누적 저장
                 csv_path = "data/D_domestic_sales_.csv"
@@ -112,7 +116,7 @@ def sales_registration_ui():
                 except FileNotFoundError:
                     updated_df = pd.DataFrame([customer_record])
 
-                # updated_df.to_csv(csv_path, index=False)
+                updated_df.to_csv(csv_path, index=False)
 
                 st.success("✅ 판매 등록이 완료되었습니다.")
 
