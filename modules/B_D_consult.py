@@ -48,7 +48,7 @@ def generate_tag(request: str, model_name: str = TEXT_MODEL_ID) -> list:
     아래 상담 내용을 분석해 위와 같은 형식으로 쉼표로 구분된 태그들을 생성하세요.
     """
 
-    full_prompt = f"{system_prompt}\n\n[상담 내용]\n\n{request.strip()}"
+    full_prompt = f"{system_prompt}\n\n[상담 내용] : {request.strip()}"
 
     try:
         client = InferenceClient(model=model_name, token=token)
