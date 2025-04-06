@@ -163,9 +163,8 @@ def ltv_market_ui():
     df_customer_clean = preprocess_data(df_customer, 'customer')
     df_domestic_clean = preprocess_data(df_domestic, 'domestic')
 
-    # 대시보드 레이아웃
-    st.title("🚗 현대자동차 시장 분석 대시보드")
-    
+
+
     # 상단 필터 섹션
     with st.container():
         col1, col2 = st.columns([1, 2])
@@ -197,14 +196,7 @@ def ltv_market_ui():
     for idx, (value, label, delta) in enumerate(metrics):
         cols[idx].metric(label, value, delta)
 
-    # 생산 분석 섹션
-    st.markdown("#### 🔹 생산 현황 분석")
-    
-    # 월별 생산량 차트
-    filtered_data = df_domestic_clean[
-        (df_domestic_clean['factory'].isin(selected_factories)) &
-        (df_domestic_clean['구매연도'] == selected_year)
-    ]
+
     
     fig1 = px.histogram(
         filtered_data,
