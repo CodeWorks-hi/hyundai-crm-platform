@@ -60,12 +60,22 @@ def app():
             #     st.error(f"모듈 로딩 오류: `{module_path}.{function_name}`\n\n**{e}**")
 
 
-        # ✔ 안전한 방식: 세션 상태로 페이지 전환
-    if st.button("← 메인으로 돌아가기"):
-        st.session_state.current_page = "home"
-        st.rerun()
-
-
+    st.markdown("---")
+    col11, col12 =  st.columns([1, 8])
+    # ✔ 안전한 방식: 세션 상태로 페이지 전환
+    with col11:
+        if st.button("← 메인으로 돌아가기"):
+            st.session_state.current_page = "home"
+            st.rerun()
+    with col12:
+        st.markdown(
+        """
+        <div style='text-align: center; color: gray; font-size: 0.9rem; margin-top: 30px;'>
+        © 2025 Hyundai & Kia Export Dashboard. All rights reserved.
+        </div>
+        """,
+        unsafe_allow_html=True
+        )
 
 
 
