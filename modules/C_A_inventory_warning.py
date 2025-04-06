@@ -3,13 +3,11 @@
         # 재고 회전율 경고 시스템
             # 재고 회전율이 임계값 이하인 경우 슬랙으로 경고 메시지 전송
 
-
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import requests
-import os
 
 # 경로 설정
 INV_PATH = "data/inventory_data.csv"
@@ -22,9 +20,6 @@ def load_data():
     df_inv = pd.read_csv(INV_PATH)
     df_list = pd.read_csv(LIST_PATH)
     return df_inv, df_list
-
-
-
 
 # 데이터 전처리 함수
 def preprocess_data(df_inv):
@@ -47,12 +42,10 @@ def preprocess_data(df_inv):
         index=df_inv.index
     )
 
-    # 2. 회전율 계산
     np.random.seed(23)
     df_inv["월평균입고"] = np.random.randint(50, 500, size=len(df_inv))
     df_inv["월평균출고"] = np.random.randint(30, 400, size=len(df_inv))
     df_inv["재고회전율"] = (df_inv["월평균출고"] / df_inv["재고량"]).replace([np.inf, -np.inf], 0).fillna(0).round(2)
-
 
     df_inv['경고등급'] = np.select(
         [
@@ -62,35 +55,26 @@ def preprocess_data(df_inv):
         ],
         ['🚨 긴급', '⚠️ 주의', '✅ 정상'],
         default='✅ 정상'
-    ).astype(str) 
+    ).astype(str)
 
-    # 제거할 컬럼 목록
-    columns_to_drop = [
+    drop_cols = [
         '전장', '전폭', '전고', '배기량',
         '공차중량', 'CO2배출량', '연비', '기본가격'
     ]
-    
-    # 존재하는 컬럼만 필터링하여 제거
-    existing_columns = [col for col in columns_to_drop if col in df_inv.columns]
+    existing_columns = [col for col in drop_cols if col in df_inv.columns]
     df_inv = df_inv.drop(columns=existing_columns)
-    
+
     return df_inv
-
-
-
-# 슬랙 웹훅 URL 환경변수에서 불러오기
-SLACK_WEBHOOK_URL = st.secrets["SLACK_WEBHOOK_URL"]
 
 # 슬랙 알림 함수 정의
 def send_slack_alert(model_name, turnover_rate, plant=None, status=None, link=None):
+    SLACK_WEBHOOK_URL = st.secrets["SLACK_WEBHOOK_URL"]
     emoji = "⚠️" if turnover_rate < 0.2 else "🔔"
-
     text = (
         f"{emoji} *재고 회전율 경고 발생!*\n"
         f"• 모델명: *{model_name}*\n"
         f"• 회전율: *{turnover_rate:.2f}*\n"
     )
-
     if plant:
         text += f"• 공장: `{plant}`\n"
     if status:
@@ -98,24 +82,19 @@ def send_slack_alert(model_name, turnover_rate, plant=None, status=None, link=No
     if link:
         text += f"🔗 <{link}|차량 상세정보 보기>\n"
 
-    payload = {
-        "text": text,
-        "link_names": 1  # 멘션 지원용 (예: @here)
-    }
+    response = requests.post(SLACK_WEBHOOK_URL, json={"text": text, "link_names": 1})
+    if response.status_code != 200:
+        st.error(f"슬랙 전송 실패: {response.status_code} - {response.text}")
 
-    response = requests.post(SLACK_WEBHOOK_URL, json=payload)
-
-# 메인 UI
+# 메인 UI 함수
 def warning_ui():
-    # 데이터 로드 및 전처리
     df_inv, df_list = load_data()
     df_inv = preprocess_data(df_inv.copy())
-    
-    # 대시보드 헤더
+
     with st.container(border=True):
         cols = st.columns([2, 1, 1, 2])
         cols[0].markdown("##### 🏭 통합 재고 관리 플랫폼 v2.1")
-    # ⚠️ 회전율 경고 기준 및 상태 필터
+
     threshold = st.select_slider(
         "⚠️ 경고 임계값 선택 (재고 회전율)",
         options=np.round(np.arange(0.1, 1.05, 0.05), 2),
@@ -123,10 +102,8 @@ def warning_ui():
     )
     status_filter = st.radio(" 경고 대상 생산상태 선택", ["전체", "생산 중", "생산 종료"], horizontal=True)
 
-    # 경고 상태 업데이트
     df_inv["경고"] = np.where(df_inv["재고회전율"] <= threshold, "⚠️ 경고", "정상")
-    
-    # 실시간 지도 시각화 개선
+
     with st.expander(" 실시간 공장 위치 모니터링", expanded=True):
         fig = px.scatter_mapbox(
             df_inv,
@@ -144,14 +121,8 @@ def warning_ui():
             zoom=3,
             height=600
         )
-        fig.update_layout(
-            mapbox_style="carto-positron",
-            margin={"r":0,"t":40,"l":0,"b":0},
-            legend=dict(orientation="h", yanchor="bottom", y=1.02)
-        )
+        fig.update_layout(mapbox_style="carto-positron", margin={"r":0,"t":40,"l":0,"b":0}, legend=dict(orientation="h", yanchor="bottom", y=1.02))
         st.plotly_chart(fig, use_container_width=True)
-
-    # 재고 분석 섹션
 
     st.subheader(" 공장별 부품 재고 현황", divider="blue")
     fig = px.bar(
@@ -166,105 +137,56 @@ def warning_ui():
     )
     fig.update_layout(xaxis_title=None, yaxis_title="재고량(개)")
     st.plotly_chart(fig, use_container_width=True)
-        
 
     st.subheader(" 위험 부품 상세 분석", divider="red")
     danger_df = df_inv[df_inv['재고량'] < 100]
-            
+
     if not danger_df.empty:
         col1, col2 = st.columns(2)
 
         with col2:
-            # 도넛형 파이 차트
             pie_df = danger_df.groupby('부품명')['재고량'].sum().reset_index()
             total_danger = pie_df['재고량'].sum()
-            
             fig = px.pie(
-                pie_df,
-                names='부품명',
-                values='재고량',
-                hole=0.6,
-                color='부품명',
-                color_discrete_sequence=px.colors.sequential.Reds_r,
+                pie_df, names='부품명', values='재고량', hole=0.6,
+                color='부품명', color_discrete_sequence=px.colors.sequential.Reds_r,
                 title=f'<b>위험 부품 현황 (총 {total_danger}개)</b>'
             )
-            
-            fig.update_traces(
-                textposition='inside',
-                textinfo='percent+label',
-                texttemplate='%{label}<br>%{percent} (%{value}개)',
-                marker=dict(line=dict(color='white', width=2)),
-                rotation=45
-            )
-            
-            fig.update_layout(
-                uniformtext_minsize=12,
-                showlegend=False,
-                margin=dict(t=50, b=20),
-                title_x=0.5
-            )
+            fig.update_traces(textposition='inside', textinfo='percent+label', texttemplate='%{label}<br>%{percent} (%{value}개)', marker=dict(line=dict(color='white', width=2)), rotation=45)
+            fig.update_layout(uniformtext_minsize=12, showlegend=False, margin=dict(t=50, b=20), title_x=0.5)
             st.plotly_chart(fig, use_container_width=True)
-        
+
         with col1:
-            # 입출고 차이 분석
             trend_df = danger_df[['부품명', '월평균입고', '월평균출고']].copy()
             trend_df['입출고 차이'] = trend_df['월평균입고'] - trend_df['월평균출고']
-            
             fig = px.bar(
                 trend_df.sort_values('입출고 차이', ascending=False),
                 x='부품명',
                 y=['월평균입고', '월평균출고'],
-                barmode='group',
-                height=400,
+                barmode='group', height=400,
                 labels={'value': '월간 물동량(개)', 'variable': '구분'},
-                color_discrete_map={
-                    '월평균입고': '#4B78DB',
-                    '월평균출고': '#F36E6E'
-                },
+                color_discrete_map={'월평균입고': '#4B78DB', '월평균출고': '#F36E6E'},
                 title='<b>월별 입출고 추이 비교</b>'
             )
-            
-            fig.update_layout(
-                xaxis=dict(title=None, tickangle=-45, type='category'),
-                yaxis=dict(gridcolor='#F0F2F6'),
-                legend=dict(
-                    title='물동량 구분',
-                    orientation="h",
-                    yanchor="bottom",
-                    y=1.02
-                ),
-                plot_bgcolor='white'
-            )
-            
-            fig.update_traces(
-                texttemplate='%{y}개',
-                textposition='outside',
-                textfont_size=10
-            )
+            fig.update_layout(xaxis=dict(title=None, tickangle=-45, type='category'), yaxis=dict(gridcolor='#F0F2F6'), legend=dict(title='물동량 구분', orientation="h", yanchor="bottom", y=1.02), plot_bgcolor='white')
+            fig.update_traces(texttemplate='%{y}개', textposition='outside', textfont_size=10)
             st.plotly_chart(fig, use_container_width=True)
     else:
         st.success("✅ 모든 부품 재고가 안전 수준입니다.")
-    # 경고 관리 섹션
+
     st.subheader("🚨 실시간 경고 관리 시스템", divider="orange")
-    
-    col1, col2 = st.columns([1,1])
+    col1, col2 = st.columns([1, 1])
     with col1:
         selected_factory = st.selectbox("공장 선택", ['전체'] + df_inv['공장명'].unique().tolist())
     with col2:
         grade_list = df_inv['경고등급'].astype(str).unique().tolist()
         valid_defaults = [g for g in ['🚨 긴급', '⚠️ 주의'] if g in grade_list]
-        
-        selected_grade = st.multiselect(
-            "경고 등급",
-            options=grade_list,
-            default=valid_defaults if valid_defaults else []
-        )
+        selected_grade = st.multiselect("경고 등급", options=grade_list, default=valid_defaults if valid_defaults else [])
 
-    # 데이터 필터링
     filtered_df = df_inv[df_inv['경고등급'].isin(selected_grade)]
     if selected_factory != '전체':
         filtered_df = filtered_df[filtered_df['공장명'] == selected_factory]
-            
+
     if not filtered_df.empty:
         fig = px.treemap(
             filtered_df,
@@ -277,29 +199,18 @@ def warning_ui():
         )
         st.plotly_chart(fig, use_container_width=True)
 
-
-    # 8. 슬랙 전송 UI
-    warning_df = df_inv[df_inv["재고회전율"] <= threshold]
+    warning_df = filtered_df[filtered_df["재고회전율"] <= threshold]
     with st.expander("📤 슬랙 경고 전송"):
         selected_models = st.multiselect("📌 슬랙으로 전송할 모델 선택", warning_df["모델명"].unique())
-        filtered_df = warning_df[warning_df["모델명"].isin(selected_models)]
+        slack_df = warning_df[warning_df["모델명"].isin(selected_models)]
 
         if st.button("🚨 슬랙 전송"):
-            for _, row in filtered_df.iterrows():
+            for _, row in slack_df.iterrows():
                 send_slack_alert(
-                    model_name=row.get("모델명", "N/A"),
-                    turnover_rate=row.get("재고회전율", 0),
-                    plant=row.get("공장명", "미지정"),
-                    status=row.get("생산상태", "알 수 없음"),
-                    link=f"https://example.com/cars/{row.get('모델명', 'unknown')}"
+                    model_name=row["모델명"],
+                    turnover_rate=row["재고회전율"],
+                    plant=row.get("공장명", ""),
+                    status=row.get("생산상태", ""),
+                    link=f"https://example.com/cars/{row['모델명']}"
                 )
             st.success("✅ 선택된 모델이 슬랙으로 전송되었습니다.")
-
-            # 슬랙 알림 예시 이미지 표시
-            col1, col2 = st.columns(2)
-            with col1:
-                st.image("data/salack_photos/salack_1.png", caption="슬랙 알림 요약 예시", use_container_width=True)
-            with col2:
-                st.image("data/salack_photos/salack_2.png", caption="슬랙 경고 상세 예시", use_container_width=True)
-
-            st.markdown("---")

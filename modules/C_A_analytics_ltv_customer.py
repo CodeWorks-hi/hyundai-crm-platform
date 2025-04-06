@@ -11,6 +11,7 @@ from reportlab.pdfgen import canvas
 import matplotlib.pyplot as plt
 import plotly.express as px
 
+np.random.seed(42) 
 
 @st.cache_data
 def load_data():
@@ -88,7 +89,7 @@ def ltv_customer_ui():
         model, df_with_pred, X = preprocess_and_train_model(df_domestic)
         df_with_pred["예측 LTV"] = model.predict(X)
 
-    st.success("✅ 모델 학습 및 예측 완료")
+
 
     # 예측 결과 시각화
     st.markdown("### 🔝 예측 LTV 기준 상위 고객 TOP 10")
@@ -97,7 +98,8 @@ def ltv_customer_ui():
 
     st.markdown("---")
 
-    st.markdown("###  예측 결과 시각화")
+    # 예측 결과 시각화
+    st.markdown("### 예측 결과 시각화")
 
     col1, col2 = st.columns(2)
 
@@ -114,8 +116,8 @@ def ltv_customer_ui():
         st.markdown("""
         #### 🔸 1. 예측 오차 분포 분석
         - 위의 **히스토그램은 고객 별 실제 LTV와 예측 LTV 간의 차이**를 보여줍니다.
-        - 분포 중심이 0에 가까울수록 모델이 전반적으로 정확하게 예측하고 있다는 것을 의미합니다.
-        - 만약 오차가 한쪽으로 치우쳐 있다면, 특정 그룹(예: 고소득 고객)에 대해 과소/과대 평가가 이루어지고 있을 가능성이 있습니다.
+        - 분포 중심이 0에 가까워진다면 모델이 전반적으로 예측을 잘하고 있다는 것을 의미합니다.
+        - 오차가 하나의 방향으로 치우쳐 있다면, 특정 그룹에 대해 과소/과대 평가가 이루어졌을 가능성이 있습니다.
         """)
 
     with col2:
@@ -129,30 +131,20 @@ def ltv_customer_ui():
         ax2.set_ylabel("LTV (원)")
         ax2.legend()
         st.pyplot(fig2)
+
         st.markdown("""
-                #### 🔸 2. 상위 고객 20명 비교 분석
-                - 실선은 **실제 LTV**, 점선은 **모델이 예측한 LTV**를 나타냅니다.
-                - 고객 순위가 높을수록(= 더 가치 있는 고객일수록), 예측값과 실제값 간 차이가 커질 가능성이 있습니다.
-                - 특히 상위 5~10명에서 예측값이 일관되게 낮거나 높은 경우, 해당 구간에 대한 **모델 개선의 여지**가 존재합니다.
-                    """)
+        #### 🔸 2. 상위 고객 20명 비교 분석
+        - 실선은 **실제 LTV**, 점선은 **모델이 예측한 LTV**를 나타냅니다.
+        - 고객 순위가 높을수록(= 더 가치 있는 고객일수록), 예측값과 실제값 간 차이가 커질 수 있습니다.
+        - 특히 상위 5~10명에서 예측값이 일관되게 낮거나 높다면, 해당 구간에 대한 **모델 개선의 여지**가 존재합니다.
+        """)
 
-    col1, col2,col3 = st.columns(3)
-    #  Boxplot: 예측 vs 실제 LTV
+    st.markdown("---")
+
+    col1, col2 = st.columns(2)
+
     with col1:
-        st.markdown("####  예측 vs 실제 LTV Boxplot 비교")
-        fig_box, ax_box = plt.subplots()
-        ax_box.boxplot(
-            [df_with_pred["고객 평생 가치"], df_with_pred["예측 LTV"]],
-            labels=["실제 LTV", "예측 LTV"],
-            patch_artist=True,
-            boxprops=dict(facecolor="lightblue"),
-        )
-        ax_box.set_title("실제 vs 예측 LTV Boxplot")
-        st.pyplot(fig_box)
-
-    with col2:
-        #  잔차(오차) vs 예측값 산점도
-        st.markdown("####  예측값에 따른 오차 산점도 (잔차)")
+        st.markdown("#### 🎯 예측값에 따른 잔차 산점도 (잔차)")
         df_with_pred["잔차"] = df_with_pred["고객 평생 가치"] - df_with_pred["예측 LTV"]
         fig_residual, ax_residual = plt.subplots()
         ax_residual.scatter(df_with_pred["예측 LTV"], df_with_pred["잔차"], alpha=0.5, color='orange')
@@ -162,8 +154,14 @@ def ltv_customer_ui():
         ax_residual.set_title("예측값에 따른 잔차 분포")
         st.pyplot(fig_residual)
 
-    with col3:
-    # 👥 고객 등급별 평균 오차 시각화
+        st.markdown("""
+        #### 🔸 4. 예측값 대비 잔차 분석
+        - 예측값이 커질수록 오차가 커지는 경향이 있다면 과대 예측 문제가 있을 수 있습니다.
+        - 잔차가 불규칙하게 분포한다면 모델의 일반화 성능이 좋다고 볼 수 있습니다.
+        - 잔차 분포가 특정 방향으로 편향되어 있으면 해당 구간의 재모델링이 필요할 수 있습니다.
+        """)
+
+    with col2:
         st.markdown("#### 👥 고객 등급별 평균 오차")
         if "고객 등급" in df_with_pred.columns:
             grade_error = df_with_pred.groupby("고객 등급")["잔차"].mean().reset_index()
@@ -172,10 +170,18 @@ def ltv_customer_ui():
             ax_grade.set_ylabel("평균 잔차")
             ax_grade.set_title("고객 등급별 평균 예측 오차")
             st.pyplot(fig_grade)
+
+            st.markdown("""
+            #### 🔸 5. 고객 등급별 오차 분석
+            - VIP, 일반, 신규 고객군별로 예측 오차가 다르게 나타날 수 있습니다.
+            - 특정 등급에서 예측 오차가 크다면 해당 그룹에 대해 별도의 모델링 또는 변수 조정이 필요합니다.
+            - 등급별 예측 신뢰도를 기반으로 마케팅 전략도 차별화할 수 있습니다.
+            """)
         else:
             st.warning("고객 등급 정보가 없어 등급별 분석을 생략합니다.")
 
     st.markdown("---")
+
 
     # 리포트 다운로드
     st.markdown("###  리포트 다운로드")
