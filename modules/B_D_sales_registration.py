@@ -3,7 +3,8 @@ import pandas as pd
 from datetime import datetime
 
 def sales_registration_ui():
-    st.subheader("🧾 판매 등록")
+    st.markdown("<h2 style='color:#2c3e50;'>🧾 차량 판매 등록</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color:gray;'>고객 및 차량 정보를 입력하여 판매 내역을 등록하세요.</p>", unsafe_allow_html=True)
 
     if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
         st.warning("딜러 정보를 먼저 등록하세요.")
@@ -36,7 +37,7 @@ def sales_registration_ui():
         ]["공장명"].dropna().unique()
         selected_factory = st.selectbox("공장명", sorted(filtered_factories))
 
-        st.markdown("</div>", unsafe_allow_html=True)
+        dealer = st.selectbox("직원명", [st.session_state["직원이름"]], disabled=True)
 
     with right_col:
         st.markdown("##### 📝 판매 정보")
@@ -51,10 +52,29 @@ def sales_registration_ui():
         contact = st.text_input("📞 연락처")
         customer_data = customers_df[(customers_df['상담자명'] == customer) & (customers_df['연락처'] == contact)]
         if customer_data.empty:
-            st.error("해당 고객이 존재하지 않습니다.")
+            st.markdown("""
+                <div style='margin-top: 10px; padding: 12px; background-color: #fff3f3;
+                            border-left: 6px solid #e74c3c; border-radius: 6px; color: #b94a48;'>
+                    ❌ <strong>해당 고객 정보가 존재하지 않습니다.</strong><br>
+                </div>
+            """, unsafe_allow_html=True)
+            st.write(" ")
+        else:
+            st.markdown(f"""
+                <div style='background-color:#f0f8ff; padding: 10px; border-left: 4px solid #1890ff; border-radius: 5px; margin-bottom: 10px;'>
+                    👤 <b>{customer_data.iloc[0]["상담자명"]}</b> / {customer_data.iloc[0]["연락처"]} / {customer_data.iloc[0]["연령대"]} / {customer_data.iloc[0]["거주지역"]}
+                </div>
+            """, unsafe_allow_html=True)
+
         sale_date = st.date_input("📅 판매일자", value=datetime.today())
 
         if st.button("✅ 판매 등록"):
+            goal_df = pd.read_csv("data/employee_goal.csv")
+            goal_df = goal_df[goal_df["직원명"] == dealer]
+            
+            goal_df[["주간실적", "월간실적", "연간실적"]] += 1
+            goal_df.to_csv("data/employee_goal.csv", index=False)
+
             if customer_data.empty or not contact:
                 st.warning("⚠️ 고객명과 연락처를 입력해주세요.")
             elif stock_qty is None or stock_qty < 1 or selected_factory is None:
@@ -122,16 +142,34 @@ def sales_registration_ui():
 
                 st.success("✅ 판매 등록이 완료되었습니다.")
 
-        st.markdown("</div>", unsafe_allow_html=True)
+    # 현재 직원 판매 실적 표시
+    goal_df = pd.read_csv("data/employee_goal.csv")
+    goal_row = goal_df[goal_df["직원명"] == st.session_state["직원이름"]]
+
+    if not goal_row.empty:
+        st.markdown(f"<h4 style='color:#1f77b4;'>📋 {st.session_state["직원이름"]} 매니저님의 판매 실적 현황</h4>", unsafe_allow_html=True)
+        weekly = int(goal_row["주간실적"].values[0])
+        monthly = int(goal_row["월간실적"].values[0])
+        yearly = int(goal_row["연간실적"].values[0])
+
+        st.markdown(f"""
+            <div style='padding: 10px 15px; background-color: #f6fbff; border-left: 5px solid #1f77b4; border-radius: 6px; margin-bottom: 20px;'>
+                <p style='margin: 4px 0;'>📆 <b>주간 실적:</b> {weekly}건</p>
+                <p style='margin: 4px 0;'>🗓️ <b>월간 실적:</b> {monthly}건</p>
+                <p style='margin: 4px 0;'>📅 <b>연간 실적:</b> {yearly}건</p>
+            </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
 
     # 누적 판매 통계
     if "sales_log" in st.session_state and st.session_state.sales_log:
-        st.markdown("#### 📈 누적 판매량 (차종 기준)")
+        st.markdown("<h4 style='color:#1f77b4;'>📈 누적 판매량 (차종 기준)</h4>", unsafe_allow_html=True)
         df = pd.DataFrame(st.session_state.sales_log)
         stat_df = df.groupby(["차종", "트림명"])["수량"].sum().reset_index().sort_values(by="수량", ascending=False)
         st.dataframe(stat_df.rename(columns={"차종": "차종명", "수량": "누적 판매량"}), use_container_width=True, hide_index=True)
 
-        st.markdown("#### 📊 최근 판매 현황")
+        st.markdown("<h4 style='color:#1f77b4;'>📊 최근 판매 현황</h4>", unsafe_allow_html=True)
         df = df.sort_values(by="판매일자", ascending=False)
         st.dataframe(df, use_container_width=True, hide_index=True)
     else:
