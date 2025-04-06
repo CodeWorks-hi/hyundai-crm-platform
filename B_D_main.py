@@ -78,7 +78,6 @@ def app():
         "리드 추적",     # Leads – 동적 느낌
         "판매 등록",     # Orders – 그대로 유지 가능
         "수요 예측",     # Forecast – 간결하게 핵심만
-        "서비스 일정",   # Schedules – 명확함
         "데이터 뷰"      # Data Lab – 원본 확인보다 더 모던함
     ])
 
@@ -90,7 +89,6 @@ def app():
         ("modules.B_D_leads", "leads_ui"),                             # 리드 퍼널, 스코어링, 자동 팔로업
         ("modules.B_D_sales_registration", "sales_registration_ui"),         # 판매 등록
         ("modules.B_D_demand_forecast", "demand_forecast_ui"),          # AI 수요 예측
-        ("modules.B_D_service", "service_ui"),                 # 서비스 일정, 고객 충성도 관리
         # ("modules.B_D_eco", "eco_ui"),                           # 경제 지표 기반 판매 인텔리전스, 금융 상품 최적화
         ("modules.B_D_data", "data_preview_ui")                # 데이터 미리보기
     ]
