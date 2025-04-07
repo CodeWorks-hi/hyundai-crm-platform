@@ -374,5 +374,9 @@ def consult_ui():
                 if st.button("»", key="visit_done_last"):
                     st.session_state["visit_done_page"] = total_visit_pages - 1
                     st.rerun()
-
-            st.markdown("</div>", unsafe_allow_html=True)
+    
+    st.markdown("###### ")
+    
+    with st.expander("🗂 원본 데이터 확인", expanded=False):
+        df = pd.read_csv("data/consult_log.csv") 
+        st.dataframe(df, hide_index=True, use_container_width=True)
