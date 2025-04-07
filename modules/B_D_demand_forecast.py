@@ -69,8 +69,9 @@ def demand_forecast_ui():
     """, unsafe_allow_html=True)
     default_budget = st.session_state["recom_budget"]
     default_gender = st.session_state["고객정보"]["성별"]
-    if default_gender not in ["남", "여"]:
-        default_gender = "남"
+    gender_options = ["남성", "여성"]
+    if default_gender not in gender_options:
+        default_gender = "남성"
     default_region = st.session_state["고객정보"]["거주지역"]
     default_age = st.session_state["고객정보"]["나이"]                               
 
@@ -80,7 +81,7 @@ def demand_forecast_ui():
         default_age = 30
 
     budget = st.number_input("구매 예산 (만원)", value=default_budget, step=500)
-    gender = st.selectbox("성별", ["남", "여"], index=["남", "여"].index(default_gender))
+    gender = st.selectbox("성별", gender_options, index=gender_options.index(default_gender))
     age = st.number_input("나이", min_value=1, max_value=100, step=1, value=default_age)
     regions = [
         '인천광역시', '광주광역시', '부산광역시', '전라남도', '경기도', '울산광역시', '서울특별시', '경상남도',
@@ -129,7 +130,13 @@ def demand_forecast_ui():
             "현대": [0,1]
         }
 
-        user_data = np.hstack([age, budget * 10000, gender_list[gender], region_list[region], brand_list[preference]]).reshape(1, -1)[0]
+        user_data = np.hstack([
+            age,
+            budget * 10000,
+            gender_list.get(gender, [0, 0]),
+            region_list.get(region, [0]*16),
+            brand_list.get(preference, [0, 0])
+        ]).reshape(1, -1)[0]
         user_data = np.array(user_data).reshape(1, 22)
 
        

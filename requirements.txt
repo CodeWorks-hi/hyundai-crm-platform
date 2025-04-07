@@ -28,6 +28,7 @@ scikit-learn
 xgboost
 shap
 prophet
+lightgbm
 
 # ✅ 자연어처리 및 API
 huggingface_hub
