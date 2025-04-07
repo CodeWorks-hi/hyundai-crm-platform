@@ -27,6 +27,7 @@ def event_ui():
         진행중 = df[(df["시작일"] <= today) & (df["종료일"] >= today)]
 
         if not 진행중.empty:
+
             rows = 진행중.reset_index(drop=True)
 
             # 상단 2개
