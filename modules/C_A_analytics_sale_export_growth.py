@@ -170,4 +170,4 @@ def export_growth_ui():
 
     # 원본 데이터 보기
     with st.expander("🗂 원본 데이터 보기"):
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df, use_container_width=True, hide_index=True)

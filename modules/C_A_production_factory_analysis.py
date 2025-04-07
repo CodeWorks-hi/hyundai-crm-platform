@@ -93,7 +93,7 @@ def factory_analysis_ui():
 
     # 전체 생산 현황 요약
     st.markdown(" #### 모델별 생산 가능 수량")
-    st.dataframe(df_summary, use_container_width=True)
+    st.dataframe(df_summary, use_container_width=True, hide_index=True)
 
     # 모델별 집계
     model_summary = df_summary.groupby(['모델명', '모델 구분'])['생산가능수량'].sum().reset_index()
@@ -124,6 +124,6 @@ def factory_analysis_ui():
     st.subheader(" 공장별 부품 재고 요약")
 
     factory_parts = df_inv.groupby(['공장명', '부품명'], as_index=False)['재고량'].sum()
-    st.dataframe(factory_parts, use_container_width=True)
+    st.dataframe(factory_parts, use_container_width=True, hide_index=True)
 
     st.markdown("---")

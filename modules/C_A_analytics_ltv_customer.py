@@ -130,6 +130,8 @@ def ltv_customer_ui():
     # 데이터프레임 인덱스 재설정
     top_n_df = df_with_pred.sort_values(by=["예측 LTV"], ascending=False).head(top_n).reset_index(drop=True)
 
+    top_n_df.index += 1
+
     # 데이터프레임 표시
     st.dataframe(
         top_n_df[["연령대", "거주 지역", "예측 LTV", "고객 평생 가치"]]

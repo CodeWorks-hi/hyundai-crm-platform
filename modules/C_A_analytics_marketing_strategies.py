@@ -178,10 +178,10 @@ def strategies_ui():
     # 원본 데이터 보기
     st.subheader("🗂 원본 데이터 확인")
     with st.expander("GDP 실질 데이터"):
-        st.dataframe(df_real.head())
+        st.dataframe(df_real.head(), hide_index=True)
     with st.expander("경제심리지수"):
-        st.dataframe(df_sen.head())
+        st.dataframe(df_sen.head(), hide_index=True)
     with st.expander("뉴스심리지수"):
-        st.dataframe(df_news.head())
+        st.dataframe(df_news.head(), hide_index=True)
     with st.expander("고객 데이터"):
-        st.dataframe(df_list.head())
+        st.dataframe(df_list.head(), hide_index=True)

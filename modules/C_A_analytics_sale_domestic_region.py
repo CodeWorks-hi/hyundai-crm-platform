@@ -84,7 +84,7 @@ def domestic_region_ui():
             st.write(f"{year}년, {region}에 해당하는 데이터가 없습니다.")
         else:
             st.write(f"{year}년, {region}에 대한 데이터를 분석합니다.")
-            st.write(df_filtered)
+            st.dataframe(df_filtered, hide_index=True)
     
 
     st.markdown("---")
@@ -152,7 +152,7 @@ def domestic_region_ui():
 
         # Streamlit에서 출력
         with st.expander("판매 상위 지역 TOP3", expanded=False):
-            st.write(top3_regions)
+            st.dataframe(top3_regions, hide_index=True)
             
     with col2:
         # 지역별 총 판매량 계산
@@ -167,7 +167,7 @@ def domestic_region_ui():
 
         # Streamlit에서 출력
         with st.expander("판매 하위 지역 TOP3", expanded=False):
-            st.write(bottom3_regions)
+            st.dataframe(bottom3_regions, hide_index=True)
 
     # 지역에 따른 차종 히트맵
     col1,col2=st.columns(2)
@@ -240,9 +240,9 @@ def domestic_region_ui():
 
         # Streamlit에서 출력
         with st.expander("각 지역에서 가장 많이 판매된 차종", expanded=False):
-            st.dataframe(top_car_per_region)
+            st.dataframe(top_car_per_region, hide_index=True)
 
     with col2:  
         # Streamlit에서 출력
         with st.expander(f"{selected_region} 지역의 차종 비율 데이터", expanded=False):
-            st.write(car_type_ratio)
+            st.dataframe(car_type_ratio, hide_index=True)

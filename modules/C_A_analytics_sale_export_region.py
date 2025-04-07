@@ -133,7 +133,7 @@ def export_region_ui():
 
     # 데이터 확인 및 다운로드
     with st.expander("🗂 원본 데이터 보기"):
-        st.dataframe(growth_df)
+        st.dataframe(growth_df, hide_index=True)
 
     csv = growth_df.to_csv(index=False).encode("utf-8-sig")
     st.download_button("📥 데이터 다운로드", csv, f"{country}_{start_year}_{end_year}_수출성장률.csv", "text/csv")

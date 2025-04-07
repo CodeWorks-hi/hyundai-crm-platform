@@ -116,7 +116,7 @@ def export_performance_ui():
         col3.metric("차량 구분 수", f"{type_count} 종")
 
         with st.expander("🔍 원본 데이터 보기"):
-            st.dataframe(filtered, use_container_width=True)
+            st.dataframe(filtered, use_container_width=True, hide_index=True)
 
         csv = filtered.to_csv(index=False).encode("utf-8-sig")
         st.download_button("📥 데이터 다운로드", data=csv, file_name=f"{country}_{year}_수출실적.csv", mime="text/csv")

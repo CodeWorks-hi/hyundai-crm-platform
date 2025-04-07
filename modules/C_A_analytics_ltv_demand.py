@@ -101,7 +101,7 @@ def ltv_demand_ui():
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("###  공장별 부품 소요량 예측")
-    st.dataframe(df_parts[["공장명", "부품명", "재고량", "예상 소요량", "남은 재고"]], use_container_width=True)
+    st.dataframe(df_parts[["공장명", "부품명", "재고량", "예상 소요량", "남은 재고"]], use_container_width=True, hide_index=True)
     st.info(f" 전체 예측 수요량 (90일): **{int(total_demand):,} 대**")
 
     st.markdown("###  자동 발주 제안")
@@ -119,7 +119,7 @@ def ltv_demand_ui():
         st.warning(f"🚨 총 {len(df_order)}건의 부품에 대해 발주가 필요합니다.")
         st.dataframe(
             df_order[["공장명", "부품명", "재고량", "예상 소요량", "남은 재고", "발주 수량"]],
-            use_container_width=True
+            use_container_width=True, hide_index=True
         )
         csv = df_order.to_csv(index=False).encode("utf-8-sig")
         st.download_button(
