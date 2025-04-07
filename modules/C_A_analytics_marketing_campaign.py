@@ -33,9 +33,7 @@ set_korean_font()
 
 
 def campaign_ui():
-    st.markdown("""
-    ##  이벤트 분석 및 관리
-    """)
+
     st.subheader("💡 인사이트 요약 (AI 분석 기반)")
 
     df_campaigns = pd.read_csv("data/campaign_list.csv")  # CSV 경로 확인
