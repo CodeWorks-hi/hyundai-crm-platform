@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import random
-
+from datetime import datetime
 
 def inventory_ui():
     if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
@@ -11,6 +11,7 @@ def inventory_ui():
 
     # 데이터 불러오기 예시
     inv_df = pd.read_csv("data/inventory_data.csv")
+    inv_df = inv_df.loc[inv_df["브랜드"] != "기아", :]
     delay_reason_dict = {
         "배터리팩": "해외 공급망 이슈로 인한 지연",
         "엔진": "공장 생산 설비 점검 중",
@@ -292,47 +293,113 @@ def inventory_ui():
         ]["공장명"].dropna().unique()
         selected_factory = st.selectbox("🏭 공장 선택", sorted(available_factories), key='inven_fac')
         quantity = 1
+        client_name = st.text_input("👤 고객명", key="inv_name")
+        client_contact = st.text_input("📞 연락처", key="inv_contact")
         requestor = st.text_input("👤 요청자", value=st.session_state.get("manager_name", "홍길동"), disabled=True)
 
         submitted = st.button("✅ 발주 등록")
 
         if submitted:
-            vehicle = f"{selected_model} {selected_trim}"
+            car_df = pd.read_csv("data/hyundae_car_list.csv")
+            car_df = car_df.loc[car_df["브랜드"] != "기아", :]
+            sale_date = datetime.today()
+            customers_df = pd.read_csv('data/customers.csv')
+            customer_data = customers_df[(customers_df['상담자명'] == client_name) & (customers_df['연락처'] == client_contact)]
             
-            # 재고 차감
-            inv_df.loc[
-                (inv_df["모델명"] == selected_model) &
-                (inv_df["트림명"] == selected_trim) &
-                (inv_df["공장명"] == selected_factory),
-                ["재고량"]
-            ] -= 1
+            if customer_data.empty:
+                st.markdown("""
+                    <div style='margin-top: 10px; padding: 12px; background-color: #fff3f3;
+                                border-left: 6px solid #e74c3c; border-radius: 6px; color: #b94a48;'>
+                        ❌ <strong>해당 고객 정보가 존재하지 않습니다.</strong><br>
+                    </div>
+                """, unsafe_allow_html=True)
+                st.write(" ")
+            else:
+                # 기존 구매 횟수 확인
+                try:
+                    existing_sales_df = pd.read_csv("data/domestic_customer_data.csv")
+                    prior_sales_count = existing_sales_df[
+                        existing_sales_df["이름"] == customer_data.iloc[0]["상담자명"]
+                    ].shape[0]
+                    purchase_count = prior_sales_count + 1
+                except FileNotFoundError:
+                    purchase_count = 1
 
-            # 생산 가능 수량은 재계산
-            inv_df["차종"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
-            stock_df = (
-                inv_df.groupby(['차종', '공장명'], as_index=False)['재고량']
-                .min()
-                .rename(columns={'재고량': '생산 가능 수량'})
-            )
+                # 판매 고객 정보 및 차량 스펙 저장용 항목 구성
+                car_match = car_df[
+                    (car_df["모델명"] == selected_model) &
+                    (car_df["트림명"] == selected_trim)
+                ]
 
-            st.session_state["ordered_model"] = selected_model
-            st.session_state["ordered_trim"] = selected_trim
-            st.session_state["ordered_factory"] = selected_factory
+                if not car_match.empty:
+                    car_info = car_match.iloc[0]
+                    # 이후 car_info 사용
+                else:
+                    st.error("❌ 선택한 차종 및 트림에 해당하는 차량 정보가 존재하지 않습니다.")
+                    return
 
-            # 저장
-            inv_df.to_csv("data/inventory_data.csv", index=False)
+                customer_record = {
+                    "이름": customer_data.iloc[0]["상담자명"],
+                    "연락처": customer_data.iloc[0]["연락처"],
+                    "성별": customer_data.iloc[0]["성별"][0],
+                    "현재 나이": datetime.today().year - pd.to_datetime(customer_data.iloc[0]["생년월일"]).year,
+                    "구매연도": sale_date.year,
+                    "연령대": customer_data.iloc[0]["연령대"],
+                    "거주 지역": customer_data.iloc[0]["거주지역"],
+                    "차량 구매 횟수": purchase_count,
+                    "고객 평생 가치": st.session_state.get("LTV", 0),
+                    "브랜드": car_info["브랜드"],
+                    "모델명": car_info["모델명"],
+                    "트림명": car_info["트림명"],
+                    "기본가격": car_info["기본가격"],
+                    "공장명": selected_factory,
+                    "실구매여부": 0
+                }
 
-            st.markdown(f"""
-                <div style="margin-top: 25px; padding: 20px; background-color: #f0f9ff; border-left: 6px solid #1890ff; border-radius: 8px;">
-                    <h4 style="color: #1a73e8;">📦 발주 등록 완료</h4>
-                    <p style="margin: 6px 0;">차량이 성공적으로 발주되었습니다.</p>
-                    <ul style="margin-left: 1rem; padding-left: 0.5rem;">
-                        <li><b>차종:</b> {vehicle}</li>
-                        <li><b>공장:</b> {selected_factory}</li>
-                        <li><b>요청자:</b> {requestor}</li>
-                    </ul>
-                </div>
-            """, unsafe_allow_html=True)
+                # 파일에 누적 저장
+                csv_path = "data/domestic_customer_data.csv"
+                try:
+                    existing_df = pd.read_csv(csv_path)
+                    updated_df = pd.concat([existing_df, pd.DataFrame([customer_record])], ignore_index=True)
+                except FileNotFoundError:
+                    updated_df = pd.DataFrame([customer_record])
+
+                updated_df.to_csv(csv_path, index=False)  
+
+                vehicle = f"{selected_model} {selected_trim}"
+            
+                # 재고 차감
+                inv_df.loc[
+                    (inv_df["모델명"] == selected_model) &
+                    (inv_df["트림명"] == selected_trim) &
+                    (inv_df["공장명"] == selected_factory),
+                    ["재고량"]
+                ] -= 1
+
+                # 생산 가능 수량은 재계산
+                inv_df["차종"] = inv_df["모델명"].astype(str) + " " + inv_df["트림명"].astype(str)
+                stock_df = (
+                    inv_df.groupby(['차종', '공장명'], as_index=False)['재고량']
+                    .min()
+                    .rename(columns={'재고량': '생산 가능 수량'})
+                )      
+                
+                # 저장
+                inv_df.to_csv("data/inventory_data.csv", index=False)
+
+                st.markdown(f"""
+                    <div style="margin-top: 25px; padding: 20px; background-color: #f0f9ff; border-left: 6px solid #1890ff; border-radius: 8px;">
+                        <h4 style="color: #1a73e8;">📦 발주 등록 완료</h4>
+                        <p style="margin: 6px 0;">차량이 성공적으로 발주되었습니다.</p>
+                        <ul style="margin-left: 1rem; padding-left: 0.5rem;">
+                            <li><b>차종:</b> {vehicle}</li>
+                            <li><b>공장:</b> {selected_factory}</li>
+                            <li><b>요청자:</b> {requestor}</li>
+                        </ul>
+                    </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown("##### ")
 
     # -------------------------------
     # 전체 테이블 익스펜더

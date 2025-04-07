@@ -9,18 +9,12 @@ def sales_registration_ui():
     if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
         st.warning("딜러 정보를 먼저 등록하세요.")
         return
-    if "ordered_model" not in st.session_state:
-        st.session_state["ordered_model"] = ""
-    if "ordered_trim" not in st.session_state:
-        st.session_state["ordered_trim"] = ""
-    if "ordered_factory" not in st.session_state:
-        st.session_state["ordered_factory"] = ""
 
     # Load car list dataset
     car_df = pd.read_csv("data/hyundae_car_list.csv")
     car_df = car_df.loc[car_df["브랜드"] != "기아", :]
     plant_df = pd.read_csv("data/inventory_data.csv")
-    customers_df = pd.read_csv('data/customers.csv')
+    customers_df = pd.read_csv('data/domestic_customer_data.csv')
     prod_df = pd.read_csv('data/model_trim_capacity.csv')
     plant_df.columns = plant_df.columns.str.strip()
     plant_df = plant_df[plant_df["생산상태"] == "생산중"]
@@ -31,32 +25,13 @@ def sales_registration_ui():
     left_col, right_col = st.columns(2)
     
     with left_col:
-        st.markdown("##### 🚗 차량 선택")
-
-        selected_model = st.selectbox("차종", model_options)
-        available_trims = car_df[car_df["모델명"] == selected_model]["트림명"].dropna().unique()
-        selected_trim = st.selectbox("트림명", sorted(available_trims), key=f"trim_{selected_model}")
-
-        filtered_factories = plant_df[
-            (plant_df["모델명"] == selected_model) &
-            (plant_df["트림명"] == selected_trim)
-        ]["공장명"].dropna().unique()
-        selected_factory = st.selectbox("공장명", sorted(filtered_factories))
+        st.markdown("##### 📝 판매 정보")
 
         dealer = st.selectbox("직원명", [st.session_state["직원이름"]], disabled=True)
 
-    with right_col:
-        st.markdown("##### 📝 판매 정보")
-
-        stock_qty = plant_df[
-            (plant_df["모델명"] == selected_model) &
-            (plant_df["트림명"] == selected_trim) &
-            (plant_df["공장명"] == selected_factory)
-        ]["재고량"].min()
-
         customer = st.text_input("👤 고객명")
         contact = st.text_input("📞 연락처")
-        customer_data = customers_df[(customers_df['상담자명'] == customer) & (customers_df['연락처'] == contact)]
+        customer_data = customers_df[(customers_df['이름'] == customer) & (customers_df['연락처'] == contact) & (customers_df["실구매여부"] == 0)]
         if customer_data.empty:
             st.markdown("""
                 <div style='margin-top: 10px; padding: 12px; background-color: #fff3f3;
@@ -68,96 +43,143 @@ def sales_registration_ui():
         else:
             st.markdown(f"""
                 <div style='background-color:#f0f8ff; padding: 10px; border-left: 4px solid #1890ff; border-radius: 5px; margin-bottom: 10px;'>
-                    👤 <b>{customer_data.iloc[0]["상담자명"]}</b> / {customer_data.iloc[0]["연락처"]} / {st.session_state["ordered_model"]} {st.session_state["ordered_trim"]} / {st.session_state["ordered_factory"]}
+                    👤 <b>{customer_data.iloc[0]["이름"]}</b> / {customer_data.iloc[0]["연락처"]} / {customer_data.iloc[0]["모델명"]} {customer_data.iloc[0]["트림명"]} / {customer_data.iloc[0]["공장명"]}
                 </div>
             """, unsafe_allow_html=True)
 
-        sale_date = st.date_input("📅 판매일자", value=datetime.today())
+    with right_col:
+        st.markdown("##### 🚗 차량 선택")
+        
+        if customer_data.empty:
+            selected_model = st.selectbox("차종", model_options)
+            available_trims = car_df[car_df["모델명"] == selected_model]["트림명"].dropna().unique()
+            selected_trim = st.selectbox("트림명", sorted(available_trims), key=f"trim_{selected_model}")
 
-        if st.button("✅ 판매 등록"):
-            goal_df = pd.read_csv("data/employee_goal.csv")
-            goal_df = goal_df[goal_df["직원명"] == dealer]
+            filtered_factories = plant_df[
+                (plant_df["모델명"] == selected_model) &
+                (plant_df["트림명"] == selected_trim)
+            ]["공장명"].dropna().unique()
+            selected_factory = st.selectbox("공장명", sorted(filtered_factories))
+        else:
+            selected_model_value = customer_data.iloc[0]["모델명"]
+            selected_model_index = model_options.index(selected_model_value) if selected_model_value in model_options else 0
+            selected_model = st.selectbox("차종", model_options, index=selected_model_index, disabled=True)
             
-            goal_df[["주간실적", "월간실적", "연간실적"]] += 1
-            goal_df.to_csv("data/employee_goal.csv", index=False)
+            available_trims = car_df[car_df["모델명"] == selected_model]["트림명"].dropna().unique()
+            selected_trim_value = customer_data.iloc[0]["트림명"]
+            trim_options = sorted(available_trims)
+            selected_trim_index = trim_options.index(selected_trim_value) if selected_trim_value in trim_options else 0
+            selected_trim = st.selectbox("트림명", trim_options, key=f"trim_{selected_model}", index=selected_trim_index, disabled=True)
 
-            if customer_data.empty or not contact:
-                st.warning("⚠️ 고객명과 연락처를 입력해주세요.")
-            elif stock_qty is None or stock_qty < 1 or selected_factory is None:
-                st.error("🚫 해당 차량의 재고가 부족합니다.")
-            else:
-                if len(customer) >= 2:
-                    masked_customer = customer[0] + "*" + customer[2:]
-                else:
-                    masked_customer = customer
+            filtered_factories = plant_df[
+                (plant_df["모델명"] == selected_model) &
+                (plant_df["트림명"] == selected_trim)
+            ]["공장명"].dropna().unique()
+            selected_factory_value = customer_data.iloc[0]["공장명"]
+            factory_options = sorted(filtered_factories)
+            selected_factory_index = factory_options.index(selected_factory_value) if selected_factory_value in factory_options else 0
+            selected_factory = st.selectbox("공장명", factory_options, index=selected_factory_index, disabled=True)
 
-                # 기존 구매 횟수 확인
-                try:
-                    existing_sales_df = pd.read_csv("data/domestic_customer_data.csv")
-                    prior_sales_count = existing_sales_df[
-                        existing_sales_df["이름"] == customer_data.iloc[0]["상담자명"]
-                    ].shape[0]
-                    purchase_count = prior_sales_count + 1
-                except FileNotFoundError:
-                    purchase_count = 1
+            stock_qty = plant_df[
+                (plant_df["모델명"] == selected_model) &
+                (plant_df["트림명"] == selected_trim) &
+                (plant_df["공장명"] == selected_factory)
+            ]["재고량"].min()
 
-                new_sale = {
-                    "차종": selected_model,
-                    "트림명": selected_trim,
-                    "공장명": selected_factory,
-                    "고객명": masked_customer,
-                    "수량": 1,
-                    "판매일자": sale_date.strftime("%Y-%m-%d"),
-                }
+            sale_date = st.date_input("📅 판매일자", value=datetime.today())
 
-                if "sales_log" not in st.session_state:
-                    st.session_state.sales_log = []
-                st.session_state.sales_log.append(new_sale)
-
-                # 판매 고객 정보 및 차량 스펙 저장용 항목 구성
-                car_info = car_df[
-                    (car_df["모델명"] == selected_model) &
-                    (car_df["트림명"] == selected_trim)
-                ].iloc[0]
-
-                customer_record = {
-                    "이름": customer_data.iloc[0]["상담자명"],
-                    "연락처": customer_data.iloc[0]["연락처"],
-                    "성별": customer_data.iloc[0]["성별"],
-                    "현재 나이": datetime.today().year - pd.to_datetime(customer_data.iloc[0]["생년월일"]).year,
-                    "구매연도": sale_date.year,
-                    "연령대": customer_data.iloc[0]["연령대"],
-                    "거주 지역": customer_data.iloc[0]["거주지역"],
-                    "차량 구매 횟수": purchase_count,
-                    "고객 평생 가치": st.session_state.get("LTV", 0),
-                    "브랜드": car_info["브랜드"],
-                    "모델명": car_info["모델명"],
-                    "기본가격": car_info["기본가격"],
-                    "공장명": selected_factory
-                }
-
-                # 파일에 누적 저장
-                csv_path = "data/domestic_customer_data.csv"
-                try:
-                    existing_df = pd.read_csv(csv_path)
-                    updated_df = pd.concat([existing_df, pd.DataFrame([customer_record])], ignore_index=True)
-                except FileNotFoundError:
-                    updated_df = pd.DataFrame([customer_record])
-
-                updated_df.to_csv(csv_path, index=False)
-
-                st.success("✅ 판매 등록이 완료되었습니다.")
+            if st.button("✅ 판매 등록"):
+                goal_df = pd.read_csv("data/employee_goal.csv")
+                goal_df = goal_df[goal_df["직원명"] == dealer]
                 
-                # 생산 데이터에서 해당 조합의 재고량 -1 처리
-                prod_mask = (
-                    (prod_df["모델명"] == selected_model) &
-                    (prod_df["트림명"] == selected_trim) &
-                    (prod_df["공장명"] == selected_factory)
-                )
+                goal_df[["주간실적", "월간실적", "연간실적"]] += 1
+                goal_df.to_csv("data/employee_goal.csv", index=False)
 
-                if not prod_df[prod_mask].empty:
-                    prod_df.loc[prod_mask, "재고량"] = prod_df.loc[prod_mask, "재고량"] - 1
-                    prod_df.to_csv("data/model_trim_capacity.csv", index=False)
+                if customer_data.empty or not contact:
+                    st.warning("⚠️ 고객명과 연락처를 입력해주세요.")
+                elif stock_qty is None or stock_qty < 1 or selected_factory is None:
+                    st.error("🚫 해당 차량의 재고가 부족합니다.")
+                else:
+                    if len(customer) >= 2:
+                        masked_customer = customer[0] + "*" + customer[2:]
+                    else:
+                        masked_customer = customer
+
+                    # 기존 구매 횟수 확인
+                    try:
+                        existing_sales_df = pd.read_csv("data/domestic_customer_data.csv")
+                        prior_sales_count = existing_sales_df[
+                            (existing_sales_df["이름"] == customer_data.iloc[0]["이름"]) & 
+                            (existing_sales_df["연락처"] == customer_data.iloc[0]["연락처"]) &
+                            (existing_sales_df["실구매여부"] == 1)
+                        ].shape[0]
+                        purchase_count = prior_sales_count + 1
+                    except FileNotFoundError:
+                        purchase_count = 1
+
+                    new_sale = {
+                        "차종": selected_model,
+                        "트림명": selected_trim,
+                        "공장명": selected_factory,
+                        "고객명": masked_customer,
+                        "수량": 1,
+                        "판매일자": sale_date.strftime("%Y-%m-%d"),
+                    }
+
+                    if "sales_log" not in st.session_state:
+                        st.session_state.sales_log = []
+                    st.session_state.sales_log.append(new_sale)
+
+                    # 판매 고객 정보 및 차량 스펙 저장용 항목 구성
+                    car_info = car_df[
+                        (car_df["모델명"] == selected_model) &
+                        (car_df["트림명"] == selected_trim)
+                    ].iloc[0]
+
+                    customer_record = {
+                        "이름": customer_data.iloc[0]["이름"],
+                        "연락처": customer_data.iloc[0]["연락처"],
+                        "성별": customer_data.iloc[0]["성별"],
+                        "현재 나이": customer_data.iloc[0]["현재 나이"],
+                        "구매연도": sale_date.year,
+                        "연령대": customer_data.iloc[0]["연령대"],
+                        "거주 지역": customer_data.iloc[0]["거주 지역"],
+                        "차량 구매 횟수": purchase_count,
+                        "고객 평생 가치": st.session_state.get("LTV", 0),
+                        "브랜드": car_info["브랜드"],
+                        "모델명": car_info["모델명"],
+                        "기본가격": car_info["기본가격"],
+                        "공장명": selected_factory
+                    }
+
+                    # 파일에 누적 저장
+                    csv_path = "data/domestic_customer_data.csv"
+                    try:
+                        existing_df = pd.read_csv(csv_path)
+                        updated_df = pd.concat([existing_df, pd.DataFrame([customer_record])], ignore_index=True)
+                    except FileNotFoundError:
+                        updated_df = pd.DataFrame([customer_record])
+
+                    updated_df.to_csv(csv_path, index=False)
+
+                    # 실구매여부를 1로 변경
+                    customer_mask = (customers_df["이름"] == customer_data.iloc[0]["이름"]) & (customers_df["연락처"] == customer_data.iloc[0]["연락처"])
+                    customers_df.loc[customer_mask, "실구매여부"] = 1
+                    customers_df.to_csv("data/domestic_customer_data.csv", index=False)
+
+                    st.success("✅ 판매 등록이 완료되었습니다.")
+                    
+                    # 생산 데이터에서 해당 조합의 재고량 -1 처리
+                    prod_mask = (
+                        (prod_df["모델명"] == selected_model) &
+                        (prod_df["트림명"] == selected_trim) &
+                        (prod_df["공장명"] == selected_factory)
+                    )
+
+                    if not prod_df[prod_mask].empty:
+                        prod_df.loc[prod_mask, "재고량"] = prod_df.loc[prod_mask, "재고량"] - 1
+                        prod_df.to_csv("data/model_trim_capacity.csv", index=False)
+    st.markdown("---")
 
     # 현재 직원 판매 실적 표시
     goal_df = pd.read_csv("data/employee_goal.csv")
