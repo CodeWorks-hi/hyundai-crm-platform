@@ -20,7 +20,7 @@ logging.info(f"[접속 기록] 페이지 접속 시각: {datetime.datetime.now()
 
 # ✅ 페이지 설정
 st.set_page_config(
-    page_title="Hyundai ERP",
+    page_title="Hyundai CRM",
     layout="wide",
     page_icon="https://i.namu.wiki/i/uNKzeN4J5LmcBr_4EbF2D6ObllziCSQWNo8inXP6F2vS1zIb1UtVws-7AzkP0qOUrm40Um6xekuoFUYDMtFT3w.webp"
 )

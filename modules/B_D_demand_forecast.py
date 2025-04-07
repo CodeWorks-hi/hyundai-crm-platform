@@ -59,13 +59,10 @@ def demand_forecast_ui():
     df = pd.read_csv("data/hyundae_car_list.csv")
     df = df.loc[df["브랜드"] != "기아", :]
 
-    st.title("고객 정보 입력 & 차량 추천")
-
-    st.markdown("---")
 
     st.markdown("""
-    <div style='background-color: #ffffff; padding: 30px 25px 20px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 30px;'>
-        <h3 style='color: #003366; margin-bottom: 20px;'>🚗 고객 기본 정보 입력</h3>
+    <div style='background-color: #ffffff; padding: 10px 10px 10px 10px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 10px;'>
+        <h3 style='color: #003366; margin-bottom: 10px;'> 고객 기본 정보 입력 </h3>
     """, unsafe_allow_html=True)
     default_budget = st.session_state["recom_budget"]
     default_gender = st.session_state["고객정보"]["성별"]
