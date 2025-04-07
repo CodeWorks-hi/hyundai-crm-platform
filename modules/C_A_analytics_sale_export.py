@@ -22,8 +22,8 @@ def export_ui():
     with tab2:
         export_region_ui()
     with tab3:
-        export_goal_ui()
-    with tab4:
         export_growth_ui()
+    with tab4:
+        export_goal_ui()
 
 
