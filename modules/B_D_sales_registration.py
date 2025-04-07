@@ -177,7 +177,7 @@ def sales_registration_ui():
                     )
 
                     if not prod_df[prod_mask].empty:
-                        prod_df.loc[prod_mask, "재고량"] = prod_df.loc[prod_mask, "재고량"] - 1
+                        prod_df.loc[prod_mask, "생산가능수량"] = prod_df.loc[prod_mask, "생산가능수량"] - 1
                         prod_df.to_csv("data/model_trim_capacity.csv", index=False)
     st.markdown("---")
 
