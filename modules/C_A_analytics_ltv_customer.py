@@ -41,6 +41,7 @@ def load_data():
 # 데이터 전처리 및 모델 학습 함수 수정
 def preprocess_and_train_model(df):
     df = df.drop(columns=["이름", "연락처", "브랜드", "모델명", "공장명"], errors="ignore")
+    df = df.drop(columns=["트림명"], errors="ignore")
 
     # 재현성 보장을 위한 시드 설정
     np.random.seed(42)
