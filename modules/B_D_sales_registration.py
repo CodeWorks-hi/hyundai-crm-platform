@@ -11,8 +11,10 @@ def sales_registration_ui():
         return
     if "ordered_model" not in st.session_state:
         st.session_state["ordered_model"] = ""
+    if "ordered_trim" not in st.session_state:
         st.session_state["ordered_trim"] = ""
-        st.session_state["ordered_factory"]
+    if "ordered_factory" not in st.session_state:
+        st.session_state["ordered_factory"] = ""
 
     # Load car list dataset
     car_df = pd.read_csv("data/hyundae_car_list.csv")
