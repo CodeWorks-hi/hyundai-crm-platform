@@ -129,3 +129,9 @@ def survey_ui(df_employees, generate_html_table):
                     "거주지역": 거주지역
                 }
                 st.success(f"{이름}님 설문조사가 완료되었습니다.")
+
+    st.markdown("###### ")
+
+    with st.expander("🗂 원본 데이터 확인", expanded=False):
+        base_df = pd.read_csv("data/customers.csv")
+        st.dataframe(base_df, hide_index=True, use_container_width=True)

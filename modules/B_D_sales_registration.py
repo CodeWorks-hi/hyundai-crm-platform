@@ -213,3 +213,23 @@ def sales_registration_ui():
         st.dataframe(df, use_container_width=True, hide_index=True)
     else:
         st.info("아직 등록된 판매 이력이 없습니다.")
+
+    st.markdown("###### ")
+
+    with st.expander("🗂 원본 데이터 확인", expanded=False):
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["차종별 판매량 통계", "부품 재고 현황", "차량 판매 기록", "생산 가능 수량 현황", "딜러 실적 통계"])
+        with tab1:
+            base_df = pd.read_csv("data/hyundae_car_list.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab2:
+            base_df = pd.read_csv("data/inventory_data.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab3:
+            base_df = pd.read_csv("data/domestic_customer_data.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab4:
+            base_df = pd.read_csv("data/model_trim_capacity.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab5:
+            base_df = pd.read_csv("data/employee_goal.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)

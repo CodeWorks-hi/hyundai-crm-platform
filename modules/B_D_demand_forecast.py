@@ -269,3 +269,14 @@ def demand_forecast_ui():
                         img_rows, text_rows = [], []
             else:
                 custom_message("😢 죄송합니다. 예산 내에 맞는 차량이 없습니다. 조건을 확인해주세요!", "error")
+
+    st.markdown("###### ")
+
+    with st.expander("🗂 원본 데이터 확인", expanded=False):
+        tab1, tab2 = st.tabs(["차량 판매 기록", "차량 상세 정보"])
+        with tab1:
+            base_df = pd.read_csv("data/domestic_customer_data.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab2:
+            base_df = pd.read_csv("data/hyundae_car_list.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)

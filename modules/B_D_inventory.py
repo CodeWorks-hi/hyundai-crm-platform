@@ -403,7 +403,16 @@ def inventory_ui():
 
     # -------------------------------
     # 전체 테이블 익스펜더
-    with st.expander("전체 생산 가능 수량 테이블 보기"):
+    with st.expander("🔧 전체 생산 가능 수량 테이블 보기"):
         pivot_df = inv_df.groupby(['차종', '공장명'])['재고량'].min().reset_index()
         pivot_df = pivot_df.rename(columns={"재고량": "생산 가능 수량"})
         st.dataframe(pivot_df.pivot(index="차종", columns="공장명", values="생산 가능 수량").fillna(0).astype(int))
+
+    with st.expander("🗂 원본 데이터 확인", expanded=False):
+        tab1, tab2 = st.tabs(["차종별 판매량 통계", "부품 재고 현황"])
+        with tab1:
+            base_df = pd.read_csv("data/processed/total/hyundai-by-car.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab2:
+            base_df = pd.read_csv("data/inventory_data.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
