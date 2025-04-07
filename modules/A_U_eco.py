@@ -66,7 +66,7 @@ def create_popup_html(place):
 # --------------------------
 def render_char_search_map():
 # 레이아웃
-    col1, col2 = st.columns([1, 5])
+    col1, col2= st.columns([1, 5])
 
     # 🔹 지역 선택
     with col1:
@@ -124,6 +124,11 @@ def render_char_search_map():
                 icon=folium.Icon(color="blue", icon="info-sign")
             ).add_to(m)
             st.components.v1.html(m._repr_html_(), height=600)
+        # 🔹 원본 데이터 보기
+    st.markdown("---")
+    st.markdown("##### 충전소 원본 데이터 확인")
+    with st.expander("📄 선택 지역의 충전소 목록 보기"):
+        st.dataframe(selected_area, use_container_width=True, hide_index=True)
 
 # 이미지 URL을 Base64로 변환하는 함수
 def encode_image_from_url_to_base64(image_url):
@@ -177,6 +182,16 @@ def eco_ui():
                     st.markdown(f"<div style='padding: 10px; background-color: #f5f5f5; border-radius: 8px; text-align: center;'><h4 style='margin:0;'>{elec_data.iloc[0]['보조금/초소형(만원)']}만원</h4></div>", unsafe_allow_html=True)
         else:
             st.info("보조금 데이터가 없습니다.")
+        view_option = st.radio("📂 원본 데이터 보기", ["전기차 보조금", "수소차 보조금", "충전소 현황"],horizontal=True )
+
+        # 선택에 따라 해당 데이터프레임 표시
+        with st.expander(f"📋 {view_option} 데이터 보기"):
+            if view_option == "전기차 보조금":
+                st.dataframe(ec_gift, use_container_width=True, hide_index=True)
+            elif view_option == "수소차 보조금":
+                st.dataframe(suso_gift, use_container_width=True, hide_index=True)
+            elif view_option == "충전소 현황":
+                st.dataframe(char, use_container_width=True, hide_index=True)
 
     with col2:
         st.subheader("모델을 선택하세요")
