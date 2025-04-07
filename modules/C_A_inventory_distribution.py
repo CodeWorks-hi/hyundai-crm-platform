@@ -36,6 +36,8 @@ def distribution_ui():
         "인도네시아공장": (-6.305, 107.097)
     }
 
+    np.random.seed(42) 
+    
     # 공장 위치 컬럼 추가
     df_inv["위도"] = df_inv["공장명"].map(lambda x: plant_location.get(x, (0, 0))[0])
     df_inv["경도"] = df_inv["공장명"].map(lambda x: plant_location.get(x, (0, 0))[1])

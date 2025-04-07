@@ -20,6 +20,7 @@ def load_data():
     df_inv = pd.read_csv(INV_PATH)
     df_list = pd.read_csv(LIST_PATH)
     return df_inv, df_list
+np.random.seed(42) 
 
 # 데이터 전처리 함수
 def preprocess_data(df_inv):

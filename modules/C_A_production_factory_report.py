@@ -22,7 +22,8 @@ def load_data():
     except FileNotFoundError as e:
         st.error(f"파일을 찾을 수 없습니다: {str(e)}")
         st.stop()
-
+        
+    np.random.seed(42) 
 
 # 생산 분석 리포트 UI 함수
 def report_ui(df_inv):

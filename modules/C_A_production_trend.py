@@ -7,6 +7,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
+import numpy as np
 
 # 데이터 불러오기
 @st.cache_data
@@ -24,6 +25,8 @@ def load_data():
         df.columns = df.columns.str.strip()
         df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
         return df
+    
+    np.random.seed(42) 
 
     df_list = clean_df(df_list)
     df_inv = clean_df(df_inv)

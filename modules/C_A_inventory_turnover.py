@@ -46,6 +46,8 @@ def load_data():
         .replace([np.inf, -np.inf], 0).fillna(0).round(2)
     return df_inv
 
+np.random.seed(42) 
+
 # 🎯 메인 UI
 def turnover_ui():
     df = load_data()

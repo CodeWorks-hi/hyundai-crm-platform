@@ -7,6 +7,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import os
+import numpy as np
 
 # 경로 설정
 INV_PATH = "data/inventory_data.csv"
@@ -18,6 +19,8 @@ def load_data():
     df_inv = pd.read_csv(INV_PATH)
     df_list = pd.read_csv(LIST_PATH)
     return df_inv, df_list
+
+np.random.seed(42) 
 
 # CSV 생성 함수
 def generate_capacity_file():

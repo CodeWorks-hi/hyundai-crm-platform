@@ -7,6 +7,7 @@ from prophet import Prophet
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import joblib
+import numpy as np
 
 @st.cache_data
 def load_data():
@@ -27,6 +28,8 @@ try:
 except Exception as e:
     st.error(f"LTV 모델 로드 오류: {e}")
 
+    # 재현성 보장을 위한 시드 설정
+    np.random.seed(42)
 
 def ltv_demand_ui():
     df_customer, df_export, df_inventory = load_data()

@@ -38,6 +38,10 @@ def load_data():
         st.error(f"데이터 로드 오류: {str(e)}")
         st.stop()
 
+
+    # 재현성 보장을 위한 시드 설정
+    np.random.seed(42)
+
 # 데이터 전처리
 def preprocess_data(df, data_type):
     try:
