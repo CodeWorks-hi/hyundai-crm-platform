@@ -137,3 +137,4 @@ def domestic_performance_ui():
             # 월별 판매량 데이터를 내림차순으로 정렬하고 상위 3개만 추출
             sorted_monthly_sales = monthly_sales.sort_values(ascending=False).head(3)
             st.dataframe(sorted_monthly_sales)
+            
