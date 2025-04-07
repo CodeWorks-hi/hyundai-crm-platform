@@ -145,47 +145,7 @@ def domestic_performance_ui():
             
             st.plotly_chart(fig, use_container_width=True)
 
-    # **오른쪽 열 (col2): 차량 모델 구매 비율**
-    with col2:
-        col1_1, col1_2 = st.columns(2)
-        with col1_1:
-            # 연령대 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
-            selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox")
-        with col1_2:
-            # 성별 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            gender_options = df_filtered['성별'].unique().tolist()
-            selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox")
-
-        # 필터링 로직
-        if selected_age == '전체' and selected_gender == '전체':
-            filtered_data = df_filtered.copy()  # 필터링 해제
-        elif selected_age == '전체':
-            filtered_data = df_filtered[df_filtered['성별'] == selected_gender]  # 성별만 필터링
-        elif selected_gender == '전체':
-            filtered_data = df_filtered[df_filtered['통합 연령대'] == selected_age]  # 연령대만 필터링
-        else:
-            filtered_data = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
-
-        # 차량 모델별 구매 수량 계산
-        model_counts = filtered_data['최근 구매 제품'].value_counts()
-
-        if model_counts.empty:
-            st.write("필터링된 데이터가 없습니다.")
-        else:
-            
-            # Plotly 원형 차트 시각화
-            fig = px.pie(
-                names=model_counts.index,
-                values=model_counts.values,
-                title="차량 모델 구매 비율",
-                color_discrete_sequence=px.colors.sequential.RdBu
-            )
-            # 숫자 표시 제거
-            fig.update_traces(textinfo='none')
-
-            
-            st.plotly_chart(fig, use_container_width=True)
+    
 
     st.markdown("---")
 
