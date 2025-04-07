@@ -20,7 +20,7 @@ def render_campaign_register():
         is_active = st.checkbox("활성화 여부", value=True)
 
         st.markdown("📎 이미지는 **png 파일만 업로드 가능**하며, `images/event/` 경로에 저장됩니다.")
-        uploaded_file = st.file_uploader("캠페인 배너 이미지 업로드 (PNG)", type=["png"])
+        uploaded_file = st.file_uploader("이벤트배너 이미지 업로드 (PNG)", type=["png"])
 
         submitted = st.form_submit_button("이벤트 등록")
 
@@ -56,7 +56,7 @@ def render_campaign_register():
 
 
 def render_campaign_manager():
-    st.subheader("캠페인 관리")
+    st.subheader("이벤트관리")
 
     filter_option = st.radio("이벤트 상태 필터", ["전체", "진행 중", "예정", "종료됨"], horizontal=True)
 
