@@ -10,7 +10,6 @@ from .C_A_production_factory_analysis import factory_analysis_ui
 import numpy as np
 
 # 데이터 로드 함수
-@st.cache_data
 def load_data():
     df_inv = pd.read_csv("data/inventory_data.csv")
     df_list = pd.read_csv("data/hyundae_car_list.csv")
@@ -25,6 +24,7 @@ def factory_ui():
 
     # 검색 결과 [2] 첨부 파일 구조에 따른 컬럼명 수정
     try:
+        print(trim_list.columns.tolist())
         # 필수 컬럼 존재 여부 검증
         required_columns = ['공장명', '생산가능수량']
         if not all(col in trim_list.columns for col in required_columns):
