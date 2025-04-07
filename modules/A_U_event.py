@@ -39,14 +39,21 @@ def event_ui():
         st.image("images/event/event3.jpg", use_container_width=True)
         st.markdown("#### 현대카드 제휴 이벤트")
         st.caption("현대카드로 차량을 구매하면 슈퍼콘서트 티켓 2매 증정! 자동차와 함께 특별한 경험까지 함께 드립니다.")
+
         with st.expander("이벤트 - 상세보기"):
             st.markdown("""
-                - **대상**: 현대카드로 차량 구매한 고객  
-                - **혜택**: 현대카드 슈퍼콘서트 티켓 2매 증정  
-                - **참여 방법**: 차량 구매 시 현대카드 사용
+        - **대상**: 현대카드로 차량을 구매한 고객  
+        - **혜택**: **현대카드 슈퍼콘서트 티켓 2매 증정**  
+        - **참여 방법**: 차량 계약 시 현대카드 결제 진행 → 자동 응모  
+        - **유의사항**: 티켓은 선착순 한정 / 일부 차종 제외 가능
             """)
     st.markdown("---")
-    cola, colb, colc, cold, cole  = st.columns([2, 0.1, 2, 0.1, 2])
+    colz1, cola, colb, colc, cold, cole, colz2  = st.columns([0.2, 2, 0.15, 2, 0.15, 2,0.2])
+    with colz1:
+        pass
+    with colz2:
+        pass
+
     with colb:
         pass
     with cold:
@@ -54,30 +61,39 @@ def event_ui():
     with cola:
         st.image("images/event/event5.png", use_container_width=True)
         st.markdown("#### 현대 Spring Go! 주유 걱정 없이 떠나봄")
-        st.caption("현대카드로 차량을 구매하면 슈퍼콘서트 티켓 2매 증정! 자동차와 함께 특별한 경험까지 함께 드립니다.")
+        st.caption("봄바람 타고 떠나는 드라이브, 유류비 걱정은 현대가 책임질게요!")
         with st.expander("이벤트 - 상세보기"):
             st.markdown("""
-                - **대상**: 현대카드로 차량 구매한 고객  
-                - **혜택**: 현대카드 슈퍼콘서트 티켓 2매 증정  
-                - **참여 방법**: 차량 구매 시 현대카드 사용
+        - **대상**: 2025년 4~5월 현대차 출고 고객  
+        - **혜택**: 최대 30만원 상당 주유권 또는 전기차 충전 크레딧 제공  
+        - **참여 방법**: 이벤트 대상 차종 계약 및 출고 시 자동 응모  
+        - **보너스**: SNS 인증샷 이벤트 참여 시 캠핑용품 등 경품 추첨 제공  
+        - **추가 서비스**: 봄철 무상 차량 점검 프로그램 운영
             """)
     with colc:
         st.image("images/event/event6.png", use_container_width=True)
-        st.markdown("#### 현대 EV: FLEX 페이백 시즌")
-        st.caption("현대카드로 차량을 구매하면 슈퍼콘서트 티켓 2매 증정! 자동차와 함께 특별한 경험까지 함께 드립니다.")
+        st.markdown("#### Enjoy Car Camping with Hyundai")
+        st.caption("캠핑의 계절, SUV와 함께 자연으로 떠나세요. 지금 구매 시 특별한 혜택을 드립니다.")
+
         with st.expander("이벤트 - 상세보기"):
             st.markdown("""
-                - **대상**: 현대카드로 차량 구매한 고객  
-                - **혜택**: 현대카드 슈퍼콘서트 티켓 2매 증정  
-                - **참여 방법**: 차량 구매 시 현대카드 사용
+        - **대상**: 2025년 4~5월 중 현대 SUV 차량 구매 고객  
+        - **혜택**: 100만원 상당 **프리미엄 캠핑용품 세트** 증정  
+        - **참여 방법**: 이벤트 대상 SUV 차량 계약 및 출고 시 자동 참여  
+        - **추가 혜택**:  
+            - 캠핑 인증샷 SNS 업로드 시 **추가 경품 이벤트** 참여 가능  
+            - 출고 고객 대상 **무상 차량 점검 서비스** 제공
             """)
     with cole:
-        st.image("images/event/event7.png", use_container_width=True)
-        st.markdown("#### 현대 Spring Go! 주유 걱정 없이 떠나봄")
-        st.caption("현대카드로 차량을 구매하면 슈퍼콘서트 티켓 2매 증정! 자동차와 함께 특별한 경험까지 함께 드립니다.")
+        st.image("images/event/event7.png",  use_container_width=True)
+        st.markdown("#### 현대자동차 봄맞이 주행 지원 이벤트")
+        st.caption("따뜻한 봄날, 가볍게 시승하고 주유 상품권 혜택까지 받아가세요!")
+
         with st.expander("이벤트 - 상세보기"):
             st.markdown("""
-                - **대상**: 현대카드로 차량 구매한 고객  
-                - **혜택**: 현대카드 슈퍼콘서트 티켓 2매 증정  
-                - **참여 방법**: 차량 구매 시 현대카드 사용
+        - **대상**: 현대차 시승 프로그램에 참여한 고객  
+        - **혜택**: **주유 상품권 제공**  
+        - **참여 방법**: 전국 현대자동차 전시장에서 시승 예약 후 참여  
+        - **이벤트 기간**: 2024년 4월 15일 ~ 2024년 5월 14일  
+        - **유의 사항**: 일부 전시장 제외 / 상품권은 한정 수량 소진 시까지 제공
             """)
