@@ -36,7 +36,7 @@ def sales_registration_ui():
             st.markdown("""
                 <div style='margin-top: 10px; padding: 12px; background-color: #fff3f3;
                             border-left: 6px solid #e74c3c; border-radius: 6px; color: #b94a48;'>
-                    ❌ <strong>해당 고객 정보가 존재하지 않습니다.</strong><br>
+                    ❌ <strong>해당 고객의 주문 정보가 존재하지 않습니다.</strong><br>
                 </div>
             """, unsafe_allow_html=True)
             st.write(" ")
