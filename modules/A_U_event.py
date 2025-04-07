@@ -48,7 +48,12 @@ def event_ui():
         - **유의사항**: 티켓은 선착순 한정 / 일부 차종 제외 가능
             """)
     st.markdown("---")
-    cola, colb, colc, cold, cole  = st.columns([2, 0.1, 2, 0.1, 2])
+    colz1, cola, colb, colc, cold, cole, colz2  = st.columns([0.2, 2, 0.15, 2, 0.15, 2,0.2])
+    with colz1:
+        pass
+    with colz2:
+        pass
+
     with colb:
         pass
     with cold:
@@ -80,7 +85,7 @@ def event_ui():
             - 출고 고객 대상 **무상 차량 점검 서비스** 제공
             """)
     with cole:
-        st.image("images/event/event7.png", use_container_width=True)
+        st.image("images/event/event7.png",  use_container_width=True)
         st.markdown("#### 현대자동차 봄맞이 주행 지원 이벤트")
         st.caption("따뜻한 봄날, 가볍게 시승하고 주유 상품권 혜택까지 받아가세요!")
 
