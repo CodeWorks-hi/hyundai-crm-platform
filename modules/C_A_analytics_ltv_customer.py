@@ -210,24 +210,78 @@ def ltv_customer_ui():
     )
 
 
-    st.markdown("### 고객 맞춤 추천")
-
+    # 추가 추천 항목 생성 함수
+    def get_recommendations(ltv):
+        """검색 결과 [1]의 마케팅 전략 반영"""
+        if ltv >= 80000000:  # 고가치 고객
+            return {
+                "차량": "제네시스-GV90-프레스티지",
+                "금융": "할부 금리 2.9% (7년)", 
+                "서비스": "5년 무상 유지보수 + 개인 전용 충전소 설치"
+            }
+        elif 40000000 <= ltv < 80000000:  # 중간 가치
+            return {
+                "차량": "현대-아이오닉6-디럭스",
+                "금융": "리스료 3.5% (3년)",
+                "서비스": "3년 무상 정비 + 연 2회 차량 디테일링"
+            }
+        else:  # 일반 고객
+            return {
+                "차량": "현대-아반떼-스마트",
+                "금융": "카드 할부 5.9% (5년)",
+                "서비스": "1년 무상 점검 + 보험료 10% 할인"
+            }
+        
+    st.markdown("###  고객 맞춤 추천")
+    
     if "연령대" in df_with_pred.columns and "거주 지역" in df_with_pred.columns:
-        selected_age = st.selectbox("연령대 선택", df_with_pred["연령대"].unique())
-        selected_region = st.selectbox("거주 지역 선택", df_with_pred["거주 지역"].unique())
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            selected_age = st.selectbox("연령대 선택", df_with_pred["연령대"].unique())
+        with col2:
+            selected_region = st.selectbox("거주 지역 선택", df_with_pred["거주 지역"].unique())
 
         recommended = df_with_pred[
             (df_with_pred["연령대"] == selected_age) &
             (df_with_pred["거주 지역"] == selected_region)
         ].sort_values("예측 LTV", ascending=False).head(5)
 
-        st.markdown(f"**추천 고객 TOP 5 (연령대: {selected_age}, 지역: {selected_region})**")
-        st.dataframe(recommended[["연령대", "거주 지역", "예측 LTV"]])
+        # 추천 카드 스타일링
+        st.markdown("""
+        <style>
+            .recommend-card {
+                border: 1px solid #e0e0e0;
+                border-radius: 10px;
+                padding: 15px;
+                margin: 10px 0;
+                background: #ffffff;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+        </style>
+        """, unsafe_allow_html=True)
+
+        st.markdown("####  맞춤형 추천 리스트")
+        for idx, row in recommended.iterrows():
+            rec = get_recommendations(row['예측 LTV'])
+            st.markdown(f"""
+            <div class="recommend-card">
+                <div style="font-size:18px; color:#2A7FFF; margin-bottom:8px;">🏅 고객 {idx+1}</div>
+                <table>
+                    <tr><td>연령대</td><td><strong>{row['연령대']}</strong></td></tr>
+                    <tr><td>거주지</td><td><strong>{row['거주 지역']}</strong></td></tr>
+                    <tr><td>예측 LTV</td><td><strong>{row['예측 LTV']:,.0f}원</strong></td></tr>
+                </table>
+                <hr style="margin:10px 0;">
+                🚗 <strong>추천 차량:</strong> {rec['차량']}<br>
+                💳 <strong>금융 혜택:</strong> {rec['금융']}<br>
+                🛠️ <strong>서비스 패키지:</strong> {rec['서비스']}
+            </div>
+            """, unsafe_allow_html=True)
     else:
-        st.warning("연령대 또는 거주 지역 정보가 부족합니다.")
+        st.warning("⚠️ 연령대 또는 거주 지역 정보가 부족합니다.")
 
-
-    # 📌 🗂 원본 데이터 확인
+    #  🗂 원본 데이터 확인
     st.markdown("###  🗂 원본 데이터 확인")
     with st.expander(" 🗂 원본 데이터 확인"):
         tab1, tab2, tab3 = st.tabs(["딜러 상담 리스트", "국내 판매 고객데이터", "해외 판매 고객데이터"])
