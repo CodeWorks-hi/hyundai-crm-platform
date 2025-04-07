@@ -5,16 +5,16 @@ import os
 from huggingface_hub import InferenceClient
 from streamlit.components.v1 import html
 from modules.A_U_kakao_channel import render_kakao_channel_add_button
-import toml
 
 
 
-# 모델 및 API 설정
+# Hugging Face 모델 설정
 TEXT_MODEL_ID = "google/gemma-2-9b-it"
+API_TOKEN = st.secrets.get("HUGGINGFACE_API_TOKEN")
 
-API_TOKEN = st.secrets.get("HUGGINGFACE_API_TOKEN")  # secrets.toml 내 토큰 검증
 if not API_TOKEN:
     st.error("❌ Hugging Face API 토큰이 설정되지 않았습니다.")
+
 
 # FAQ 데이터셋 (검색 결과 [3] 구조 반영)
 FAQS = [
@@ -198,7 +198,6 @@ def build_system_prompt():
                         """
 
 def generate_gemma_response(user_input: str) -> str:
-    """검색 결과 [4] 모델 최적화 적용"""
     if not API_TOKEN:
         return "❌ 시스템 오류: 관리자에게 문의해주세요"
     
@@ -212,7 +211,6 @@ def generate_gemma_response(user_input: str) -> str:
         )
         return clean_response(response)
     except Exception as e:
-        # 상세 오류 메시지 처리 추가
         if "401" in str(e):
             return "⚠️ 인증 오류: API 토큰을 재발급해주세요"
         return f"⚠️ 시스템 오류: {str(e)}"
