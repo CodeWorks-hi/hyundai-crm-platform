@@ -112,15 +112,17 @@ def ltv_customer_ui():
         df_with_pred["예측 LTV"] = model.predict(X)
 
     # 상단 컬럼 레이아웃 추가
-    col1, col2 = st.columns([3, 7])
-    with col1:
-        st.markdown("##### 표시할 상위 고객 수")
-    with col2:
+
+# 상단 컬럼 레이아웃 추가
+    col_top_selector, _ = st.columns([7, 3])
+
+    with col_top_selector:
+    # 표시할 상위 고객 수 선택
         top_n = st.selectbox(
-            "",
-            options=[10, 20, 50, 100],
-            index=0,
-            key="top_n_selector"
+    "표시할 상위 고객 수",
+        options=[10, 20, 50, 100],
+        index=0,
+        key="top_n_selector"
         )
     st.markdown("---")
 
@@ -159,12 +161,12 @@ def ltv_customer_ui():
     st.markdown("---")
 
     # 예측 결과 시각화
-    st.markdown("### 예측 결과 시각화")
+    st.markdown("#### 예측 결과 분석 및 시각화")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("#### 🔹 예측 vs 실제 LTV 오차 분포")
+        st.markdown("##### 🔹 예측 vs 실제 LTV 오차 분포")
         df_with_pred["LTV 오차"] = df_with_pred["고객 평생 가치"] - df_with_pred["예측 LTV"]
         fig1, ax1 = plt.subplots()
         ax1.hist(df_with_pred["LTV 오차"], bins=20, color='salmon', edgecolor='black')
@@ -174,29 +176,44 @@ def ltv_customer_ui():
         st.pyplot(fig1)
 
         st.markdown("""
-        #### 🔸 1. 예측 오차 분포 분석
-        - 위의 **히스토그램은 고객 별 실제 LTV와 예측 LTV 간의 차이**를 보여줍니다.
-        - 분포 중심이 0에 가까워진다면 모델이 전반적으로 예측을 잘하고 있다는 것을 의미합니다.
-        - 오차가 하나의 방향으로 치우쳐 있다면, 특정 그룹에 대해 과소/과대 평가가 이루어졌을 가능성이 있습니다.
+        ##### 🔸 1. 예측 오차 분포 분석
+          - **오차란?**  
+          예측 오차는 실제 LTV와 모델이 예측한 LTV 간의 차이를 의미합니다.  
+          수학적으로는 다음과 같이 계산됩니다:  
+          `오차 = 실제 LTV - 예측 LTV`
+        - **분석 내용**  
+          - 위의 히스토그램은 고객별 실제 LTV와 예측 LTV 간의 차이를 시각적으로 보여줍니다.  
+          - 분포 중심이 0에 가까워질수록 모델이 전반적으로 정확하게 예측하고 있음을 의미합니다.  
+          - 오차가 특정 방향으로 치우쳐 있다면, 특정 그룹에 대해 과소/과대 평가가 이루어졌을 가능성이 있습니다.
+        - **활용 방안**  
+          - 오차가 큰 구간을 식별하여 해당 고객 그룹에 대한 모델 개선 작업 수행.
+          - 특정 고객 등급(VIP, 일반, 신규)에 따른 오차 패턴 분석을 통해 맞춤형 마케팅 전략 수립.
         """)
 
+
     with col2:
-        st.markdown("#### 🔹 예측 vs 실제 LTV 비교 (상위 20명)")
-        top20 = df_with_pred.sort_values("고객 평생 가치", ascending=False).head(20).reset_index()
+        st.markdown("##### 🔹 예측 vs 실제 LTV 비교 (상위 50명)")
+        top20 = df_with_pred.sort_values("고객 평생 가치", ascending=False).head(50).reset_index()
         fig2, ax2 = plt.subplots()
         ax2.plot(top20.index, top20["고객 평생 가치"], label="실제 LTV", marker='o')
         ax2.plot(top20.index, top20["예측 LTV"], label="예측 LTV", marker='x')
-        ax2.set_title("상위 20명 고객 LTV 비교")
+        ax2.set_title("상위 50명 고객 LTV 비교")
         ax2.set_xlabel("고객 순위")
         ax2.set_ylabel("LTV (원)")
         ax2.legend()
         st.pyplot(fig2)
 
         st.markdown("""
-        #### 🔸 2. 상위 고객 20명 비교 분석
-        - 실선은 **실제 LTV**, 점선은 **모델이 예측한 LTV**를 나타냅니다.
-        - 고객 순위가 높을수록(= 더 가치 있는 고객일수록), 예측값과 실제값 간 차이가 커질 수 있습니다.
-        - 특히 상위 5~10명에서 예측값이 일관되게 낮거나 높다면, 해당 구간에 대한 **모델 개선의 여지**가 존재합니다.
+        ##### 🔸 2. 상위 고객 50명 비교 분석
+       - **상위 고객 분석 목적**  
+          상위 고객은 높은 LTV를 가진 잠재적 가치가 큰 고객으로, 이들의 예측값과 실제값 간 차이를 분석함으로써 모델의 성능을 평가할 수 있습니다.
+        - **분석 내용**  
+          - 실선은 실제 LTV를, 점선은 모델이 예측한 LTV를 나타냅니다.  
+          - 고객 순위가 높을수록(= 더 가치 있는 고객일수록), 예측값과 실제값 간 차이가 커질 가능성이 있습니다.  
+          - 특히 상위 5~10명에서 예측값이 일관되게 낮거나 높다면, 해당 구간에 대한 모델 개선의 여지가 존재합니다.
+        - **활용 방안**  
+          - 상위 고객 그룹에 대한 모델 재학습 및 변수 조정을 통해 예측 정확도 향상.  
+          - 상위 고객별 맞춤형 혜택 제공(예: VIP 금융 패키지, 프리미엄 서비스)을 통해 전환율 극대화.
         """)
 
     st.markdown("---")
@@ -204,7 +221,7 @@ def ltv_customer_ui():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("####  예측값에 따른 잔차 산점도 (잔차)")
+        st.markdown("#####  예측값에 따른 잔차 산점도 (잔차)")
         df_with_pred["잔차"] = df_with_pred["고객 평생 가치"] - df_with_pred["예측 LTV"]
         fig_residual, ax_residual = plt.subplots()
         ax_residual.scatter(df_with_pred["예측 LTV"], df_with_pred["잔차"], alpha=0.5, color='orange')
@@ -215,14 +232,21 @@ def ltv_customer_ui():
         st.pyplot(fig_residual)
 
         st.markdown("""
-        #### 🔸 4. 예측값 대비 잔차 분석
-        - 예측값이 커질수록 오차가 커지는 경향이 있다면 과대 예측 문제가 있을 수 있습니다.
-        - 잔차가 불규칙하게 분포한다면 모델의 일반화 성능이 좋다고 볼 수 있습니다.
-        - 잔차 분포가 특정 방향으로 편향되어 있으면 해당 구간의 재모델링이 필요할 수 있습니다.
-        """)
-
+                ##### 🔸 4. 예측값 대비 잔차 분석
+                - **잔차란?**  
+                잔차는 실제값과 모델이 예측한 값의 차이를 의미합니다.  
+                수학적으로는 다음과 같이 표현됩니다:  
+                `잔차 = 실제값 - 예측값`
+                - **분석 목적**  
+                잔차를 분석하면 모델의 예측 정확도를 평가하고, 개선이 필요한 부분을 식별할 수 있습니다.
+                - **주요 분석 내용**  
+                - 예측값이 커질수록 오차가 커지는 경향이 있다면 과대 예측 문제가 있을 수 있습니다.
+                - 잔차가 불규칙하게 분포한다면 모델의 일반화 성능이 좋다고 볼 수 있습니다.
+                - 잔차 분포가 특정 방향으로 편향되어 있으면 해당 구간의 재모델링이 필요할 수 있습니다.
+                """)
+        
     with col2:
-        st.markdown("####  고객 등급별 평균 오차")
+        st.markdown("#####  고객 등급별 평균 오차")
         if "고객 등급" in df_with_pred.columns:
             grade_error = df_with_pred.groupby("고객 등급")["잔차"].mean().reset_index()
             fig_grade, ax_grade = plt.subplots()
@@ -231,12 +255,21 @@ def ltv_customer_ui():
             ax_grade.set_title("고객 등급별 평균 예측 오차")
             st.pyplot(fig_grade)
 
+
             st.markdown("""
-            #### 🔸 5. 고객 등급별 오차 분석
-            - VIP, 일반, 신규 고객군별로 예측 오차가 다르게 나타날 수 있습니다.
-            - 특정 등급에서 예측 오차가 크다면 해당 그룹에 대해 별도의 모델링 또는 변수 조정이 필요합니다.
-            - 등급별 예측 신뢰도를 기반으로 마케팅 전략도 차별화할 수 있습니다.
+                        
+            ##### 🔸 5. 고객 등급별 오차 분석
+            - **분석 목적**  
+              - VIP 고객군에서 예측 오차가 크다면 고가 상품 및 프리미엄 서비스에 대한 모델 개선이 필요합니다.
+              - 일반 고객군은 평균적인 구매 패턴을 반영하여 예측 모델을 최적화할 수 있습니다.
+              - 신규 고객군은 데이터 부족으로 인해 발생하는 오차를 줄이기 위해 추가 변수 확보가 필요합니다.
+            - **활용 방안**  
+              - 등급별 예측 신뢰도를 기반으로 마케팅 전략을 차별화하여 전환율을 높일 수 있습니다.
+              - VIP 고객군: 맞춤형 금융 혜택 및 컨시어지 서비스 제공
+              - 일반 고객군: 대중적인 프로모션 및 장기 할부 옵션 제안
+              - 신규 고객군: 초기 구매 유도 캠페인 및 데이터 확보를 위한 설문조사 진행
             """)
+
         else:
             st.warning("고객 등급 정보가 없어 등급별 분석을 생략합니다.")
 
