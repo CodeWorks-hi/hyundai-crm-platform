@@ -93,7 +93,6 @@ def export_growth_ui():
         st.error("❌ 수출 데이터를 불러오지 못했습니다.")
         return
 
-    st.subheader(" 목표 수출 달성률")
     year, country = get_filter_values(df, "export_4")
     goal = st.number_input("수출 목표 (대)", min_value=0, step=10000, value=200000)
 

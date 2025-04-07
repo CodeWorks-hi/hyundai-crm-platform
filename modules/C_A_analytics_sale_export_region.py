@@ -63,7 +63,6 @@ def export_region_ui():
 
     month_cols = extract_month_columns(df)
 
-    st.subheader(" 해외 시장 국가별 월별 수출량 비교")
 
     # 연도 선택
     selected_year = st.selectbox(" 연도를 선택하세요", options=extract_year_list(df), index=0)

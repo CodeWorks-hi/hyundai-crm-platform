@@ -21,7 +21,7 @@ def sales_registration_ui():
     car_df = car_df.loc[car_df["브랜드"] != "기아", :]
     plant_df = pd.read_csv("data/inventory_data.csv")
     customers_df = pd.read_csv('data/customers.csv')
-    sales_df = pd.read_csv('data/domestic_customer_data.csv')
+    prod_df = pd.read_csv('data/model_trim_capacity.csv')
     plant_df.columns = plant_df.columns.str.strip()
     plant_df = plant_df[plant_df["생산상태"] == "생산중"]
 
@@ -147,6 +147,17 @@ def sales_registration_ui():
                 updated_df.to_csv(csv_path, index=False)
 
                 st.success("✅ 판매 등록이 완료되었습니다.")
+                
+                # 생산 데이터에서 해당 조합의 재고량 -1 처리
+                prod_mask = (
+                    (prod_df["모델명"] == selected_model) &
+                    (prod_df["트림명"] == selected_trim) &
+                    (prod_df["공장명"] == selected_factory)
+                )
+
+                if not prod_df[prod_mask].empty:
+                    prod_df.loc[prod_mask, "재고량"] = prod_df.loc[prod_mask, "재고량"] - 1
+                    prod_df.to_csv("data/model_trim_capacity.csv", index=False)
 
     # 현재 직원 판매 실적 표시
     goal_df = pd.read_csv("data/employee_goal.csv")

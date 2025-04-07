@@ -112,10 +112,12 @@ def consult_ui():
                     st.success("문의가 접수되었습니다.")
 
     st.markdown("---")
-    consult_list, spacer1, consult_true, spacer2, consult_visit = st.columns([1, 0.02, 1, 0.02, 1])
+    consult_list, spacer1, consult_true, spacer2, consult_visit, spacer3 ,consult_visit_True = st.columns([0.5, 0.02, 0.5, 0.02, 0.5, 0.02, 0.5])
     with spacer1:
         st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
     with spacer2:
+        st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
+    with spacer3:
         st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
 
     # 상담 내역 표시
@@ -128,7 +130,7 @@ def consult_ui():
             df["답변내용"] = ""
 
         with consult_list:
-            st.markdown("##### 상담 대기")
+            st.markdown("##### 답변 대기")
             wait_df = df[df["완료여부"] == False]
             per_page = 5
             total_wait_pages = (len(wait_df) - 1) // per_page + 1
@@ -194,20 +196,22 @@ def consult_ui():
             st.markdown("</div>", unsafe_allow_html=True)
 
         with consult_true:
-            st.markdown("##### 상담 완료 ")
+            st.markdown("##### 답변 완료 ")
             done_df = df[df["완료여부"] == True]
             total_done_pages = (len(done_df) - 1) // per_page + 1
             start = st.session_state["done_page"] * per_page
             end = start + per_page
             done_df_page = done_df.iloc[start:end]
+
             for idx, row in done_df_page.iterrows():
                 st.markdown(f"""
                 <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
                 <b>성명:</b> {mask_name(row['이름'])}<br>
                 <b>요청사항:</b> {row['요청사항']}<br>
-                <b>진행상태:</b> 상담완료
+                <b>진행상태:</b> 답변 완료
                 </div>
                 """, unsafe_allow_html=True)
+
                 with st.expander("내용확인 및 삭제", expanded=False):
                     with st.form(f"view_done_{idx}"):
                         input_name = st.text_input("이름 확인", key=f"done_name_{idx}")
@@ -225,9 +229,16 @@ def consult_ui():
                                 if pd.isna(답변) or str(답변).strip() == "":
                                     답변 = "답변대기중"
                                 st.info(f"**답변내용:** {답변}")
-                                # st.text_area("고객 피드백", key=f"feedback_{idx}")
-                                # if st.form_submit_button("고객 피드백 제출"):
-                                #     pass
+
+                                # 👍 만족도 슬라이더 추가
+                                with st.form(f"feedback_done_{idx}"):
+                                    rating = st.slider("⭐ 상담 만족도 (1~5점)", 1, 5, 3, key=f"feedback_rating_{idx}")
+                                    if st.form_submit_button("고객 피드백 제출"):
+                                        df.at[idx, "고객피드백"] = rating
+                                        df.to_csv("data/consult_log.csv", index=False)
+                                        st.success("피드백이 제출되었습니다.")
+                                        st.rerun()
+
                             elif delete_clicked:
                                 df.drop(index=idx, inplace=True)
                                 df.to_csv("data/consult_log.csv", index=False)
@@ -262,7 +273,7 @@ def consult_ui():
             st.markdown("</div>", unsafe_allow_html=True)
 
         with consult_visit:
-            st.markdown("##### 방문 신청 목록")
+            st.markdown("##### 방문 신청")
             visit_df = df[(df["완료여부"] == False) & (df["목적"] == "방문")]
             total_visit_pages = (len(visit_df) - 1) // per_page + 1
             start = st.session_state["visit_page"] * per_page
@@ -311,15 +322,18 @@ def consult_ui():
                 if st.button("»", key="visit_last"):
                     st.session_state["visit_page"] = total_visit_pages - 1
                     st.rerun()
-
-            st.markdown("---")
-
-            st.markdown("##### 방문 상담 완료")
+        with consult_visit_True:
+            st.markdown("##### 방문 완료")
             visit_df = df[(df["완료여부"] == True) & (df["목적"] == "방문")]
+            per_page = 5
+            if "visit_done_page" not in st.session_state:
+                st.session_state["visit_done_page"] = 0
+
             total_visit_pages = (len(visit_df) - 1) // per_page + 1
-            start = st.session_state["visit_page"] * per_page
+            start = st.session_state["visit_done_page"] * per_page
             end = start + per_page
             visit_df_page = visit_df.iloc[start:end]
+
             for idx, row in visit_df_page.iterrows():
                 with st.container():
                     st.markdown(f"""
@@ -330,17 +344,15 @@ def consult_ui():
                     """, unsafe_allow_html=True)
                     with st.expander("만족도 조사", expanded=False):
                         with st.form(f"satis_{idx}"):
-                            input_name = st.text_input("이름 확인", key=f"cancel_name_{idx}")
-                            input_phone = st.text_input("전화번호 확인", key=f"cancel_phone_{idx}")
-                            confirm_clicked = st.form_submit_button("확인")
-                            if confirm_clicked:    
+                            input_name = st.text_input("이름 확인", key=f"done_name_{idx}")
+                            input_phone = st.text_input("전화번호 확인", key=f"done_phone_{idx}")
+                            rating = st.slider("⭐ 상담 만족도 (1~5점)", 1, 5, 3, key=f"rating_{idx}")
+                            if st.form_submit_button("고객 피드백 제출"):
                                 if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
-                                    rating = st.slider("⭐ 상담 만족도 (1~5점)", 1, 5, 3, key=f"rating_{idx}")
-                                    if st.form_submit_button("고객 피드백 제출"):
-                                        df.at[idx, "고객피드백"] = rating
-                                        df.to_csv("data/consult_log.csv", index=False)
-                                        st.success("피드백이 제출되었습니다.")
-                                        st.rerun()
+                                    df.at[idx, "고객피드백"] = rating
+                                    df.to_csv("data/consult_log.csv", index=False)
+                                    st.success("피드백이 제출되었습니다.")
+                                    st.rerun()
                                 else:
                                     st.warning("정보가 일치하지 않습니다.")
 
@@ -348,22 +360,22 @@ def consult_ui():
             page_buttons = st.columns(7)
 
             with page_buttons[0]:
-                if st.button("«", key="post_visit_first"):
-                    st.session_state["visit_page"] = 0
+                if st.button("«", key="visit_done_first"):
+                    st.session_state["visit_done_page"] = 0
                     st.rerun()
 
-            start_page = max(0, st.session_state["visit_page"] - 2)
+            start_page = max(0, st.session_state["visit_done_page"] - 2)
             end_page = min(total_visit_pages, start_page + 5)
 
             for i, page_num in enumerate(range(start_page, end_page)):
                 with page_buttons[i + 1]:
-                    if st.button(f"{page_num + 1}", key=f"post_visit_page_{page_num}"):
-                        st.session_state["visit_page"] = page_num
+                    if st.button(f"{page_num + 1}", key=f"visit_done_page_{page_num}"):
+                        st.session_state["visit_done_page"] = page_num
                         st.rerun()
 
             with page_buttons[6]:
-                if st.button("»", key="post_visit_last"):
-                    st.session_state["visit_page"] = total_visit_pages - 1
+                if st.button("»", key="visit_done_last"):
+                    st.session_state["visit_done_page"] = total_visit_pages - 1
                     st.rerun()
 
             st.markdown("</div>", unsafe_allow_html=True)

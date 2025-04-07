@@ -97,7 +97,6 @@ def generate_pdf_report(df_top10):
 
 
 def ltv_customer_ui():
-    st.title(" LTV 고객 가치 예측 분석")
 
     df_customer, df_export, df_domestic, df_list = load_data()
 
