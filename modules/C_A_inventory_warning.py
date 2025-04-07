@@ -79,8 +79,7 @@ def send_slack_alert(model_name, turnover_rate, plant=None, status=None, link=No
         text += f"• 공장: `{plant}`\n"
     if status:
         text += f"• 생산상태: `{status}`\n"
-    if link:
-        text += f"🔗 <{link}|차량 상세정보 보기>\n"
+
 
     response = requests.post(SLACK_WEBHOOK_URL, json={"text": text, "link_names": 1})
     if response.status_code != 200:

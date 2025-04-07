@@ -71,7 +71,7 @@ def strategies_ui():
     # 전체 5개 컬럼 구성 (여백 0.15, 콘텐츠 컬럼 0.275씩)
     col1, col2, col3, col4, col5 = st.columns([0.05, 1, 0.05, 1, 0.05])
 
-    # 캠페인 전략 Top 5
+    # 이벤트전략 Top 5
     with col2:
         st.header("이벤트 전략 Top 5")
 
@@ -113,6 +113,13 @@ def strategies_ui():
     fig_gdp = px.line(df_gdp, x="분기", y="GDP", title="국내총생산(GDP) 실질 추이", markers=True)
     st.plotly_chart(fig_gdp, use_container_width=True)
 
+    # 📌 분석 내용 추가
+    st.markdown("""
+    - **경기 추세 분석**: 실질 GDP 추이를 통해 국내 경기의 전반적인 성장 흐름을 파악할 수 있습니다.
+    - **마케팅 전략 연계**: GDP가 하락세일 경우, 저비용/고효율 중심의 프로모션 전략 강화 필요.
+    - **예측 기반 타이밍 설정**: GDP 반등 시점에 맞춰 고가 상품/전환 캠페인 기획 시 전환율 상승 가능성 ↑
+    """)
+
     # 소비자심리지수 vs 마케팅 반응률
     st.markdown(" #### 소비자심리지수 vs 마케팅 반응률")
     dates = pd.date_range(start="2022-01-01", periods=24, freq="M")
@@ -129,7 +136,7 @@ def strategies_ui():
         (df_response["소비자심리지수"].shift(1) > df_response["소비자심리지수"]) &
         (df_response["소비자심리지수"].shift(-1) > df_response["소비자심리지수"])
     )
-    df_response["추천 캠페인"] = np.where(df_response["심리지수_저점"], "\ud83d\udce2 회복기 타겟팅 캠페인 시작", "")
+    df_response["추천 캠페인"] = np.where(df_response["심리지수_저점"], "\ud83d\udce2 회복기 타겟팅 이벤트시작", "")
 
     fig, ax1 = plt.subplots(figsize=(12, 5))
     ax1.set_title("소비자심리지수 vs 마케팅 반응률", fontsize=15)
@@ -143,6 +150,13 @@ def strategies_ui():
     ax2.plot(df_response["날짜"], df_response["마케팅 반응률(%)"], color="tab:green", marker='s', linestyle='--')
     ax2.tick_params(axis='y', labelcolor="tab:green")
     st.pyplot(fig)
+    
+    # 📌 분석 내용 추가
+    st.markdown("""
+    - **소비자심리와 반응률 상관관계**: 소비자심리지수가 저점을 찍고 반등할 때, 마케팅 반응률도 동반 상승하는 경향이 확인됩니다.
+    - **회복기 마케팅 전략 유효성**: 저점 직후의 ‘회복기 타이밍’에 타겟 캠페인을 집행하면 응답률 향상 기대 가능.
+    - **AI 추천 활용**: 회복기 타이밍에 대한 자동 탐지 및 추천 캠페인 라벨링(📢 회복기 타겟팅 이벤트시작)으로 선제적 대응 가능.
+    """)
 
     # 고객 인사이트 시각화
     st.markdown(" #### 고객 성향 분석")
@@ -152,6 +166,13 @@ def strategies_ui():
     fig.update_layout(title="예상예산 분포", xaxis_title="예상예산 (만원)", yaxis_title="고객 수")
     st.plotly_chart(fig, use_container_width=True)
 
+
+    # 📌 분석 내용 추가
+    st.markdown("""
+    - **고객 예산 분포 파악**: 대부분의 고객은 약 2,000만~4,000만원대 예산을 갖고 있어 중형급 전기차, SUV 타겟팅이 유리.
+    - **프리미엄 세그먼트 식별**: 6,000만원 이상 예산 고객은 고급 브랜드, 전기차 장기 리스 및 혜택 중심 접근 필요.
+    - **세그먼트별 제안 차별화**: 예산 구간에 따라 금융 패키지, 프로모션, 차량 제안을 개인화함으로써 전환률 제고 가능.
+    """)
     # 원본 데이터 보기
     st.subheader("🗂 원본 데이터 확인")
     with st.expander("GDP 실질 데이터"):

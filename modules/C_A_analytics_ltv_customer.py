@@ -160,7 +160,7 @@ def ltv_customer_ui():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("#### 🎯 예측값에 따른 잔차 산점도 (잔차)")
+        st.markdown("####  예측값에 따른 잔차 산점도 (잔차)")
         df_with_pred["잔차"] = df_with_pred["고객 평생 가치"] - df_with_pred["예측 LTV"]
         fig_residual, ax_residual = plt.subplots()
         ax_residual.scatter(df_with_pred["예측 LTV"], df_with_pred["잔차"], alpha=0.5, color='orange')
@@ -178,7 +178,7 @@ def ltv_customer_ui():
         """)
 
     with col2:
-        st.markdown("#### 👥 고객 등급별 평균 오차")
+        st.markdown("####  고객 등급별 평균 오차")
         if "고객 등급" in df_with_pred.columns:
             grade_error = df_with_pred.groupby("고객 등급")["잔차"].mean().reset_index()
             fig_grade, ax_grade = plt.subplots()
