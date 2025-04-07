@@ -143,11 +143,11 @@ def domestic_performance_ui():
         col1, col2 = st.columns(2)
         with col1:
             # 연령대 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
+            age_options = sorted(df_customer['통합 연령대'].unique().tolist())
             selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox")
         with col2:
             # 성별 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            gender_options = df_filtered['성별'].unique().tolist()
+            gender_options = df_customer['성별'].unique().tolist()
             selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox")
 
         # 필터링 로직
