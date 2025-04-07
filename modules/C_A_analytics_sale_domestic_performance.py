@@ -71,6 +71,7 @@ def domestic_performance_ui():
     # 데이터 필터링
     df_filtered = df_customer[df_customer['최근 구매 연도'] == year]
 
+    print(df_filtered['최근 구매 연도'])
     # 주요 지표 계산
     total_customers = df_filtered['아이디'].nunique()
     avg_age = df_filtered['현재 나이'].mean()
@@ -103,28 +104,27 @@ def domestic_performance_ui():
         col1_1, col1_2 = st.columns(2)
         with col1_1:
             # 연령대 선택 셀렉박스 (전체 옵션 포함)
-            age_options = sorted(df_customer['통합 연령대'].unique().tolist())
+            age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
             selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0)
         with col1_2:
             # 성별 선택 셀렉박스 (전체 옵션 포함)
-            gender_options = df_customer['성별'].unique().tolist()
+            gender_options = df_filtered['성별'].unique().tolist()
             selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0)
 
         # 필터링 로직 수정
         if selected_age == '전체' and selected_gender == '전체':
-            df_filtered = df_customer.copy()  # 전체 데이터 사용
             chart_data = df_filtered['통합 연령대'].value_counts()
             legend_title = "연령대"  # 범례 제목 설정 (연령대 기준)
         elif selected_age == '전체':
-            df_filtered = df_customer[df_customer['성별'] == selected_gender]  # 성별만 필터링
+            df_filtered = df_filtered[df_filtered['성별'] == selected_gender]  # 성별만 필터링
             chart_data = df_filtered['통합 연령대'].value_counts()
             legend_title = "연령대"  # 범례 제목 설정 (연령대 기준)
         elif selected_gender == '전체':
-            df_filtered = df_customer[df_customer['통합 연령대'] == selected_age]  # 연령대만 필터링
+            df_filtered = df_filtered[df_filtered['통합 연령대'] == selected_age]  # 연령대만 필터링
             chart_data = df_filtered['성별'].value_counts()
             legend_title = "성별"  # 범례 제목 설정 (성별 기준)
         else:
-            df_filtered = df_customer[(df_customer['통합 연령대'] == selected_age) & (df_customer['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
+            df_filtered = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
             chart_data = df_filtered['성별'].value_counts()
             legend_title = "성별"  # 범례 제목 설정 (성별 기준)
 
@@ -143,22 +143,22 @@ def domestic_performance_ui():
         col1, col2 = st.columns(2)
         with col1:
             # 연령대 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            age_options = sorted(df_customer['통합 연령대'].unique().tolist())
+            age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
             selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox")
         with col2:
             # 성별 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            gender_options = df_customer['성별'].unique().tolist()
+            gender_options = df_filtered['성별'].unique().tolist()
             selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox")
 
         # 필터링 로직
         if selected_age == '전체' and selected_gender == '전체':
-            df_filtered = df_customer.copy()  # 필터링 해제
+            df_filtered = df_filtered.copy()  # 필터링 해제
         elif selected_age == '전체':
-            df_filtered = df_customer[df_customer['성별'] == selected_gender]  # 성별만 필터링
+            df_filtered = df_filtered[df_filtered['성별'] == selected_gender]  # 성별만 필터링
         elif selected_gender == '전체':
-            df_filtered = df_customer[df_customer['통합 연령대'] == selected_age]  # 연령대만 필터링
+            df_filtered = df_filtered[df_filtered['통합 연령대'] == selected_age]  # 연령대만 필터링
         else:
-            df_filtered = df_customer[(df_customer['통합 연령대'] == selected_age) & (df_customer['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
+            df_filtered = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
 
         # 차량 모델별 구매 수량 계산
         model_counts = df_filtered['최근 구매 제품'].value_counts()
@@ -178,7 +178,7 @@ def domestic_performance_ui():
             st.pyplot(fig)
 
     st.markdown("---")
-
+    print(df_filtered['최근 구매 연도'])
     # 등급별 구매 모델 비율
     st.markdown("### 등급별 구매 모델 비율")
 
@@ -188,22 +188,22 @@ def domestic_performance_ui():
         col1_1, col1_2 = st.columns(2)
         with col1_1:
             # 연령대 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            age_options = sorted(df_customer['통합 연령대'].unique().tolist())
+            age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
             selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox_1")
         with col1_2:
             # 성별 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            gender_options = df_customer['성별'].unique().tolist()
+            gender_options = df_filtered['성별'].unique().tolist()
             selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox_1")
         
         # 필터링 로직
         if selected_age == '전체' and selected_gender == '전체':
-            df_filtered = df_customer.copy()  # 필터링 해제
+            df_filtered = df_filtered.copy()  # 필터링 해제
         elif selected_age == '전체':
-            df_filtered = df_customer[df_customer['성별'] == selected_gender]  # 성별만 필터링
+            df_filtered = df_filtered[df_filtered['성별'] == selected_gender]  # 성별만 필터링
         elif selected_gender == '전체':
-            df_filtered = df_customer[df_customer['통합 연령대'] == selected_age]  # 연령대만 필터링
+            df_filtered = df_filtered[df_filtered['통합 연령대'] == selected_age]  # 연령대만 필터링
         else:
-            df_filtered = df_customer[(df_customer['통합 연령대'] == selected_age) & (df_customer['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
+            df_filtered = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
         
         # 등급 별 분포
         grade_counts = df_filtered['고객 그룹'].value_counts()
@@ -228,36 +228,36 @@ def domestic_performance_ui():
         col1, col2,col3 = st.columns(3)
         with col1:
             # 등급 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            grade_options = sorted(df_customer['고객 그룹'].unique().tolist())
+            grade_options = sorted(df_filtered['고객 그룹'].unique().tolist())
             selected_grade = st.selectbox("등급 선택", options=['전체'] + grade_options, index=0, key="grade_selectbox")
         with col2:
             # 연령대 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            age_options = sorted(df_customer['통합 연령대'].unique().tolist())
+            age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
             selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox_2")
         with col3:
             # 성별 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
-            gender_options = df_customer['성별'].unique().tolist()
+            gender_options = df_filtered['성별'].unique().tolist()
             selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox_2")
         
         # 필터링 로직
         if selected_grade == '전체' and selected_age == '전체' and selected_gender == '전체':
-            df_filtered = df_customer.copy()  # 모든 데이터 사용
+            df_filtered = df_filtered.copy()  # 모든 데이터 사용
         elif selected_grade == '전체' and selected_age == '전체':
-            df_filtered = df_customer[df_customer['성별'] == selected_gender]  # 성별만 필터링
+            df_filtered = df_filtered[df_filtered['성별'] == selected_gender]  # 성별만 필터링
         elif selected_grade == '전체' and selected_gender == '전체':
-            df_filtered = df_customer[df_customer['통합 연령대'] == selected_age]  # 연령대만 필터링
+            df_filtered = df_filtered[df_filtered['통합 연령대'] == selected_age]  # 연령대만 필터링
         elif selected_age == '전체' and selected_gender == '전체':
-            df_filtered = df_customer[df_customer['고객 그룹'] == selected_grade]  # 등급만 필터링
+            df_filtered = df_filtered[df_filtered['고객 그룹'] == selected_grade]  # 등급만 필터링
         elif selected_grade == '전체':
-            df_filtered = df_customer[(df_customer['통합 연령대'] == selected_age) & (df_customer['성별'] == selected_gender)]  # 연령대와 성별 필터링
+            df_filtered = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]  # 연령대와 성별 필터링
         elif selected_age == '전체':
-            df_filtered = df_customer[(df_customer['고객 그룹'] == selected_grade) & (df_customer['성별'] == selected_gender)]  # 등급과 성별 필터링
+            df_filtered = df_filtered[(df_filtered['고객 그룹'] == selected_grade) & (df_filtered['성별'] == selected_gender)]  # 등급과 성별 필터링
         elif selected_gender == '전체':
-            df_filtered = df_customer[(df_customer['고객 그룹'] == selected_grade) & (df_customer['통합 연령대'] == selected_age)]  # 등급과 연령대 필터링
+            df_filtered = df_filtered[(df_filtered['고객 그룹'] == selected_grade) & (df_filtered['통합 연령대'] == selected_age)]  # 등급과 연령대 필터링
         else:
-            df_filtered = df_customer[(df_customer['고객 그룹'] == selected_grade) & 
-                                    (df_customer['통합 연령대'] == selected_age) & 
-                                    (df_customer['성별'] == selected_gender)]
+            df_filtered = df_filtered[(df_filtered['고객 그룹'] == selected_grade) & 
+                                    (df_filtered['통합 연령대'] == selected_age) & 
+                                    (df_filtered['성별'] == selected_gender)]
         # 차량 모델별 구매 수량 계산
         model_counts = df_filtered['최근 구매 제품'].value_counts()
         # 시각화 데이터 준비
@@ -276,6 +276,7 @@ def domestic_performance_ui():
         
     st.markdown("---")
 
+    print(df_filtered['최근 구매 연도'])
     # 구매 트렌드
     st.markdown("### 구매 트렌드")
     col1, col2 = st.columns(2)
@@ -298,7 +299,6 @@ def domestic_performance_ui():
             df_filtered['구매 월'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.month
             trend_data = df_filtered.groupby('구매 월')['아이디'].nunique()
         elif selected_trend == '요일':
-            df_filtered['구매 요일'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.day_name(locale='ko_KR.UTF-8')  # 한국어 요일
             days_order = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일']
             trend_data = df_filtered.groupby('구매 요일')['아이디'].nunique().reindex(days_order, fill_value=0)
         elif selected_trend == '계절':
@@ -335,6 +335,7 @@ def domestic_performance_ui():
             index=0,
             key="unique_trend_selectbox_1"  # 고유 키 지정
         )
+        
         # 트렌드 데이터 준비
         if selected_trend == '분기':
             df_filtered['구매 분기'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.to_period('Q').astype(str)
@@ -343,7 +344,6 @@ def domestic_performance_ui():
             df_filtered['구매 월'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.month
             trend_data = df_filtered.groupby(['구매 월', '최근 구매 제품']).size().unstack(fill_value=0)
         elif selected_trend == '요일':
-            df_filtered['구매 요일'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.day_name(locale='ko_KR.UTF-8')
             days_order = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일']
             trend_data = df_filtered.groupby(['구매 요일', '최근 구매 제품']).size().unstack(fill_value=0).reindex(days_order)
         elif selected_trend == '계절':
@@ -370,7 +370,8 @@ def domestic_performance_ui():
             
             st.pyplot(fig)
 
+    print(df_filtered['최근 구매 연도'])
     # 원본데이터 보기
     with st.expander("원본 데이터 보기", expanded=False):
             st.write(df_filtered)
-            st.dataframe(df_filtered, use_container_width=True)
+
