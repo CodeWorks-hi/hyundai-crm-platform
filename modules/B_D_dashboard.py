@@ -162,7 +162,7 @@ def dashboard_ui():
     with col3:
         # 일정 목록
         st.markdown("######")
-        st.markdown("### 📋 예정된 상담 목록")
+        st.markdown("### 📋 예정된 방문 상담 목록")
         st.write("")
 
         upcoming_events = sorted(
