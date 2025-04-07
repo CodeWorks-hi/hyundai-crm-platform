@@ -46,8 +46,8 @@ if st.session_state.current_page == "home":
     st.markdown(
         f"""
         <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 40px;">
-            <img src="data:image/png;base64,{image_base64}" width="60"/>
-            <h1 style="margin-bottom: 0;">Hyundai & Kia ERP</h1>
+            <img src="data:image/png;base64,{image_base64}" width="80"/>
+            <h1 style="margin-bottom: 0;">Hyundai CRM </h1>
         </div>
         """,
         unsafe_allow_html=True
