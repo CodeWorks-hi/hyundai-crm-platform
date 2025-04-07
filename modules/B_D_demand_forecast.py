@@ -129,13 +129,7 @@ def demand_forecast_ui():
             "현대": [0,1]
         }
 
-        user_data = np.hstack([
-            age,
-            budget * 10000,
-            gender_list.get(gender, [0, 0]),
-            region_list.get(region, [0]*16),
-            brand_list.get(preference, [0, 0])
-        ]).reshape(1, -1)[0]
+        user_data = np.hstack([age, budget * 10000, gender_list[gender], region_list[region], brand_list[preference]]).reshape(1, -1)[0]
         user_data = np.array(user_data).reshape(1, 22)
 
        
