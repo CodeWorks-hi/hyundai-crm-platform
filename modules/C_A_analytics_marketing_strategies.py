@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 import math
+from datetime import datetime
 
 # 데이터 경로 설정
 real_path = "extra_data/processed/경제 성장 관련/GDP_GNI_real.csv"
@@ -55,46 +56,53 @@ def render_paginated_list(df, category_name, current_page_key):
 
 def strategies_ui():
     df_real, df_nom, df_sen, df_news, df_list, df_event = load_data()
+    
+    campaign_path = "data/campaign_list.csv"
+    df_campaigns = pd.read_csv(campaign_path)
+    today = datetime.today().date()
+    df_campaigns["시작일"] = pd.to_datetime(df_campaigns["기간"].str.split("~").str[0].str.strip(), errors="coerce").dt.date
+    df_campaigns["종료일"] = pd.to_datetime(df_campaigns["기간"].str.split("~").str[1].str.strip(), errors="coerce").dt.date
+    df_campaigns["진행상태"] = df_campaigns.apply(
+        lambda row: "진행 중" if row["시작일"] <= today <= row["종료일"]
+        else "예정" if row["시작일"] > today
+        else "종료", axis=1)
 
-    st.markdown(" ### 마케팅 전략 분석 및 캠페인 제안")
+    st.markdown(" ### 마케팅 전략 분석 및 이벤트 제안")
+
+    # 전체 5개 컬럼 구성 (여백 0.15, 콘텐츠 컬럼 0.275씩)
+    col1, col2, col3, col4, col5 = st.columns([0.05, 1, 0.05, 1, 0.05])
 
     # 캠페인 전략 Top 5
-    st.markdown(" #### 캠페인 전략 Top 5")
+    with col2:
+        st.header("캠페인 전략 Top 5")
 
-    with st.expander("① 금리/환율 기반 실시간 트리거"):
-        st.markdown("**조건**: 기준금리 < 3%, 환율 > 1300원")
-        st.code("if (interest_rate < 3.0) & (exchange_rate > 1300):\n    activate_campaign('환율보호 프로모션')", language="python")
-        st.success("2024년 4월 전환율 22% 상승")
+        in_progress_events = df_campaigns[df_campaigns["진행상태"] == "진행 중"].head(5)
+        for idx, row in in_progress_events.iterrows():
+            with st.expander(f"{idx+1}. {row['이벤트명']}"):
+                st.markdown(f"""
+                - **대상**: {row['대상']}
+                - **혜택**: {row['혜택']}
+                - **참여 방법**: {row['참여 방법']}
+                - **기간**: {row['기간']}
+                - **전략 분류**: {row['분류']}
+                """)
 
-    with st.expander("② 소비자 심리 하락기 맞춤 할인"):
-        st.markdown("**조건**: CCI < 75, 뉴스심리지수 하락")
-        st.code("if consumer_index < 75:\n    send_campaign(title='불확실성 대비 할인', targets=price_sensitive_users)", language="python")
-        st.metric("2025년 1월 결과", "주문량 41% 증가", "+18%")
+    # 추가 전략 제안
+    with col4:
+        st.header("추가 전략 제안")
 
-    with st.expander("③ EV 충전소 타겟 캠페인"):
-        st.image("https://example.com/ev_charging_map.jpg", width=600)
-        st.caption("전기차 충전소 기반 지역 마케팅")
+        upcoming_events = df_campaigns[df_campaigns["진행상태"] == "예정"].head(5)
+        for idx, row in upcoming_events.iterrows():
+            with st.expander(f"{idx+1}. {row['이벤트명']}"):
+                st.markdown(f"""
+                - **대상**: {row['대상']}
+                - **혜택**: {row['혜택']}
+                - **참여 방법**: {row['참여 방법']}
+                - **기간**: {row['기간']}
+                - **전략 분류**: {row['분류']}
+                """)
 
-    with st.expander("④ AI 기반 유지비 절감 캠페인"):
-        st.markdown("유가 변동 시 하이브리드 추천")
-        st.progress(65, text="하이브리드 추천률 55%")
-
-    with st.expander("⑤ 경기 회복기 리타겟팅"):
-        st.code("if gdp_growth > 1.0:\n    send_retargeting(segment='침체기 미구매자')", language="python")
-        st.success("ROI 4.8배 달성")
-
-    # 확장 전략
-    st.markdown(" #### 추가 전략 제안")
-    with st.expander("⑥ 제조업 회복 → B2B 캠페인"):
-        st.write("제조업 실질 GDP 상승 시 법인 고객 대상 프로모션")
-    with st.expander("⑦ 고용 회복기 신차 구독 유도"):
-        st.write("실업률 개선 시 월구독 신차 서비스 제공")
-    with st.expander("⑧ 부동산 회복기 대형차 캠페인"):
-        st.write("부동산 가격 상승기 SUV 프로모션 강조")
-    with st.expander("⑨ 뉴스심리 회복 시 신차 발표"):
-        st.write("뉴스심리지수 90 이상 상승기 신차 런칭")
-    with st.expander("⑩ 글로벌 성장률 상승기 수출형 모델 강조"):
-        st.write("해외 GDP 상승기 수출전략 모델 중심 캠페인")
+    st.markdown("---")
 
     # GDP 실질 성장률 시각화
     st.markdown(" #### 국내총생산(GDP) 실질 추이")
@@ -155,5 +163,3 @@ def strategies_ui():
         st.dataframe(df_news.head())
     with st.expander("고객 데이터"):
         st.dataframe(df_list.head())
-
-
