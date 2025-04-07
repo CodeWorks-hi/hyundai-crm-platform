@@ -120,7 +120,7 @@ def domestic_region_ui():
 
     # 아래부터 위에 선택에 영향 없음
     
-    col1,col2,col3=st.columns(3)
+    col1,col2=st.columns(2)
     with col1:
         # 지역별 총 판매량 비교 (막대)
         # 지역별 총 판매량 계산
@@ -169,32 +169,6 @@ def domestic_region_ui():
         # Streamlit에서 그래프 표시
         st.plotly_chart(fig)
 
-    with col3:
-        # 지역별 고객 등급 비교(막대)
-        # 지역별 고객 등급 계산
-        region_grade = df_customer.groupby(['거주 지역', '고객 등급'])['아이디'].count().reset_index()
-        region_grade.columns = ['거주 지역', '고객 등급', '고객 수']
-
-        # Streamlit에서 출력
-        st.markdown("### 지역별 고객 등급 비교")
-
-        # Plotly로 막대 그래프 생성
-        fig = px.bar(
-            region_grade,
-            x='거주 지역',
-            y='고객 수',
-            color='고객 등급',
-            barmode='group',
-            title="지역별 고객 등급 비교",
-            labels={'거주 지역': '지역', '고객 수': '고객 수'},
-            text_auto=False,
-            color_discrete_sequence=px.colors.sequential.RdBu
-        )
-
-
-        # Streamlit에서 그래프 표시
-        st.plotly_chart(fig, use_container_width=True)
-    
     col1, col2=st.columns(2)
     with col1:
         # 지역별 총 판매량 계산
@@ -209,7 +183,6 @@ def domestic_region_ui():
 
         # Streamlit에서 출력
         with st.expander("판매 상위 지역 TOP3", expanded=False):
-            st.markdown("### 판매 상위 지역 TOP3")
             st.write(top3_regions)
             
     with col2:
@@ -225,7 +198,6 @@ def domestic_region_ui():
 
         # Streamlit에서 출력
         with st.expander("판매 하위 지역 TOP3", expanded=False):
-            st.markdown("### 판매 하위 지역 TOP3")
             st.write(bottom3_regions)
 
     # 지역에 따른 차종 히트맵
@@ -254,7 +226,37 @@ def domestic_region_ui():
         st.markdown("### 지역별 차종 히트맵")
         st.plotly_chart(fig, use_container_width=True)
 
+    
     with col2:
+        st.markdown("### 지역별 차종 비율")
+
+        selected_region = st.selectbox("지역을 선택하세요", df_customer['거주 지역'].unique())
+
+        # 선택한 지역의 데이터 필터링
+        filtered_data = df_customer[df_customer['거주 지역'] == selected_region]
+
+        # 차종 비율 계산
+        car_type_ratio = filtered_data.groupby('최근 구매 제품')['아이디'].count().reset_index()
+        car_type_ratio.columns = ['차종', '비율 (%)']
+        car_type_ratio['비율 (%)'] = (car_type_ratio['비율 (%)'] / car_type_ratio['비율 (%)'].sum() * 100).round(2)
+
+        # 원형 그래프 시각화
+        
+        fig = px.pie(
+            car_type_ratio,
+            names='차종',
+            values='비율 (%)',
+            color_discrete_sequence=px.colors.sequential.RdBu
+        )
+
+        # 숫자 표시 제거
+        fig.update_traces(textinfo='none')
+
+        st.plotly_chart(fig)
+
+
+    col1,col2=st.columns(2)
+    with col1:
         # 지역별 차종 빈도 계산
         region_top_car = (
             df_customer.groupby(['거주 지역', '최근 구매 제품'])['아이디'].count()
@@ -267,58 +269,11 @@ def domestic_region_ui():
             region_top_car.groupby('거주 지역')['판매량'].idxmax()
         ].reset_index(drop=True)
 
-        st.markdown(" ")
-        st.markdown(" ")
-        st.markdown(" ")
-        st.markdown(" ")
-        st.markdown(" ")
         # Streamlit에서 출력
-        st.markdown("### 각 지역에서 가장 많이 판매된 차종")
-        st.dataframe(top_car_per_region)
+        with st.expander("각 지역에서 가장 많이 판매된 차종", expanded=False):
+            st.dataframe(top_car_per_region)
 
-    # 지역별 차종 비율
-    col1,col2=st.columns(2)
-    # 지역 선택 (셀렉트 박스)
-    selected_region = st.selectbox("지역을 선택하세요", df_customer['거주 지역'].unique())
-    with col1:
-        
-
-        # 선택한 지역의 데이터 필터링
-        filtered_data = df_customer[df_customer['거주 지역'] == selected_region]
-
-        # 차종 비율 계산
-        car_type_ratio = filtered_data.groupby('최근 구매 제품')['아이디'].count().reset_index()
-        car_type_ratio.columns = ['차종', '비율 (%)']
-        car_type_ratio['비율 (%)'] = (car_type_ratio['비율 (%)'] / car_type_ratio['비율 (%)'].sum() * 100).round(2)
-
-        # 원형 그래프 시각화
-        st.markdown(f"### {selected_region} 지역의 차종 비율")
-        fig = px.pie(
-            car_type_ratio,
-            names='차종',
-            values='비율 (%)',
-            title=f"{selected_region} 지역의 차종 비율",
-            color_discrete_sequence=px.colors.sequential.RdBu
-        )
-
-        # 숫자 표시 제거
-        fig.update_traces(textinfo='none')
-
-        st.plotly_chart(fig)
-
-    with col2:
-        # 데이터프레임 출력 (가운데 정렬)
-        st.markdown(" ")
-        st.markdown(" ")
-        st.markdown(" ")
-        st.markdown(" ")
-        st.markdown(" ")
-        st.markdown(f"### {selected_region} 지역의 차종 비율 데이터")  
-        st.write(
-            car_type_ratio.style.set_table_styles(
-                [{'selector': 'th',
-                'props': [('text-align', 'center')]},
-                {'selector': 'td',
-                'props': [('text-align', 'center')]}]
-            )
-        )
+    with col2:  
+        # Streamlit에서 출력
+        with st.expander(f"{selected_region} 지역의 차종 비율 데이터", expanded=False):
+            st.write(car_type_ratio)
