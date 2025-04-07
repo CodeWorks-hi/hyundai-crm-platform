@@ -9,6 +9,10 @@ def sales_registration_ui():
     if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
         st.warning("딜러 정보를 먼저 등록하세요.")
         return
+    if "ordered_model" not in st.session_state:
+        st.session_state["ordered_model"] = ""
+        st.session_state["ordered_trim"] = ""
+        st.session_state["ordered_factory"]
 
     # Load car list dataset
     car_df = pd.read_csv("data/hyundae_car_list.csv")
@@ -62,7 +66,7 @@ def sales_registration_ui():
         else:
             st.markdown(f"""
                 <div style='background-color:#f0f8ff; padding: 10px; border-left: 4px solid #1890ff; border-radius: 5px; margin-bottom: 10px;'>
-                    👤 <b>{customer_data.iloc[0]["상담자명"]}</b> / {customer_data.iloc[0]["연락처"]} / {customer_data.iloc[0]["연령대"]} / {customer_data.iloc[0]["거주지역"]}
+                    👤 <b>{customer_data.iloc[0]["상담자명"]}</b> / {customer_data.iloc[0]["연락처"]} / {st.session_state["ordered_model"]} {st.session_state["ordered_trim"]} / {st.session_state["ordered_factory"]}
                 </div>
             """, unsafe_allow_html=True)
 

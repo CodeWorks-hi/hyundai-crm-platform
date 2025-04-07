@@ -315,6 +315,10 @@ def inventory_ui():
                 .rename(columns={'재고량': '생산 가능 수량'})
             )
 
+            st.session_state["ordered_model"] = selected_model
+            st.session_state["ordered_trim"] = selected_trim
+            st.session_state["ordered_factory"] = selected_factory
+
             # 저장
             inv_df.to_csv("data/inventory_data.csv", index=False)
 
