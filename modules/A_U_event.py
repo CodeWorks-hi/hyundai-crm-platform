@@ -12,6 +12,7 @@ def event_ui():
         </div>
     """, unsafe_allow_html=True)
     st.markdown("")
+    st.markdown("---")
 
     col4, col1, col2, col3, col5  = st.columns([0.1, 1, 0.1, 1, 0.1])
     with col4:
@@ -80,54 +81,3 @@ def event_ui():
                 - **혜택**: 현대카드 슈퍼콘서트 티켓 2매 증정  
                 - **참여 방법**: 차량 구매 시 현대카드 사용
             """)
-    st.markdown("---")
-    col11, col12, col13, col14, col15  = st.columns([2, 0.1, 2, 0.1, 2])
-    with col12:
-        pass
-    with col14:
-        pass
-
-    def render_paginated_list(df, category_name, current_page_key):
-        items_per_page = 5
-        df = df[df["구분"] == category_name].sort_values(by="등록일", ascending=False).reset_index(drop=True)
-        total_pages = math.ceil(len(df) / items_per_page)
-        current_page = st.session_state.get(current_page_key, 1)
-
-        start = (current_page - 1) * items_per_page
-        end = start + items_per_page
-        paginated_df = df.iloc[start:end]
-
-        for _, row in paginated_df.iterrows():
-            with st.expander(row["제목"]):
-                st.markdown(row["내용"])
-
-        if total_pages > 1:
-            cols = st.columns(total_pages + 2)
-            with cols[0]:
-                if st.button("◀", key=f"{category_name}_prev") and current_page > 1:
-                    st.session_state[current_page_key] = current_page - 1
-                    st.rerun()
-            for i in range(total_pages):
-                with cols[i + 1]:
-                    if st.button(str(i + 1), key=f"{category_name}_page_{i+1}"):
-                        st.session_state[current_page_key] = i + 1
-                        st.rerun()
-            with cols[-1]:
-                if st.button("▶", key=f"{category_name}_next") and current_page < total_pages:
-                    st.session_state[current_page_key] = current_page + 1
-                    st.rerun()
-
-    # 데이터 불러오기
-    df_notice = pd.read_csv("data/event.csv")
-
-    with col11:
-        st.markdown("### 📢 이벤트")
-        render_paginated_list(df_notice, "이벤트", "이벤트_page")
-
-    with col13:
-        st.markdown("### 📋 공지사항")
-        render_paginated_list(df_notice, "공지사항", "공지_page")
-
-    with col15:
-        st.markdown("### ⚙️ 점검안내")
-        render_paginated_list(df_notice, "점검 안내", "점검_page")
