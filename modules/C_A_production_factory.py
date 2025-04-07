@@ -7,6 +7,7 @@ import plotly.express as px
 from .C_A_production_factory_report import report_ui
 from .C_A_production_factory_treemap import treemap_ui
 from .C_A_production_factory_analysis import factory_analysis_ui
+import numpy as np
 
 # 데이터 로드 함수
 @st.cache_data
@@ -15,6 +16,8 @@ def load_data():
     df_list = pd.read_csv("data/hyundae_car_list.csv")
     trim_list = pd.read_csv("data/model_trim_capacity.csv") 
     return df_inv, df_list, trim_list
+
+np.random.seed(42) 
 
 # 생산 UI 함수
 def factory_ui():

@@ -5,6 +5,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
+import numpy as np
 
 
 # 데이터 로드 함수
@@ -13,6 +14,8 @@ def load_data():
     df_inv = pd.read_csv("data/inventory_data.csv")
     df_list = pd.read_csv("data/hyundae_car_list.csv")
     trim_list = pd.read_csv("data/model_trim_capacity.csv")
+
+    np.random.seed(42) 
 
     # 데이터 정제
     df_inv['트림명'] = df_inv['트림명'].astype(str).str.strip()

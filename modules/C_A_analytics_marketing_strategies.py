@@ -24,6 +24,8 @@ def load_data():
     df_event = pd.read_csv(event_path)
     return df_real, df_nom, df_sen, df_news, df_list, df_event
 
+np.random.seed(42) 
+
 def render_paginated_list(df, category_name, current_page_key):
     items_per_page = 5
     df = df[df["구분"] == category_name].sort_values(by="등록일", ascending=False).reset_index(drop=True)
@@ -150,7 +152,7 @@ def strategies_ui():
     ax2.plot(df_response["날짜"], df_response["마케팅 반응률(%)"], color="tab:green", marker='s', linestyle='--')
     ax2.tick_params(axis='y', labelcolor="tab:green")
     st.pyplot(fig)
-    
+
     # 📌 분석 내용 추가
     st.markdown("""
     - **소비자심리와 반응률 상관관계**: 소비자심리지수가 저점을 찍고 반등할 때, 마케팅 반응률도 동반 상승하는 경향이 확인됩니다.

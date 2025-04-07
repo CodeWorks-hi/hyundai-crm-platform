@@ -10,6 +10,7 @@ from io import BytesIO
 from reportlab.pdfgen import canvas
 import matplotlib.pyplot as plt
 import plotly.express as px
+from datetime import datetime 
 
 
 # 모델 파일 경로
@@ -37,9 +38,12 @@ def load_data():
 
 
 
-
+# 데이터 전처리 및 모델 학습 함수 수정
 def preprocess_and_train_model(df):
     df = df.drop(columns=["이름", "연락처", "브랜드", "모델명", "공장명"], errors="ignore")
+
+    # 재현성 보장을 위한 시드 설정
+    np.random.seed(42)
 
     df["고객 등급"] = np.random.choice(["VIP", "일반", "신규"], size=len(df))
     df["차량 유형"] = np.random.choice(["세단", "SUV", "해치백"], size=len(df))
@@ -68,24 +72,28 @@ def preprocess_and_train_model(df):
 
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    model = XGBRegressor(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42)
+    model = XGBRegressor(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42,deterministic_histogram=True  # 결정적 히스토그램 활성화
+    )
+
     model.fit(X_train, y_train)
 
     os.makedirs("model", exist_ok=True)
-    joblib.dump(model, "model/xgb_domestic_ltv_model.pkl")
+    model_version = datetime.now().strftime("%Y%m%d%H%M") 
+    joblib.dump(model, f"model/xgb_model_v{model_version}.pkl")
 
     return model, df, X
 
-
-def generate_pdf_report(df_top10):
+# PDF 리포트 생성 함수 수정
+def generate_pdf_report(df_top):
     buffer = BytesIO()
     c = canvas.Canvas(buffer)
     c.setFont("Helvetica", 14)
-    c.drawString(100, 800, "LTV 예측 리포트 상위 고객 10명")
+    c.drawString(100, 800, f"LTV 예측 리포트 상위 {len(df_top)}명")
 
     y = 760
-    for i, row in df_top10.iterrows():
-        line = f"{row['연령대']} / {row['거주 지역']} / 예측 LTV: {row['예측 LTV']:,.0f}원"
+    for idx, row in df_top.iterrows():
+        rank = idx + 1
+        line = f"{rank}위: {row['연령대']} / {row['거주 지역']} / {row['예측 LTV']:,.0f}원"
         c.drawString(80, y, line)
         y -= 20
         if y < 100:
@@ -95,21 +103,58 @@ def generate_pdf_report(df_top10):
     buffer.seek(0)
     return buffer
 
-
 def ltv_customer_ui():
-
+    # 데이터 로드
     df_customer, df_export, df_domestic, df_list = load_data()
 
     with st.spinner("모델 학습 및 예측 중..."):
         model, df_with_pred, X = preprocess_and_train_model(df_domestic)
         df_with_pred["예측 LTV"] = model.predict(X)
 
+    # 상단 컬럼 레이아웃 추가
+    col1, col2 = st.columns([3, 7])
+    with col1:
+        st.markdown("##### 표시할 상위 고객 수")
+    with col2:
+        top_n = st.selectbox(
+            "",
+            options=[10, 20, 50, 100],
+            index=0,
+            key="top_n_selector"
+        )
+    st.markdown("---")
+
+    # 데이터프레임 인덱스 재설정
+    top_n_df = df_with_pred.sort_values(by=["예측 LTV"], ascending=False).head(top_n).reset_index(drop=True)
+
+    # 데이터프레임 표시
+    st.dataframe(
+        top_n_df[["연령대", "거주 지역", "예측 LTV", "고객 평생 가치"]]
+        .style.format({'예측 LTV': '{:,.0f}원'}),
+        height=400 if top_n <= 20 else 600
+    )
 
 
-    # 예측 결과 시각화
-    st.markdown("### 🔝 예측 LTV 기준 상위 고객 TOP 10")
-    top10 = df_with_pred[["연령대", "거주 지역", "고객 평생 가치", "예측 LTV"]].sort_values("예측 LTV", ascending=False).head(10)
-    st.dataframe(top10.style.format({'예측 LTV': '{:,.0f}원'}), height=400)
+    # PDF 리포트 생성 함수 수정
+    def generate_pdf_report(df_top):
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer)
+        c.setFont("Helvetica", 14)
+        c.drawString(100, 800, f"LTV 예측 리포트 상위 {len(df_top)}명")
+        
+        y = 760
+        for idx, row in df_top.iterrows():
+            rank = idx + 1
+            line = f"{rank}위: {row['연령대']} / {row['거주 지역']} / {row['예측 LTV']:,.0f}원"
+            c.drawString(80, y, line)
+            y -= 20
+            if y < 100:
+                break
+                
+        c.save()
+        buffer.seek(0)
+        return buffer
+
 
     st.markdown("---")
 
@@ -197,14 +242,14 @@ def ltv_customer_ui():
 
     st.markdown("---")
 
+    # PDF 리포트 생성
+    pdf_buffer = generate_pdf_report(top_n_df)
 
-    # 리포트 다운로드
-    st.markdown("###  리포트 다운로드")
-    pdf_buffer = generate_pdf_report(top10)
+    # 다운로드 버튼
     st.download_button(
         label="📥 LTV 예측 리포트 다운로드",
         data=pdf_buffer,
-        file_name="ltv_report.pdf",
+        file_name=f"ltv_report_top_{top_n}.pdf",
         mime="application/pdf"
     )
 

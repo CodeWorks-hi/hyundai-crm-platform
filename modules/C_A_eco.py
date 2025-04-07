@@ -12,6 +12,8 @@ import numpy as np
 df_inv = pd.read_csv("data/inventory_data.csv")
 df_list = pd.read_csv("data/hyundae_car_list.csv")
 
+np.random.seed(42) 
+
 def load_data():
     for col in ['모델명', '트림명']:
         df_list[col] = df_list[col].astype(str).str.strip()
