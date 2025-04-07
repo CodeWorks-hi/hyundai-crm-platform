@@ -46,8 +46,6 @@ df_list = pd.read_csv(car_list_path)
 df_customer = pd.read_csv(customer_path)
 
 def domestic_performance_ui():
-    st.title("🚗 국내 판매 실적 분석")
-    st.write("고객 구매 실적 및 주요 통계를 한눈에 확인하세요.")
 
     df_customer['통합 연령대'] = df_customer['연령대'].replace(
             {
@@ -133,15 +131,17 @@ def domestic_performance_ui():
         if chart_data.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            st.write("**연령대/성별 분포**")
             
             # Plotly 원형 차트 시각화
             fig = px.pie(
                 names=chart_data.index,
                 values=chart_data.values,
                 title=f"{legend_title} 분포",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
             
             st.plotly_chart(fig, use_container_width=True)
 
@@ -173,20 +173,22 @@ def domestic_performance_ui():
         if model_counts.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            st.write("**선택된 조건에 따른 차량 모델 구매 비율**")
             
             # Plotly 원형 차트 시각화
             fig = px.pie(
                 names=model_counts.index,
                 values=model_counts.values,
                 title="차량 모델 구매 비율",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
+
             
             st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
-    print(df_filtered['최근 구매 연도'])
+
     # 등급별 구매 모델 비율
     st.markdown("### 등급별 구매 모델 비율")
 
@@ -219,15 +221,16 @@ def domestic_performance_ui():
         if grade_counts.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            st.write("**선택된 조건에 따른 고객 그룹 분포**")
             
             # Plotly Pie Chart Visualization
             fig = px.pie(
                 names=grade_counts.index,
                 values=grade_counts.values,
                 title="고객 그룹 분포",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
             
             # Assign a unique key to the chart
             st.plotly_chart(fig, use_container_width=True, key="customer_group_chart")
@@ -274,22 +277,23 @@ def domestic_performance_ui():
         if model_counts.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            st.write("**선택된 조건에 따른 차량 모델 구매 비율**")
             
             # Plotly Pie Chart Visualization
             fig = px.pie(
                 names=model_counts.index,
                 values=model_counts.values,
                 title="차량 모델 구매 비율",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
             
             # Assign a unique key to the chart
             st.plotly_chart(fig, use_container_width=True, key="vehicle_model_chart")
         
     st.markdown("---")
 
-    print(df_filtered['최근 구매 연도'])
     # 구매 트렌드
     st.markdown("### 구매 트렌드")
     col1, col2 = st.columns(2)
@@ -324,7 +328,6 @@ def domestic_performance_ui():
         if trend_data.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            st.write(f"**{selected_trend}별 구매 트렌드**")
             
             # Plotly Line Chart Visualization
             fig = px.line(
@@ -368,7 +371,6 @@ def domestic_performance_ui():
         if trend_data.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            st.write(f"**{selected_trend}별 차량 모델 구매 트렌드**")
             
             # Aggregate Data by Vehicle Model
             aggregated_data = trend_data.sum(axis=0)  # Sum across all time periods
@@ -378,8 +380,11 @@ def domestic_performance_ui():
                 names=aggregated_data.index,
                 values=aggregated_data.values,
                 title=f"{selected_trend}별 차량 모델 구매 비율",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
             
             st.plotly_chart(fig, use_container_width=True)
 
