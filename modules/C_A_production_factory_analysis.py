@@ -72,6 +72,25 @@ def factory_analysis_ui():
     df_summary = pd.read_csv(OUTPUT_PATH)
     df_inv = pd.read_csv(INV_PATH)
 
+    # '생산가능수량' 컬럼이 없을 경우 처리
+    if '생산가능수량' not in df_summary.columns:
+        if {'모델명', '트림명'}.issubset(df_inv.columns):
+            # 최소 재고량 기준으로 생산가능수량 계산
+            df_summary = (
+                df_inv.groupby(['모델명', '트림명'])['재고량']
+                .min()
+                .reset_index()
+                .rename(columns={'재고량': '생산가능수량'})
+            )
+            df_summary = df_summary.merge(
+                df_inv[['모델명', '트림명', '모델 구분']].drop_duplicates(),
+                on=['모델명', '트림명'],
+                how='left'
+            )
+        else:
+            st.error("⚠️ '생산가능수량'을 계산할 수 없습니다. 데이터 컬럼을 확인해주세요.")
+            return
+
     # 전체 생산 현황 요약
     st.markdown(" #### 모델별 생산 가능 수량")
     st.dataframe(df_summary, use_container_width=True)
@@ -108,4 +127,3 @@ def factory_analysis_ui():
     st.dataframe(factory_parts, use_container_width=True)
 
     st.markdown("---")
-

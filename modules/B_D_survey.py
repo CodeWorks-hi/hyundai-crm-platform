@@ -129,3 +129,6 @@ def survey_ui(df_employees, generate_html_table):
                     "거주지역": 거주지역
                 }
                 st.success(f"{이름}님 설문조사가 완료되었습니다.")
+                # 설문 완료 후 상담 이력 탭으로 자동 이동
+                st.session_state["selected_consult_tab"] = 1
+                st.rerun()
