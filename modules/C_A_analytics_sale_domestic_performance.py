@@ -5,6 +5,7 @@ from matplotlib.colors import ListedColormap
 import seaborn as sb
 from matplotlib import font_manager, rc
 import matplotlib.pyplot as plt
+import plotly.express as px
 import os
 import platform
 
@@ -133,49 +134,56 @@ def domestic_performance_ui():
             st.write("필터링된 데이터가 없습니다.")
         else:
             st.write("**연령대/성별 분포**")
-            fig, ax = plt.subplots(figsize=(6, 6))  # 그래프 크기 설정
-            colors = plt.cm.Set3.colors[:len(chart_data)]  # 고유한 옅은 색상 사용 (Set3 팔레트)
-            ax.pie(chart_data, colors=colors, startangle=90)  # 비율 표시 추가
-            ax.legend(sorted(chart_data.index), title=legend_title, loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
-            st.pyplot(fig)
+            
+            # Plotly 원형 차트 시각화
+            fig = px.pie(
+                names=chart_data.index,
+                values=chart_data.values,
+                title=f"{legend_title} 분포",
+                color_discrete_sequence=px.colors.qualitative.Set3
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
 
+    # **오른쪽 열 (col2): 차량 모델 구매 비율**
     with col2:
-        col1, col2 = st.columns(2)
-        with col1:
+        col1_1, col1_2 = st.columns(2)
+        with col1_1:
             # 연령대 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
             age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
             selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox")
-        with col2:
+        with col1_2:
             # 성별 선택 셀렉박스 (전체 옵션 포함) - 고유 키 추가
             gender_options = df_filtered['성별'].unique().tolist()
             selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox")
 
         # 필터링 로직
         if selected_age == '전체' and selected_gender == '전체':
-            df_filtered = df_filtered.copy()  # 필터링 해제
+            filtered_data = df_filtered.copy()  # 필터링 해제
         elif selected_age == '전체':
-            df_filtered = df_filtered[df_filtered['성별'] == selected_gender]  # 성별만 필터링
+            filtered_data = df_filtered[df_filtered['성별'] == selected_gender]  # 성별만 필터링
         elif selected_gender == '전체':
-            df_filtered = df_filtered[df_filtered['통합 연령대'] == selected_age]  # 연령대만 필터링
+            filtered_data = df_filtered[df_filtered['통합 연령대'] == selected_age]  # 연령대만 필터링
         else:
-            df_filtered = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
+            filtered_data = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
 
         # 차량 모델별 구매 수량 계산
-        model_counts = df_filtered['최근 구매 제품'].value_counts()
+        model_counts = filtered_data['최근 구매 제품'].value_counts()
 
-        # 시각화 데이터 준비
         if model_counts.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
             st.write("**선택된 조건에 따른 차량 모델 구매 비율**")
             
-            # 원형 차트 시각화
-            fig, ax = plt.subplots(figsize=(6, 6))
-            colors = plt.cm.Set3.colors[:len(model_counts)]  # 고유한 색상 사용 (Set3 팔레트)
-            ax.pie(model_counts, startangle=90, colors=colors)
-            ax.legend(sorted(model_counts.index), title=legend_title, loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
+            # Plotly 원형 차트 시각화
+            fig = px.pie(
+                names=model_counts.index,
+                values=model_counts.values,
+                title="차량 모델 구매 비율",
+                color_discrete_sequence=px.colors.qualitative.Set3
+            )
             
-            st.pyplot(fig)
+            st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
     print(df_filtered['최근 구매 연도'])

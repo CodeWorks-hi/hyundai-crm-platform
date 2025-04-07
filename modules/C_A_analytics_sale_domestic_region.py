@@ -46,9 +46,7 @@ customer_path = "data/customer_data.csv"
 df_customer = pd.read_csv(customer_path)
 
 def domestic_region_ui():
-    st.subheader("판매·수출 관리")
-    st.write("국내 판매 실적을 분석하는 페이지입니다.")
-    st.write("차종/지역별 시장 비교")
+    st.title("판매·수출 관리")
 
     col1, col2=st.columns(2)
     # 연도 선택
@@ -131,7 +129,7 @@ def domestic_region_ui():
         region_sale.columns = ['거주 지역', '판매량']
 
         # Streamlit에서 출력
-        st.markdown("### 지역별 총 판매량 비교 (막대 그래프)")
+        st.markdown("### 지역별 총 판매량 비교")
 
         # Plotly로 막대 그래프 생성
         fig = px.bar(
@@ -155,7 +153,7 @@ def domestic_region_ui():
         region_sale_percentage.columns = ['거주 지역', '점유율 (%)']
 
         # Streamlit에서 출력
-        st.markdown("### 지역별 점유율 비교 (원형 그래프)")
+        st.markdown("### 지역별 점유율 비교")
 
         # Plotly로 원형 그래프 생성
         fig = px.pie(
@@ -176,7 +174,7 @@ def domestic_region_ui():
         region_grade.columns = ['거주 지역', '고객 등급', '고객 수']
 
         # Streamlit에서 출력
-        st.markdown("### 지역별 고객 등급 비교 (막대 그래프)")
+        st.markdown("### 지역별 고객 등급 비교")
 
         # Plotly로 막대 그래프 생성
         fig = px.bar(
