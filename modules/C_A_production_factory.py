@@ -25,12 +25,6 @@ def factory_ui():
 
     # 검색 결과 [2] 첨부 파일 구조에 따른 컬럼명 수정
     try:
-        # 실제 컬럼명 확인 (Plant → 공장명, Production Capacity → 생산가능수량)
-        trim_list = trim_list.rename(columns={
-            'Plant': '공장명',
-            'Production Capacity': '생산가능수량'
-        })
-        
         # 필수 컬럼 존재 여부 검증
         required_columns = ['공장명', '생산가능수량']
         if not all(col in trim_list.columns for col in required_columns):
