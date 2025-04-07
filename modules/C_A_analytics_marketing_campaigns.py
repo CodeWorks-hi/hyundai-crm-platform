@@ -8,7 +8,7 @@ IMAGE_DIR = "images/event"
 os.makedirs(IMAGE_DIR, exist_ok=True)
 
 def render_campaign_register():
-    st.subheader("캠페인 등록")
+    st.subheader("이벤트 등록")
 
     with st.form("register_campaign_form"):
         event_name = st.text_input("이벤트명")

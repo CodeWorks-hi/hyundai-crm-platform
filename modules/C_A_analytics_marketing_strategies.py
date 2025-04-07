@@ -67,14 +67,13 @@ def strategies_ui():
         else "예정" if row["시작일"] > today
         else "종료", axis=1)
 
-    st.markdown(" ### 마케팅 전략 분석 및 이벤트 제안")
 
     # 전체 5개 컬럼 구성 (여백 0.15, 콘텐츠 컬럼 0.275씩)
     col1, col2, col3, col4, col5 = st.columns([0.05, 1, 0.05, 1, 0.05])
 
     # 캠페인 전략 Top 5
     with col2:
-        st.header("캠페인 전략 Top 5")
+        st.header("이벤트 전략 Top 5")
 
         in_progress_events = df_campaigns[df_campaigns["진행상태"] == "진행 중"].head(5)
         for idx, row in in_progress_events.iterrows():

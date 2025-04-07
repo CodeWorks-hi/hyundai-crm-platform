@@ -8,7 +8,7 @@ from modules.C_A_analytics_marketing_campaigns import render_campaign_register, 
 
 
 def marketing_ui():
-    tab1, tab2, tab3 = st.tabs(["마케팅 전략", "캠폐인 분석", "캠폐인 관리"])
+    tab1, tab2, tab3 = st.tabs(["이벤트 전략", "이벤트 분석", "이벤트 관리"])
 
     with tab1:
         strategies_ui()  

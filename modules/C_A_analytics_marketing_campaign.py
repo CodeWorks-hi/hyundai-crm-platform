@@ -1,9 +1,3 @@
-# 판매·수출 관리
-    # 마케팅 캠페인/ # 캠페인 성과 측정
-        #  캠페인 관리 메뉴
-
-
-
 import streamlit as st
 import plotly.express as px
 import pandas as pd
@@ -14,6 +8,12 @@ import json
 import plotly.graph_objects as go
 from datetime import datetime
 
+TEXT_MODEL_ID = "google/gemma-2-9b-it"
+API_TOKEN = st.secrets.get("HUGGINGFACE_API_TOKEN")
+
+if not API_TOKEN:
+    st.error("❌ Hugging Face API 토큰이 설정되지 않았습니다.")
+    st.stop()
 
 # 한글 폰트 설정 (윈도우/Mac/Linux 공통 지원)
 def set_korean_font():
@@ -34,13 +34,49 @@ set_korean_font()
 
 def campaign_ui():
     st.markdown("""
-    ##  캠페인 분석 및 관리
-    
-    ### 💡 인사이트 요약
-    - 최근 **소비자 심리지수 회복** → 고관여 제품 관심도 증가
-    - **금리/환율 안정기** 진입 → 금융 캠페인 효율성 상승
-    - **보상판매, 리타겟팅 캠페인 응답률** 눈에 띄게 상승
+    ##  이벤트 분석 및 관리
     """)
+    st.subheader("💡 인사이트 요약 (AI 분석 기반)")
+
+    df_campaigns = pd.read_csv("data/campaign_list.csv")  # CSV 경로 확인
+    selected_campaign = st.selectbox("📌 분석할 캠페인을 선택하세요", df_campaigns["이벤트명"].unique())
+
+    if st.button("선택한 이벤트 AI 인사이트 생성"):
+        selected = df_campaigns[df_campaigns["이벤트명"] == selected_campaign].iloc[0]
+
+        with st.spinner("KoAlpaca가 인사이트를 분석 중입니다..."):
+            import requests
+            HF_API_URL = f"https://api-inference.huggingface.co/models/{TEXT_MODEL_ID}"
+            headers = {"Authorization": f"Bearer {API_TOKEN}"}
+
+            prompt = f"""
+다음 마케팅 캠페인을 다음 항목별로 요약 분석해줘:
+
+1. 전략 분석
+2. 기대 효과
+3. 시장 전망
+
+이벤트명: {selected['이벤트명']}
+대상: {selected['대상']}
+혜택: {selected['혜택']}
+참여 방법: {selected['참여 방법']}
+기간: {selected['기간']}
+전략 분류: {selected['분류']}
+
+결과를 항목별로 나누어 정리해줘.
+"""
+
+            res = requests.post(HF_API_URL, headers=headers, json={"inputs": prompt})
+            if res.status_code == 200:
+                result = res.json()
+                if isinstance(result, list) and "generated_text" in result[0]:
+                    st.markdown(f"#### 📌 {selected_campaign} 분석 결과")
+                    st.success(result[0]["generated_text"])
+                else:
+                    st.warning("AI 응답 형식을 이해할 수 없습니다.")
+            else:
+                st.error("AI 분석 요청에 실패했습니다. API Key나 모델 상태를 확인해주세요.")
+
     st.header("기대 효과 및 분석")
 
     st.markdown("""
@@ -112,7 +148,6 @@ def create_realtime_chart():
 
 def economic_dashboard():
 
-
     st.title("실시간 경제지표 모니터링")
     st.markdown("---")
     
@@ -169,3 +204,53 @@ def economic_dashboard():
                           y=[d['value'] for d in interest_data[-12:]],
                           name="금리 변화")
                 st.plotly_chart(fig, use_container_width=True)
+
+            # AI 인사이트 분석 버튼
+            if st.button(f"AI 인사이트 보기: {row['이벤트명']}", key=f"ai_insight_inprogress_{idx}"):
+                with st.spinner("AI가 캠페인을 분석 중입니다..."):
+                    import requests
+                    HF_API_URL = f"https://api-inference.huggingface.co/models/{TEXT_MODEL_ID}"
+                    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+                    prompt = f"다음 마케팅 캠페인의 전략을 분석해주고, 기대 효과와 시장 전망을 요약해줘.\n\n이벤트명: {row['이벤트명']}\n대상: {row['대상']}\n혜택: {row['혜택']}\n참여 방법: {row['참여 방법']}\n기간: {row['기간']}\n전략 분류: {row['분류']}\n\n결과:"
+                    res = requests.post(HF_API_URL, headers=headers, json={"inputs": prompt})
+                    if res.status_code == 200:
+                        result = res.json()
+                        if isinstance(result, list) and "generated_text" in result[0]:
+                            st.markdown("**📌 AI 분석 결과**")
+                            st.success(result[0]["generated_text"])
+                        else:
+                            st.warning("AI 응답 형식을 이해할 수 없습니다.")
+                    else:
+                        st.error("AI 분석 요청에 실패했습니다. API Key나 모델 상태를 확인해주세요.")
+
+            # 기존 정의 오류 방지용, 실제 정의는 다른 곳에서 처리됨
+            upcoming_events = [] if 'upcoming_events' not in locals() else upcoming_events
+            
+            # upcoming_events 반복문 내에도 AI 인사이트 분석 버튼 추가
+            for idx, row in upcoming_events.iterrows():
+                with st.expander(f"{idx+1}. {row['이벤트명']}"):
+                    st.markdown(f"""
+                    - **대상**: {row['대상']}
+                    - **혜택**: {row['혜택']}
+                    - **참여 방법**: {row['참여 방법']}
+                    - **기간**: {row['기간']}
+                    - **전략 분류**: {row['분류']}
+                    """)
+
+                    # AI 인사이트 분석 버튼
+                    if st.button(f"AI 인사이트 보기: {row['이벤트명']}", key=f"ai_insight_upcoming_{idx}"):
+                        with st.spinner("AI가 캠페인을 분석 중입니다..."):
+                            import requests
+                            HF_API_URL = f"https://api-inference.huggingface.co/models/{TEXT_MODEL_ID}"
+                            headers = {"Authorization": f"Bearer {API_TOKEN}"}
+                            prompt = f"다음 마케팅 캠페인의 전략을 분석해주고, 기대 효과와 시장 전망을 요약해줘.\n\n이벤트명: {row['이벤트명']}\n대상: {row['대상']}\n혜택: {row['혜택']}\n참여 방법: {row['참여 방법']}\n기간: {row['기간']}\n전략 분류: {row['분류']}\n\n결과:"
+                            res = requests.post(HF_API_URL, headers=headers, json={"inputs": prompt})
+                            if res.status_code == 200:
+                                result = res.json()
+                                if isinstance(result, list) and "generated_text" in result[0]:
+                                    st.markdown("**📌 AI 분석 결과**")
+                                    st.success(result[0]["generated_text"])
+                                else:
+                                    st.warning("AI 응답 형식을 이해할 수 없습니다.")
+                            else:
+                                st.error("AI 분석 요청에 실패했습니다. API Key나 모델 상태를 확인해주세요.")
