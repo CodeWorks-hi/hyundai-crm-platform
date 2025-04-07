@@ -2,6 +2,10 @@ import streamlit as st
 import os
 import pandas as pd
 from datetime import datetime
+from datetime import datetime, time as dtime
+
+
+
 
 def consult_ui():
     if "wait_page" not in st.session_state: st.session_state["wait_page"] = 0
@@ -31,7 +35,20 @@ def consult_ui():
 
                 col3, col4 = st.columns(2)
                 date = col3.date_input("희망 상담 날짜")
-                time = col4.time_input("희망 상담 시간")
+
+                # 👉 희망 시간은 10:00 ~ 17:00 중 점심시간 제외, 30분 단위
+                valid_times = []
+                for hour in range(10, 17):
+                    if hour == 13:  # 점심시간 제외
+                        continue
+                    for minute in [0, 30]:
+                        valid_times.append(dtime(hour, minute))
+
+                time = col4.selectbox(
+                    "희망 상담 시간",
+                    valid_times,
+                    format_func=lambda t: t.strftime("%H:%M")
+                )
 
                 content = st.text_area("상담 내용") or "-"
 
@@ -53,6 +70,7 @@ def consult_ui():
                     df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
                     df.to_csv(df_path, index=False)
                     st.success("방문예약 신청이 되었습니다.")
+
 
     with right_form:
         with st.expander("문의하기", expanded=True):
