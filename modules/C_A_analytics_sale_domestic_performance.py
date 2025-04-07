@@ -137,8 +137,11 @@ def domestic_performance_ui():
                 names=chart_data.index,
                 values=chart_data.values,
                 title=f"{legend_title} 분포",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
             
             st.plotly_chart(fig, use_container_width=True)
 
@@ -176,8 +179,11 @@ def domestic_performance_ui():
                 names=model_counts.index,
                 values=model_counts.values,
                 title="차량 모델 구매 비율",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
+
             
             st.plotly_chart(fig, use_container_width=True)
 
@@ -221,8 +227,10 @@ def domestic_performance_ui():
                 names=grade_counts.index,
                 values=grade_counts.values,
                 title="고객 그룹 분포",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
             
             # Assign a unique key to the chart
             st.plotly_chart(fig, use_container_width=True, key="customer_group_chart")
@@ -275,8 +283,11 @@ def domestic_performance_ui():
                 names=model_counts.index,
                 values=model_counts.values,
                 title="차량 모델 구매 비율",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
             
             # Assign a unique key to the chart
             st.plotly_chart(fig, use_container_width=True, key="vehicle_model_chart")
@@ -369,8 +380,11 @@ def domestic_performance_ui():
                 names=aggregated_data.index,
                 values=aggregated_data.values,
                 title=f"{selected_trend}별 차량 모델 구매 비율",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                color_discrete_sequence=px.colors.sequential.RdBu
             )
+
+            # 숫자 표시 제거
+            fig.update_traces(textinfo='none')
             
             st.plotly_chart(fig, use_container_width=True)
 

@@ -138,7 +138,7 @@ def domestic_region_ui():
             title="지역별 총 판매량",
             labels={'판매량': '판매량', '거주 지역': '지역'},
             color='거주 지역',
-            text_auto=True,
+            text_auto=False,
             color_discrete_sequence=px.colors.sequential.RdBu
         )
 
@@ -163,6 +163,9 @@ def domestic_region_ui():
             color_discrete_sequence=px.colors.sequential.RdBu
         )
 
+        # 숫자 표시 제거
+        fig.update_traces(textinfo='none')
+
         # Streamlit에서 그래프 표시
         st.plotly_chart(fig)
 
@@ -184,9 +187,10 @@ def domestic_region_ui():
             barmode='group',
             title="지역별 고객 등급 비교",
             labels={'거주 지역': '지역', '고객 수': '고객 수'},
-            text_auto=True,
+            text_auto=False,
             color_discrete_sequence=px.colors.sequential.RdBu
         )
+
 
         # Streamlit에서 그래프 표시
         st.plotly_chart(fig, use_container_width=True)
@@ -236,7 +240,7 @@ def domestic_region_ui():
             labels=dict(x="차종", y="거주 지역", color="빈도"),
             x=heatmap_data.columns,
             y=heatmap_data.index,
-            text_auto=True,
+            text_auto=False,
             color_continuous_scale="Blues"
         )
 
@@ -296,6 +300,10 @@ def domestic_region_ui():
             title=f"{selected_region} 지역의 차종 비율",
             color_discrete_sequence=px.colors.sequential.RdBu
         )
+
+        # 숫자 표시 제거
+        fig.update_traces(textinfo='none')
+
         st.plotly_chart(fig)
 
     with col2:
