@@ -112,7 +112,7 @@ def consult_ui():
                     st.success("문의가 접수되었습니다.")
 
     st.markdown("---")
-    consult_list, spacer1, consult_true, spacer2, consult_visit, spacer3 ,consult_visit_True = st.columns([1, 0.02, 1, 0.02, 1, 0.02, 1])
+    consult_list, spacer1, consult_true, spacer2, consult_visit, spacer3 ,consult_visit_True = st.columns([0.5, 0.02, 0.5, 0.02, 0.5, 0.02, 0.5])
     with spacer1:
         st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
     with spacer2:
