@@ -7,14 +7,8 @@
 
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-import seaborn as sb
-from matplotlib import font_manager, rc
-import matplotlib.pyplot as plt
 import plotly.express as px
-import os
-import platform
+
 
 
 
