@@ -7,7 +7,6 @@ from .C_A_production_factory import factory_ui
 from .C_A_production_trend import trend_ui
 
 def production_ui():
-    st.subheader("생산·제조 현황 분석")
 
 
     tab1, tab2 = st.tabs(["공장별 생산량 비교", "연도별 추이, 목표 달성률"])
