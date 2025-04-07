@@ -241,7 +241,7 @@ def domestic_performance_ui():
         with col1_1:
             # Grade Selection Dropdown
             grade_options = sorted(df_filtered['고객 그룹'].unique().tolist())
-            selected_grade = st.selectbox("등급 선택", options=['전체'] + grade_options, index=0, key="grade_selectbox")
+            selected_grade = st.selectbox("등급 선택", grade_options, index=0, key="grade_selectbox")
         with col1_2:
             # Age Selection Dropdown
             age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
@@ -252,13 +252,7 @@ def domestic_performance_ui():
             selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox_2")
         
         # Filtering Logic
-        if selected_grade == '전체' and selected_age == '전체' and selected_gender == '전체':
-            filtered_data = df_filtered.copy()
-        elif selected_grade == '전체' and selected_age == '전체':
-            filtered_data = df_filtered[df_filtered['성별'] == selected_gender]
-        elif selected_grade == '전체' and selected_gender == '전체':
-            filtered_data = df_filtered[df_filtered['통합 연령대'] == selected_age]
-        elif selected_age == '전체' and selected_gender == '전체':
+        if selected_age == '전체' and selected_gender == '전체':
             filtered_data = df_filtered[df_filtered['고객 그룹'] == selected_grade]
         elif selected_grade == '전체':
             filtered_data = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]
