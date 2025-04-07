@@ -46,7 +46,6 @@ customer_path = "data/customer_data.csv"
 df_customer = pd.read_csv(customer_path)
 
 def domestic_region_ui():
-    st.title("판매·수출 관리")
 
     col1, col2=st.columns(2)
     # 연도 선택

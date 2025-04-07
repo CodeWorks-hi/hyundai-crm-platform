@@ -46,8 +46,6 @@ df_list = pd.read_csv(car_list_path)
 df_customer = pd.read_csv(customer_path)
 
 def domestic_performance_ui():
-    st.title("🚗 국내 판매 실적 분석")
-    st.write("고객 구매 실적 및 주요 통계를 한눈에 확인하세요.")
 
     df_customer['통합 연령대'] = df_customer['연령대'].replace(
             {
