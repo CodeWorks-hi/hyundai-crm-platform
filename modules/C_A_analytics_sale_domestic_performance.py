@@ -369,3 +369,8 @@ def domestic_performance_ui():
             ax.legend(aggregated_data.index, title="차량 모델", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
             
             st.pyplot(fig)
+
+    # 원본데이터 보기
+    with st.expander("원본 데이터 보기", expanded=False):
+            st.write(df_filtered)
+            st.dataframe(df_filtered, use_container_width=True)
