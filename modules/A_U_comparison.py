@@ -117,12 +117,13 @@ def comparison_ui():
                 <p><strong>가격:</strong> {int(car.get('기본가격', 0)):,}원</p>
                 <hr />
                 <p><strong>연료구분:</strong> {car.get('연료구분','')}</p>
-                <p><strong>배기량:</strong> {car.get('배기량','')}</p>
-                <p><strong>공차중량:</strong> {car.get('공차중량','')}</p>
+                <p><strong>배기량:</strong> {car.get('배기량','')}cc</p>
+                <p><strong>공차중량:</strong> {car.get('공차중량','')}kg</p>
                 <p><strong>연비:</strong> {car.get('연비','')}</p>
                 <p><strong>차량형태:</strong> {car.get('차량형태','')}</p>
                 <p><strong>차량구분:</strong> {car.get('차량구분','')}</p>
                 <p><strong>탑승인원:</strong> {car.get('탑승인원','')}</p>
+                <p><strong>트림:</strong> {', '.join(df[df['모델명'] == car.get('모델명', '')]['트림명'].dropna().unique())}</p>
             </div>
         """, unsafe_allow_html=True)
     else:
