@@ -309,10 +309,7 @@ def consult_ui():
 
     with col_right:
         st.markdown("#### 🏷️ 상담 태그 분류")
-        st.markdown(
-            "<div style='font-size: 14px; color: #666; margin-bottom: 6px;'>상담 내용을 분류하기 위한 태그를 선택하거나 직접 입력하세요.</div>",
-            unsafe_allow_html=True
-        )
+
         # default_tags = generate_tag(memo, model_name=TEXT_MODEL_ID) if memo.strip() else []
         # st.write("📥 생성된 태그:", default_tags)
         default_tags = ["SUV", "가족용", "예산 3000 이하", "전기차 관심", "시승 희망", "재방문 예정"]
