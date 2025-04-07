@@ -7,6 +7,7 @@ import os
 import logging
 import traceback
 import datetime
+import base64
 
 
 
@@ -36,14 +37,31 @@ def switch_page(page):
 
 # ✅ 홈 페이지
 if st.session_state.current_page == "home":
-    st.image("images/hyundae_kia_logo.png", width=100)
+    def get_image_base64(path):
+        with open(path, "rb") as img:
+            return base64.b64encode(img.read()).decode()
+
+    image_base64 = get_image_base64("images/hyundai_logo.png")
 
     st.markdown(
-        "<h1 style='text-align: center; margin-bottom: 40px;'>Hyundai & Kia ERP</h1>",
+        f"""
+        <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 40px;">
+            <img src="data:image/png;base64,{image_base64}" width="60"/>
+            <h1 style="margin-bottom: 0;">Hyundai & Kia ERP</h1>
+        </div>
+        """,
         unsafe_allow_html=True
     )
-
-    col4, col1, col2, col3, col5 = st.columns([1.5, 1, 1, 1, 1])
+    st.subheader("")
+    col4, col1,col6, col2,col7, col3, col5 = st.columns([1.5, 1,0.1, 1,0.1, 1, 1])
+    with col4:
+        st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
+    with col5:
+        st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
+    with col6:
+        st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
+    with col7:
+        st.markdown("<div style='height:100%; border-left:1px solid #ddd;'></div>", unsafe_allow_html=True)
 
     with col1:
         st.image("images/user_icon.png", width=80)
@@ -80,5 +98,3 @@ else:
     elif page == "admin_main":  
         import C_A_main as admin
         admin.app()
-
-
