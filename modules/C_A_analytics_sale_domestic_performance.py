@@ -10,30 +10,6 @@ import os
 import platform
 
 
-# 한글 폰트 설정 함수
-def set_korean_font():
-    try:
-        if platform.system() == "Darwin":  # macOS
-            rc("font", family="AppleGothic")
-        elif platform.system() == "Windows":
-            font_path = "C:/Windows/Fonts/malgun.ttf"
-            if os.path.exists(font_path):
-                font_name = font_manager.FontProperties(fname=font_path).get_name()
-                rc("font", family=font_name)
-        elif platform.system() == "Linux":
-            font_path = "fonts/NanumGothic.ttf"
-            if os.path.exists(font_path):
-                font_manager.fontManager.addfont(font_path)
-                font_name = font_manager.FontProperties(fname=font_path).get_name()
-                rc("font", family=font_name)
-            else:
-                st.error("Linux 환경에서 NanumGothic.ttf 폰트가 없습니다. 'fonts' 폴더에 추가해주세요.")
-    except Exception as e:
-        st.warning(f"폰트 설정 중 오류 발생: {e}")
-    plt.rcParams["axes.unicode_minus"] = False
-
-# 호출
-set_korean_font()
 
 # 데이터 경로 설정
 car_list_path = "data/hyundae_car_list.csv"
@@ -95,194 +71,115 @@ def domestic_performance_ui():
 
     # 분포 시각화 (깔끔한 레이아웃)
     st.markdown("---")
-    st.markdown("### 고객 분포 시각화")
-    
+
+    col1_1, col1_2,col3 = st.columns(3)
+    with col1_1:
+        # Age Selection Dropdown
+        age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
+        selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox_1")
+    with col1_2:
+        # Gender Selection Dropdown
+        gender_options = df_filtered['성별'].unique().tolist()
+        selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox_1")
+    with col3:
+        # Grade Selection Dropdown
+            grade_options = sorted(df_filtered['고객 그룹'].unique().tolist())
+            selected_grade = st.selectbox("등급 선택", options=['전체'] + grade_options, index=0, key="grade_selectbox")
+
+    # 필터링 로직
+    filtered_data = df_filtered.copy()
+
+    if selected_age != "전체":
+        filtered_data = filtered_data[filtered_data['통합 연령대'] == selected_age]
+
+    if selected_gender != "전체":
+        filtered_data = filtered_data[filtered_data['성별'] == selected_gender]
+
+    if selected_grade != "전체":
+        filtered_data = filtered_data[filtered_data['고객 그룹'] == selected_grade]
+
+    # 고객 그룹 분포 계산
+    grade_counts = filtered_data['고객 그룹'].value_counts()
+
+    # 하단 시각화 영역
     col1, col2 = st.columns(2)
 
     with col1:
-        col1_1, col1_2 = st.columns(2)
-        with col1_1:
-            # 연령대 선택 셀렉박스 (전체 옵션 포함)
-            age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
-            selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0)
-        with col1_2:
-            # 성별 선택 셀렉박스 (전체 옵션 포함)
-            gender_options = df_filtered['성별'].unique().tolist()
-            selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0)
-
-        # 필터링 로직 수정
-        if selected_age == '전체' and selected_gender == '전체':
-            chart_data = df_filtered['통합 연령대'].value_counts()
-            legend_title = "연령대"  # 범례 제목 설정 (연령대 기준)
-        elif selected_age == '전체':
-            df_filtered = df_filtered[df_filtered['성별'] == selected_gender]  # 성별만 필터링
-            chart_data = df_filtered['통합 연령대'].value_counts()
-            legend_title = "연령대"  # 범례 제목 설정 (연령대 기준)
-        elif selected_gender == '전체':
-            df_filtered = df_filtered[df_filtered['통합 연령대'] == selected_age]  # 연령대만 필터링
-            chart_data = df_filtered['성별'].value_counts()
-            legend_title = "성별"  # 범례 제목 설정 (성별 기준)
-        else:
-            df_filtered = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]  # 연령대와 성별 모두 필터링
-            chart_data = df_filtered['성별'].value_counts()
-            legend_title = "성별"  # 범례 제목 설정 (성별 기준)
-
-        # 데이터가 없는 경우 처리
-        if chart_data.empty:
-            st.write("필터링된 데이터가 없습니다.")
-        else:
-            
-            # Plotly 원형 차트 시각화
-            fig = px.pie(
-                names=chart_data.index,
-                values=chart_data.values,
-                title=f"{legend_title} 분포",
-                color_discrete_sequence=px.colors.sequential.RdBu
-            )
-
-            # 숫자 표시 제거
-            fig.update_traces(textinfo='none')
-            
-            st.plotly_chart(fig, use_container_width=True)
-
-    
-
-    st.markdown("---")
-
-    # 등급별 구매 모델 비율
-    st.markdown("### 등급별 구매 모델 비율")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        col1_1, col1_2 = st.columns(2)
-        with col1_1:
-            # Age Selection Dropdown
-            age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
-            selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox_1")
-        with col1_2:
-            # Gender Selection Dropdown
-            gender_options = df_filtered['성별'].unique().tolist()
-            selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox_1")
-        
-        # Filtering Logic
-        if selected_age == '전체' and selected_gender == '전체':
-            filtered_data = df_filtered.copy()
-        elif selected_age == '전체':
-            filtered_data = df_filtered[df_filtered['성별'] == selected_gender]
-        elif selected_gender == '전체':
-            filtered_data = df_filtered[df_filtered['통합 연령대'] == selected_age]
-        else:
-            filtered_data = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]
-        
-        # Customer Group Distribution Calculation
-        grade_counts = filtered_data['고객 그룹'].value_counts()
-
         if grade_counts.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            
-            # Plotly Pie Chart Visualization
+            # Plotly 원형 차트 시각화 (고객 그룹 분포)
             fig = px.pie(
                 names=grade_counts.index,
                 values=grade_counts.values,
-                title="고객 그룹 분포",
+                title="고객 분포",
                 color_discrete_sequence=px.colors.sequential.RdBu
             )
             # 숫자 표시 제거
             fig.update_traces(textinfo='none')
             
-            # Assign a unique key to the chart
+            # 그래프 출력
             st.plotly_chart(fig, use_container_width=True, key="customer_group_chart")
 
-    # **Right Column (col2): Vehicle Model Purchase Ratio**
     with col2:
-        col1_1, col1_2, col1_3 = st.columns(3)
-        with col1_1:
-            # Grade Selection Dropdown
-            grade_options = sorted(df_filtered['고객 그룹'].unique().tolist())
-            selected_grade = st.selectbox("등급 선택", grade_options, index=0, key="grade_selectbox")
-        with col1_2:
-            # Age Selection Dropdown
-            age_options = sorted(df_filtered['통합 연령대'].unique().tolist())
-            selected_age = st.selectbox("연령대 선택", options=['전체'] + age_options, index=0, key="age_selectbox_2")
-        with col1_3:
-            # Gender Selection Dropdown
-            gender_options = df_filtered['성별'].unique().tolist()
-            selected_gender = st.selectbox("성별 선택", options=['전체'] + gender_options, index=0, key="gender_selectbox_2")
-        
-        # Filtering Logic
-        if selected_age == '전체' and selected_gender == '전체':
-            filtered_data = df_filtered[df_filtered['고객 그룹'] == selected_grade]
-        elif selected_grade == '전체':
-            filtered_data = df_filtered[(df_filtered['통합 연령대'] == selected_age) & (df_filtered['성별'] == selected_gender)]
-        elif selected_age == '전체':
-            filtered_data = df_filtered[(df_filtered['고객 그룹'] == selected_grade) & (df_filtered['성별'] == selected_gender)]
-        elif selected_gender == '전체':
-            filtered_data = df_filtered[(df_filtered['고객 그룹'] == selected_grade) & (df_filtered['통합 연령대'] == selected_age)]
-        else:
-            filtered_data = df_filtered[(df_filtered['고객 그룹'] == selected_grade) & 
-                                        (df_filtered['통합 연령대'] == selected_age) & 
-                                        (df_filtered['성별'] == selected_gender)]
-        
-        # Vehicle Model Purchase Ratio Calculation
+        # 차량 모델 구매 비율 계산
         model_counts = filtered_data['최근 구매 제품'].value_counts()
 
         if model_counts.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            
-            # Plotly Pie Chart Visualization
+            # Plotly 원형 차트 시각화 (차량 모델 구매 비율)
             fig = px.pie(
                 names=model_counts.index,
                 values=model_counts.values,
-                title="차량 모델 구매 비율",
+                title="차량 분포",
                 color_discrete_sequence=px.colors.sequential.RdBu
             )
-
             # 숫자 표시 제거
             fig.update_traces(textinfo='none')
             
-            # Assign a unique key to the chart
+            # 그래프 출력
             st.plotly_chart(fig, use_container_width=True, key="vehicle_model_chart")
-        
+    
+
     st.markdown("---")
+
 
     # 구매 트렌드
     st.markdown("### 구매 트렌드")
+
+    # Trend Selection Dropdown
+    trend_options = ['분기', '월', '요일', '계절']
+    selected_trend = st.selectbox(
+        "트렌드 선택", 
+        trend_options, 
+        index=0,
+        key="unique_trend_selectbox"  # Unique key for the dropdown
+    )
+
+    # Prepare Trend Data
+    if selected_trend == '분기':
+        df_filtered['구매 분기'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.to_period('Q').astype(str)
+        trend_data = df_filtered.groupby('구매 분기')['아이디'].nunique()
+    elif selected_trend == '월':
+        df_filtered['구매 월'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.month
+        trend_data = df_filtered.groupby('구매 월')['아이디'].nunique()
+    elif selected_trend == '요일':
+        days_order = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일']
+        trend_data = df_filtered.groupby('구매 요일')['아이디'].nunique().reindex(days_order, fill_value=0)
+    elif selected_trend == '계절':
+        df_filtered['구매 시즌'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.month % 12 // 3 + 1
+        season_map = {1: '봄', 2: '여름', 3: '가을', 4: '겨울'}
+        df_filtered['구매 시즌'] = df_filtered['구매 시즌'].map(season_map)
+        trend_data = df_filtered.groupby('구매 시즌')['아이디'].nunique()
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
-        # Trend Selection Dropdown
-        trend_options = ['분기', '월', '요일', '계절']
-        selected_trend = st.selectbox(
-            "트렌드 선택", 
-            trend_options, 
-            index=0,
-            key="unique_trend_selectbox"  # Unique key for the dropdown
-        )
-
-        # Prepare Trend Data
-        if selected_trend == '분기':
-            df_filtered['구매 분기'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.to_period('Q').astype(str)
-            trend_data = df_filtered.groupby('구매 분기')['아이디'].nunique()
-        elif selected_trend == '월':
-            df_filtered['구매 월'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.month
-            trend_data = df_filtered.groupby('구매 월')['아이디'].nunique()
-        elif selected_trend == '요일':
-            days_order = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일']
-            trend_data = df_filtered.groupby('구매 요일')['아이디'].nunique().reindex(days_order, fill_value=0)
-        elif selected_trend == '계절':
-            df_filtered['구매 시즌'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.month % 12 // 3 + 1
-            season_map = {1: '봄', 2: '여름', 3: '가을', 4: '겨울'}
-            df_filtered['구매 시즌'] = df_filtered['구매 시즌'].map(season_map)
-            trend_data = df_filtered.groupby('구매 시즌')['아이디'].nunique()
-
-        # Visualize Data
+        # Visualize Data (Line Chart)
         if trend_data.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            
             # Plotly Line Chart Visualization
             fig = px.line(
                 x=trend_data.index,
@@ -291,48 +188,21 @@ def domestic_performance_ui():
                 title=f"{selected_trend}별 구매 트렌드",
                 markers=True
             )
-            
             st.plotly_chart(fig, use_container_width=True)
 
-    # **오른쪽 열 (col2): Vehicle Model Purchase Trend**
     with col2:
-        # Trend Selection Dropdown
-        trend_options = ['분기', '월', '요일', '계절']
-        selected_trend = st.selectbox(
-            "트렌드 선택", 
-            trend_options, 
-            index=0,
-            key="unique_trend_selectbox_1"  # Unique key for the dropdown
-        )
-        
-        # Prepare Trend Data
-        if selected_trend == '분기':
-            df_filtered['구매 분기'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.to_period('Q').astype(str)
-            trend_data = df_filtered.groupby(['구매 분기', '최근 구매 제품']).size().unstack(fill_value=0)
-        elif selected_trend == '월':
-            df_filtered['구매 월'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.month
-            trend_data = df_filtered.groupby(['구매 월', '최근 구매 제품']).size().unstack(fill_value=0)
-        elif selected_trend == '요일':
-            days_order = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일']
-            trend_data = df_filtered.groupby(['구매 요일', '최근 구매 제품']).size().unstack(fill_value=0).reindex(days_order)
-        elif selected_trend == '계절':
-            df_filtered['구매 시즌'] = pd.to_datetime(df_filtered['최근 구매 날짜']).dt.month % 12 // 3 + 1
-            season_map = {1: '봄', 2: '여름', 3: '가을', 4: '겨울'}
-            df_filtered['구매 시즌'] = df_filtered['구매 시즌'].map(season_map)
-            trend_data = df_filtered.groupby(['구매 시즌', '최근 구매 제품']).size().unstack(fill_value=0)
-
-        # Visualize Data
+        # Visualize Data (Pie Chart)
         if trend_data.empty:
             st.write("필터링된 데이터가 없습니다.")
         else:
-            
-            # Aggregate Data by Vehicle Model
-            aggregated_data = trend_data.sum(axis=0)  # Sum across all time periods
-            
+            # Prepare aggregated data for pie chart
+            aggregated_data = trend_data.reset_index()  # Convert Series to DataFrame for names and values
+            aggregated_data.columns = ['names', 'values']  # Rename columns for Plotly
+
             # Plotly Pie Chart Visualization
             fig = px.pie(
-                names=aggregated_data.index,
-                values=aggregated_data.values,
+                names=aggregated_data['names'],
+                values=aggregated_data['values'],
                 title=f"{selected_trend}별 차량 모델 구매 비율",
                 color_discrete_sequence=px.colors.sequential.RdBu
             )
