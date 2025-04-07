@@ -118,7 +118,7 @@ def users_ui():
                 else:
                     st.warning("❗ 사진 파일이 없습니다.")
             with col3:
-                if st.button("삭제", key=f"delete_{i}"):
+                if st.button("삭제", key=f"deleted_{i}"):
                     if os.path.exists(row["사진경로"]):
                         os.remove(row["사진경로"])
                     df_employees = df_employees[df_employees["고유ID"] != row["고유ID"]]

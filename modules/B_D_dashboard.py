@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 TEXT_MODEL_ID = "google/gemma-2-9b-it"
 
 def get_huggingface_token(model_type):
-    tokens = {"gemma": st.secrets.get("HUGGINGFACE_API_TOKEN")}
+    tokens = {"gemma": st.secrets.get("gemma_token")}
     return tokens.get(model_type)
 
 def generate_answer(request: str, keywords: str, model_name: str = TEXT_MODEL_ID) -> str:
