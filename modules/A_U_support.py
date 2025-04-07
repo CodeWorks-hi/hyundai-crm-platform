@@ -5,29 +5,16 @@ import os
 from huggingface_hub import InferenceClient
 from streamlit.components.v1 import html
 from modules.A_U_kakao_channel import render_kakao_channel_add_button
-import toml
 
 
-# .streamlit/secrets.template.toml 경로
-TEMPLATE_SECRET_PATH = ".streamlit/secrets.template.toml"
 
-# secrets.toml이 없을 경우 template에서 읽어오기
-def get_custom_secret(key):
-    try:
-        if os.path.exists(TEMPLATE_SECRET_PATH):
-            secrets = toml.load(TEMPLATE_SECRET_PATH)
-            return secrets.get(key)
-        else:
-            st.error("❌ secrets.template.toml 파일이 존재하지 않습니다.")
-            return None
-    except Exception as e:
-        st.error(f"❌ 시크릿 로딩 실패: {e}")
-        return None
-
-
-# 모델 및 API 설정
+# Hugging Face 모델 설정
 TEXT_MODEL_ID = "google/gemma-2-9b-it"
 API_TOKEN = st.secrets.get("HUGGINGFACE_API_TOKEN")
+
+if not API_TOKEN:
+    st.error("❌ Hugging Face API 토큰이 설정되지 않았습니다.")
+
 
 # FAQ 데이터셋 (검색 결과 [3] 구조 반영)
 FAQS = [
@@ -211,21 +198,22 @@ def build_system_prompt():
                         """
 
 def generate_gemma_response(user_input: str) -> str:
-    """검색 결과 [4] 모델 최적화 적용"""
     if not API_TOKEN:
         return "❌ 시스템 오류: 관리자에게 문의해주세요"
     
     try:
-        client = InferenceClient(token=API_TOKEN)
+        client = InferenceClient(model=TEXT_MODEL_ID, token=API_TOKEN,timeout=30)
         response = client.text_generation(
             model=TEXT_MODEL_ID,
             prompt=f"{build_system_prompt()}\n\n[질문]\n{user_input}\n[답변]",
-            max_new_tokens=500,
+            max_new_tokens=800,
             temperature=0.2
         )
         return clean_response(response)
     except Exception as e:
-        return f"⚠️ 오류 발생: {str(e)}"
+        if "401" in str(e):
+            return "⚠️ 인증 오류: API 토큰을 재발급해주세요"
+        return f"⚠️ 시스템 오류: {str(e)}"
 
 def clean_response(text: str) -> str:
     """검색 결과 [1] 데이터 클렌징 규칙 적용"""
