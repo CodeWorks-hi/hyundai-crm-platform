@@ -12,6 +12,7 @@ def event_ui():
         </div>
     """, unsafe_allow_html=True)
     st.markdown("")
+    st.markdown("---")
 
     col4, col1, col2, col3, col5  = st.columns([0.1, 1, 0.1, 1, 0.1])
     with col4:
