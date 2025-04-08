@@ -1,27 +1,15 @@
-# 판매·수출 관리
-    # 판매·수출 관리 
-        # 국내 판매 (차종/지역별 등)
-            # 성장률 트렌드 분석
-
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-customer_path = "data/customer_data.csv"
+customer_path = "data/domestic_customer_data.csv"
 df_customer = pd.read_csv(customer_path)
 
 
 def domestic_growth_ui():
-
-    # 날짜를 datetime 형식으로 변환
-    df_customer['최근 구매 날짜'] = pd.to_datetime(df_customer['최근 구매 날짜'])
-    df_customer['최근 구매 연도'] = df_customer['최근 구매 날짜'].dt.year
-    df_customer['최근 구매 월'] = df_customer['최근 구매 날짜'].dt.month
-
     col1,col2,col3=st.columns(3)
     with col1:
-        years = sorted(df_customer['최근 구매 연도'].unique())
+        years = sorted(df_customer['구매연도'].unique())
         selected_year = st.selectbox("연도 선택", years)
 
     with col2:
@@ -29,21 +17,21 @@ def domestic_growth_ui():
         selected_region = st.selectbox("지역 선택", regions)
 
     with col3:
-        categorys = ['전체'] + sorted(df_customer['차량 유형'].unique())  # '전체' 옵션 추가
+        categorys = ['전체'] + sorted(df_customer['모델명'].unique())  # '전체' 옵션 추가
         selected_category = st.selectbox("차종 선택", categorys)
 
 
     # 필터링 로직
-    filtered_data = df_customer[df_customer['최근 구매 연도'] == selected_year]  # 선택한 연도로 필터링
+    filtered_data = df_customer[df_customer['구매연도'] == selected_year]  # 선택한 연도로 필터링
 
     if selected_region != '전체':
         filtered_data = filtered_data[filtered_data['거주 지역'] == selected_region]
 
     if selected_category != '전체':
-        filtered_data = filtered_data[filtered_data['차량 유형'] == selected_category]
+        filtered_data = filtered_data[filtered_data['모델명'] == selected_category]
 
     # 월별 구매량 계산
-    monthly_trend_data = filtered_data.groupby('최근 구매 월')['아이디'].count()
+    monthly_trend_data = filtered_data.groupby('구매월')['연락처'].count()
 
     # 성장률 계산
     monthly_growth_rate = monthly_trend_data.pct_change().fillna(0) * 100
@@ -63,3 +51,32 @@ def domestic_growth_ui():
         )
         
         st.plotly_chart(fig, use_container_width=True)
+    
+    st.markdown("""
+        ---
+        ##### 📊 분석 개요
+        선택한 조건(연도, 지역, 차종)에 따른 **국내 판매 월별 성장률**을 시각적으로 분석합니다.
+
+        ##### 🔍 분석 세부 결과
+        - 월별 판매 실적 데이터를 기반으로 **성장률(%)**을 산출하였습니다.
+        - **연속적인 월별 비교**를 통해 특정 시기나 이벤트에 따른 성과 변동을 파악할 수 있습니다.
+        - 지역 및 차종 선택 시 해당 조건에 맞는 세부 분석 결과가 반영됩니다.
+
+        ##### 📈 성장률 해석 기준
+        | 성장률 (%) | 의미             | 예시 해석                       |
+        |------------|------------------|----------------------------------|
+        | > 0        | 판매 증가 📈     | 전월 대비 실적 향상              |
+        | = 0        | 변화 없음 ➖     | 전월과 동일한 수준               |
+        | < 0        | 판매 감소 📉     | 전월 대비 실적 감소              |
+
+        ##### 🧭 활용 방안
+        1. **감소 구간**에 대해 원인을 분석하고 개선 전략을 수립할 수 있습니다.
+        2. **급격한 증가 구간**은 성공 요인을 도출해 마케팅/판매 전략에 반영 가능합니다.
+        3. 특정 지역·차종의 성과를 비교하여 **지역 맞춤 전략** 수립에 활용할 수 있습니다.
+    """)
+
+    st.markdown("###### ")
+
+    # 원본 데이터 보기
+    with st.expander("🗂 원본 데이터 보기"):
+        st.dataframe(df_customer, use_container_width=True, hide_index=True)

@@ -39,7 +39,7 @@ def search_place(query, keyword):
     query = f"{query} 현대자동차 {keyword}"
     url = "https://dapi.kakao.com/v2/local/search/keyword.json"
     headers = {"Authorization": f"KakaoAK {KAKAO_API_KEY}"}
-    params = {"query": query, "size": 5}
+    params = {"query": query}
     response = requests.get(url, headers=headers, params=params)
     return response.json()["documents"] if response.status_code == 200 else []
 
@@ -74,7 +74,6 @@ def map_ui():
     for tab, keyword in zip([tab1, tab2], ["지점", "정비소"]):
         with tab:
 
-
             col_map, col_list = st.columns([2, 1])
             with col_list:
                 search_query = st.text_input(f"{keyword} 검색어 입력:", key=f"{keyword}_input")
@@ -82,8 +81,19 @@ def map_ui():
                 if search_query:
                     results = search_place(search_query, keyword)
                     if results:
-                        st.write(f"**검색 결과 ({len(results)}개)**")
-                        for i, place in enumerate(results, start=1):
+                        if f"{keyword}_result_page" not in st.session_state:
+                            st.session_state[f"{keyword}_result_page"] = 0
+
+                        items_per_page = 2
+                        total_pages = (len(results) + items_per_page - 1) // items_per_page
+
+                        st.write(f"**검색 결과 총 {len(results)}개 중 {st.session_state[f'{keyword}_result_page']+1}페이지**")
+
+                        start_idx = st.session_state[f"{keyword}_result_page"] * items_per_page
+                        end_idx = start_idx + items_per_page
+                        paged_results = results[start_idx:end_idx]
+
+                        for i, place in enumerate(paged_results, start=start_idx + 1):
                             with st.container():
                                 st.markdown(f"##### {i}. {place['place_name']}")
                                 st.write(f"**주소**: {place['road_address_name'] or place['address_name']}")
@@ -92,8 +102,28 @@ def map_ui():
                                 with col_a:
                                     st.link_button("상세확인", place['place_url'])
                                 with col_b:
-                                    st.link_button("길찾기", f"https://map.kakao.com/link/from/내위치,{DEFAULT_LAT},{DEFAULT_LON}/to/{place['place_name']},{place['y']},{place['x']}")
+                                    st.link_button("길찾기", f"https://map.kakao.com/link/from/내위치,{DEFAULT_LAT},{DEFAULT_LAT}/to/{place['place_name']},{place['y']},{place['x']}")
                                 st.markdown("---")
+
+                        page_buttons = st.columns(7)
+                        with page_buttons[0]:
+                            if st.button("«", key=f"{keyword}_first"):
+                                st.session_state[f"{keyword}_result_page"] = 0
+                                st.rerun()
+
+                        start_page = max(0, st.session_state[f"{keyword}_result_page"] - 2)
+                        end_page = min(total_pages, start_page + 5)
+
+                        for i, page_num in enumerate(range(start_page, end_page)):
+                            with page_buttons[i + 1]:
+                                if st.button(f"{page_num + 1}", key=f"{keyword}_page_{page_num}"):
+                                    st.session_state[f"{keyword}_result_page"] = page_num
+                                    st.rerun()
+
+                        with page_buttons[6]:
+                            if st.button("»", key=f"{keyword}_last"):
+                                st.session_state[f"{keyword}_result_page"] = total_pages - 1
+                                st.rerun()
                     else:
                         st.warning("검색 결과가 없습니다.")
                 else:

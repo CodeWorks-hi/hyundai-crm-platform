@@ -60,7 +60,6 @@ def detail_ui():
                                 """, unsafe_allow_html=True
                             )
                             st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
-
-            with st.expander(f"{모델} 상세비교", expanded=False):
+                
                 비교_데이터 = df[df["모델명"] == 모델]
                 st.markdown(generate_html_table(비교_데이터), unsafe_allow_html=True)

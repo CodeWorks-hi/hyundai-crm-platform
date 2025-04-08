@@ -33,11 +33,8 @@ set_korean_font()
 
 
 def campaign_ui():
-
-    st.subheader("💡 인사이트 요약 (AI 분석 기반)")
-
     df_campaigns = pd.read_csv("data/campaign_list.csv")  # CSV 경로 확인
-    selected_campaign = st.selectbox("📌 분석할 이벤트을 선택하세요", df_campaigns["이벤트명"].unique())
+    selected_campaign = st.selectbox("분석할 이벤트을 선택하세요", df_campaigns["이벤트명"].unique())
 
     if st.button("선택한 이벤트 AI 인사이트 생성"):
         selected = df_campaigns[df_campaigns["이벤트명"] == selected_campaign].iloc[0]

@@ -10,10 +10,7 @@ import pandas as pd
 import plotly.express as px
 
 
-
-
-
-customer_path = "data/customer_data.csv"
+customer_path = "data/domestic_customer_data.csv"
 df_customer = pd.read_csv(customer_path)
 
 def domestic_region_ui():
@@ -21,7 +18,7 @@ def domestic_region_ui():
     col1, col2=st.columns(2)
     # 연도 선택
     with col1:
-        years = sorted(df_customer['최근 구매 연도'].unique())
+        years = sorted(df_customer['구매연도'].unique())
         default_year = 2024
         default_index = years.index(default_year) if default_year in years else 0
         year = st.selectbox("연도 선택", years, index=default_index)
@@ -35,14 +32,14 @@ def domestic_region_ui():
 
     # 데이터 필터링 (연도 및 지역 기준)
     df_filtered = df_customer[
-        (df_customer['최근 구매 연도'] == year) &
+        (df_customer['구매연도'] == year) &
         (df_customer['거주 지역'] == region)
     ]
 
     # 주요 지표 계산
     if not df_filtered.empty:
-        total_sales = df_filtered['최근 구매 제품'].count()  # 총 판매량
-        total_money = df_filtered['최근 거래 금액'].sum()  # 총 판매 금액
+        total_sales = df_filtered['모델명'].count()  # 총 판매량
+        total_money = df_filtered['기본가격'].sum()  # 총 판매 금액
 
         # 선택한 연도와 지역에 대한 전년 대비 판매 증가율 계산
         YoY_growth = "-"
@@ -50,10 +47,10 @@ def domestic_region_ui():
         if year - 1 in years:
             # 현재 연도와 전년도 데이터 필터링
             current_year_sales = df_customer[
-                (df_customer['최근 구매 연도'] == year) & (df_customer['거주 지역'] == region)
+                (df_customer['구매연도'] == year) & (df_customer['거주 지역'] == region)
             ]
             last_year_sales = df_customer[
-                (df_customer['최근 구매 연도'] == year - 1) & (df_customer['거주 지역'] == region)
+                (df_customer['구매연도'] == year - 1) & (df_customer['거주 지역'] == region)
             ]
 
             # 현재 연도와 전년도 판매량 계산
@@ -95,7 +92,7 @@ def domestic_region_ui():
     with col1:
         # 지역별 총 판매량 비교 (막대)
         # 지역별 총 판매량 계산
-        region_sale = df_customer.groupby('거주 지역')['최근 구매 제품'].count().reset_index()
+        region_sale = df_customer.groupby('거주 지역')['모델명'].count().reset_index()
         region_sale.columns = ['거주 지역', '판매량']
 
         # Streamlit에서 출력
@@ -117,7 +114,7 @@ def domestic_region_ui():
         
     with col2:
         # 지역별 점유율 계산
-        region_sale = df_customer.groupby('거주 지역')['최근 구매 제품'].count()
+        region_sale = df_customer.groupby('거주 지역')['모델명'].count()
         region_sale_percentage = (region_sale / region_sale.sum() * 100).round(2).reset_index()
         region_sale_percentage.columns = ['거주 지역', '점유율 (%)']
 
@@ -141,7 +138,7 @@ def domestic_region_ui():
     col1, col2=st.columns(2)
     with col1:
         # 지역별 총 판매량 계산
-        region_sales = df_customer.groupby('거주 지역')['최근 구매 제품'].count().reset_index()
+        region_sales = df_customer.groupby('거주 지역')['모델명'].count().reset_index()
         region_sales.columns = ['거주 지역', '판매량']
 
         # 전체 판매량 대비 점유율 계산
@@ -156,7 +153,7 @@ def domestic_region_ui():
             
     with col2:
         # 지역별 총 판매량 계산
-        region_sales = df_customer.groupby('거주 지역')['최근 구매 제품'].count().reset_index()
+        region_sales = df_customer.groupby('거주 지역')['모델명'].count().reset_index()
         region_sales.columns = ['거주 지역', '판매량']
 
         # 전체 판매량 대비 점유율 계산
@@ -173,7 +170,7 @@ def domestic_region_ui():
     col1,col2=st.columns(2)
     with col1:
         # 지역별 차종 빈도 계산
-        heatmap_data = df_customer.groupby(['거주 지역', '최근 구매 제품'])['아이디'].count().unstack().fillna(0)
+        heatmap_data = df_customer.groupby(['거주 지역', '모델명'])['연락처'].count().unstack().fillna(0)
 
         # Plotly로 히트맵 생성
         fig = px.imshow(
@@ -205,7 +202,7 @@ def domestic_region_ui():
         filtered_data = df_customer[df_customer['거주 지역'] == selected_region]
 
         # 차종 비율 계산
-        car_type_ratio = filtered_data.groupby('최근 구매 제품')['아이디'].count().reset_index()
+        car_type_ratio = filtered_data.groupby('모델명')['연락처'].count().reset_index()
         car_type_ratio.columns = ['차종', '비율 (%)']
         car_type_ratio['비율 (%)'] = (car_type_ratio['비율 (%)'] / car_type_ratio['비율 (%)'].sum() * 100).round(2)
 
@@ -228,9 +225,9 @@ def domestic_region_ui():
     with col1:
         # 지역별 차종 빈도 계산
         region_top_car = (
-            df_customer.groupby(['거주 지역', '최근 구매 제품'])['아이디'].count()
+            df_customer.groupby(['거주 지역', '모델명'])['연락처'].count()
             .reset_index()
-            .rename(columns={'아이디': '판매량'})
+            .rename(columns={'연락처': '판매량'})
         )
 
         # 각 지역에서 가장 많이 판매된 차종 추출
