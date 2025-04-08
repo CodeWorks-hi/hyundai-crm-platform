@@ -73,3 +73,9 @@ def event_ui():
                                 """)
         else:
             st.info("현재 진행 중인 이벤트가 없습니다.")
+
+    st.markdown("###### ")
+    
+    with st.expander("🗂 원본 데이터 확인", expanded=False):
+        df = pd.read_csv("data/event.csv") 
+        st.dataframe(df, hide_index=True, use_container_width=True)

@@ -36,7 +36,8 @@ def comparison_ui():
     col2, col4, col3 = st.columns([4, 0.1, 0.7])
     
     with col2:
-  
+        with st.expander("🗂 원본 데이터 확인", expanded=False):
+            st.dataframe(df, hide_index=True, use_container_width=True)
 
         def display_category(title, df_category):
             st.markdown(f"####  {title}")

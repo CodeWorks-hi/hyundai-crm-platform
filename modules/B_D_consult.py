@@ -369,3 +369,17 @@ def consult_ui():
                     cr_df = pd.concat([cr_df, pd.DataFrame([new_log])], ignore_index=True)
                     cr_df.to_csv("data/consult_log.csv", index=False)
                     st.success("✅ 상담 내용이 저장되었습니다.")
+
+    st.markdown("###### ")
+
+    with st.expander("🗂 원본 데이터 확인", expanded=False):
+        tab1, tab2, tab3 = st.tabs(["고객 상담 신청 기록", "고객 설문조사 기록", "차량 상세 정보"])
+        with tab1:
+            base_df = pd.read_csv("data/consult_log.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab2:
+            base_df = pd.read_csv("data/customers.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab3:
+            base_df = pd.read_csv("data/hyundae_car_list.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)

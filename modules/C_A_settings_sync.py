@@ -63,8 +63,6 @@ def sync_ui():
     fig.update_yaxes(tickvals=[0, 1], ticktext=["실패", "성공"])
     st.plotly_chart(fig, use_container_width=True)
 
-    st.session_state.sync_log.index += 1
-
     # 전체 테이블 보기
     with st.expander(" 🗂 원본 데이터 확인"):
         st.dataframe(st.session_state.sync_log, use_container_width=True)

@@ -10,23 +10,24 @@ def leads_ui():
     if "직원이름" not in st.session_state or st.session_state["직원이름"] == "":
         st.warning("딜러 정보를 먼저 등록하세요.")
         return
+    else:
+        dealer_name = st.session_state["직원이름"]
+        dealer_id = st.session_state["사번"]
+        
 
-    col1, col2, col3, col4, col5, col6 = st.columns([1, 1, 0.3, 1, 1, 1.7])
-    with col1:
-        dealer_name = st.text_input("딜러 성명", key="leads_dealer_name")
-    with col2:
-        dealer_id = st.text_input("딜러 사번", key="leads_dealer_id")
+    col1, col2, col3 = st.columns([1, 1, 4])
+    # with col1:
+    #     dealer_name = st.text_input("딜러 성명", key="leads_dealer_name")
+    # with col2:
+    #     dealer_id = st.text_input("딜러 사번", key="leads_dealer_id")
 
     if dealer_name == "" or dealer_id == "":
         st.warning("딜러 정보를 먼저 등록하세요.")
         return
-    if dealer_name != st.session_state["직원이름"] or dealer_id != st.session_state["사번"]:
-        st.warning("딜러 정보가 일치하지 않습니다.")
-        return
     else:
-        with col4:
+        with col1:
             selected_name = st.text_input("고객 성명 입력", key="leads_name")
-        with col5:
+        with col2:
             selected_contact = st.text_input("고객 연락처 입력", key="leads_contact")
 
         df = pd.read_csv("data/customers.csv")
@@ -170,4 +171,17 @@ def leads_ui():
                             상담 내용: {row['상담내용']}
                         </div>
                     """, unsafe_allow_html=True)
-                
+
+    st.markdown("###### ")
+
+    with st.expander("🗂 원본 데이터 확인", expanded=False):
+        tab1, tab2, tab3 = st.tabs(["고객 설문조사 기록", "차량 판매 기록", "고객 상담 신청 기록"])
+        with tab1:
+            base_df = pd.read_csv("data/customers.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab2:
+            base_df = pd.read_csv("data/domestic_customer_data.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
+        with tab3:
+            base_df = pd.read_csv("data/consult_log.csv")
+            st.dataframe(base_df, hide_index=True, use_container_width=True)
