@@ -224,4 +224,9 @@ def export_goal_ui():
             2. 우수한 성과를 보이는 국가에서는 현 전략 유지 및 성공 사례 공유를 추천합니다.
             3. 연도별 성장률 변화를 지속 모니터링하여 전략적 대응이 가능합니다.
             """)
+        
+    st.markdown("###### ")
 
+    # 원본 데이터 보기
+    with st.expander("🗂 원본 데이터 보기"):
+        st.dataframe(df, use_container_width=True, hide_index=True)
