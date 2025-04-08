@@ -38,34 +38,43 @@ def load_data():
 
 
 
-def classify_customer_grade(ltv):
-    if ltv >= 60_000_000:
-        return "VIP"
-    elif ltv >= 40_000_000:
-        return "일반"
+def classify_customer_grade(ltv, purchase_count):
+    if purchase_count >= 2:
+        if ltv >= 200_000_000:
+            return "VIP"
+        else:
+            return "일반"
     else:
-        return "신규"
+        if ltv >= 100_000_000:
+            return "VIP"
+        elif ltv >= 50_000_000:
+            return "일반"
+        else:
+            return "신규"
 
 def preprocess_and_train_model(df):
     df = df.drop(columns=["이름", "연락처", "브랜드", "모델명", "공장명", "트림명"], errors="ignore")
 
     np.random.seed(42)
 
-    # 거래/충성도 관련 칼럼 생성
+    #  거래/충성도 관련 정보 생성
     df["차량 유형"] = np.random.choice(["세단", "SUV", "해치백"], size=len(df))
     df["할부 여부"] = np.random.choice([0, 1], size=len(df))
     df["구매 경로"] = np.random.choice([0, 1], size=len(df))
-    df["최근 거래 금액"] = np.random.randint(10_000_000, 40_000_000, size=len(df))
-    df["누적 구매 금액"] = df["최근 거래 금액"] + np.random.randint(10_000_000, 30_000_000, size=len(df))
-    df["평균 구매 금액"] = (df["최근 거래 금액"] + df["누적 구매 금액"]) // 2
-    df["고객 충성도 지수"] = np.round(np.random.uniform(0.5, 1.0, size=len(df)), 2)
-    df["고객 평생 가치"] = df["누적 구매 금액"] * df["고객 충성도 지수"]
+    df["최근 거래 금액"] = np.random.randint(25_000_000, 60_000_000, size=len(df))
+    df["평균 구매 금액"] = df["최근 거래 금액"]
+    df["차량 구매 횟수"] = np.random.randint(1, 6, size=len(df))  # 1~5회
+    df["고객 충성도 지수"] = np.round(np.random.uniform(0.6, 1.0, size=len(df)), 2)
 
-    # 예측 모델 학습 대상
+    #  LTV 계산 (최대 5억 제한)
+    ltv_raw = df["평균 구매 금액"] * df["차량 구매 횟수"] * df["고객 충성도 지수"]
+    df["고객 평생 가치"] = ltv_raw.clip(upper=500_000_000).astype(int)
+
+    #  모델 학습
     features = [
         "성별", "연령대", "거주 지역", "차량 유형",
         "차량 구매 횟수", "할부 여부", "구매 경로",
-        "최근 거래 금액", "누적 구매 금액", "평균 구매 금액", "고객 충성도 지수"
+        "최근 거래 금액", "평균 구매 금액", "고객 충성도 지수"
     ]
     target = "고객 평생 가치"
     categorical_cols = ["성별", "연령대", "거주 지역", "차량 유형"]
@@ -74,19 +83,26 @@ def preprocess_and_train_model(df):
     encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
     encoded = encoder.fit_transform(df[categorical_cols])
     encoded_df = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(categorical_cols))
-
-    # 입력 데이터 구성
     X = pd.concat([df.drop(columns=categorical_cols + [target]), encoded_df], axis=1)
     y = df[target]
 
-    # 학습
+    # 모델 정의 및 학습
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = XGBRegressor(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42, deterministic_histogram=True)
+    model = XGBRegressor(
+        n_estimators=100,
+        max_depth=4,
+        learning_rate=0.1,
+        random_state=42,
+        deterministic_histogram=True
+    )
     model.fit(X_train, y_train)
 
-    # 예측 및 고객 등급 재정의
-    df["예측 LTV"] = model.predict(X)
-    df["고객 등급"] = df["예측 LTV"].apply(classify_customer_grade)
+    # 예측 후 고객 등급 분류 (LTV + 구매횟수 조건 반영)
+    df["예측 LTV"] = model.predict(X).astype(int)
+    df["고객 등급"] = df.apply(
+        lambda row: classify_customer_grade(row["예측 LTV"], row["차량 구매 횟수"]),
+        axis=1
+    )
 
     # 모델 저장
     os.makedirs("model", exist_ok=True)
@@ -211,7 +227,7 @@ def ltv_customer_ui():
         ax2.plot(top20.index, top20["예측 LTV"], label="예측 LTV", marker='x')
         ax2.set_title("상위 50명 고객 LTV 비교")
         ax2.set_xlabel("고객 순위")
-        ax2.set_ylabel("LTV (원)")
+        ax2.set_ylabel("LTV (금액)")
         ax2.legend()
         st.pyplot(fig2)
 
@@ -252,7 +268,7 @@ def ltv_customer_ui():
             grade_error = df_with_pred.groupby("고객 등급")["잔차"].mean().reset_index()
             fig_grade, ax_grade = plt.subplots()
             ax_grade.bar(grade_error["고객 등급"], grade_error["잔차"], color='skyblue')
-            ax_grade.set_ylabel("평균 잔차(천원)")
+            ax_grade.set_ylabel("평균 잔차(금액)")
             ax_grade.set_title("고객 등급별 평균 예측 오차")
             st.pyplot(fig_grade)
         else:
@@ -304,34 +320,34 @@ def ltv_customer_ui():
     )
 
 
-    # 추가 추천 항목 생성 함수
+    # LTV 기반 맞춤형 추천 함수 (최대 5억 기준 반영)
     def get_recommendations(ltv, grade=None):
         """
         고객 LTV와 등급 정보를 바탕으로 맞춤형 마케팅 패키지 추천.
+        등급이 있으면 등급 기준 우선, 없으면 LTV로 판단
         """
-        # 등급 우선, 없으면 LTV 기반 분류
-        if grade == "VIP" or (grade is None and ltv >= 60000000):
+        if grade == "VIP" or (grade is None and ltv >= 200_000_000):
             return {
                 "차량": "제네시스 GV90 프레스티지",
-                "금융": "할부 금리 2.9% (7년)",
-                "서비스": "5년 무상 정비 + 전용 충전소 설치 + 컨시어지 서비스"
+                "금융": "할부 금리 2.5% (7년)",
+                "서비스": "5년 무상 정비 + 전용 충전소 설치 + VIP 컨시어지 서비스"
             }
-        elif grade == "일반" or (grade is None and 40000000 <= ltv < 60000000):
+        elif grade == "일반" or (grade is None and 80_000_000 <= ltv < 200_000_000):
             return {
                 "차량": "현대 아이오닉6 디럭스",
-                "금융": "리스료 3.5% (3년)",
-                "서비스": "3년 무상 정비 + 실내 클리닝 연 2회"
+                "금융": "리스료 3.5% (4년)",
+                "서비스": "3년 무상 정비 + 실내 클리닝 연 2회 + 보험 캐시백"
             }
-        else:  # 신규 or LTV 낮음
+        else:  # 신규 또는 LTV 낮음
             return {
                 "차량": "현대 아반떼 스마트",
-                "금융": "카드 할부 5.9% (5년)",
-                "서비스": "1년 무상 점검 + 보험료 10% 할인"
+                "금융": "카드 할부 5.5% (5년)",
+                "서비스": "1년 무상 점검 + 등록비 50% 지원"
             }
 
         
     st.markdown("###  고객 맞춤 추천")
-    
+
     if "연령대" in df_with_pred.columns and "거주 지역" in df_with_pred.columns:
         col1, col2 = st.columns(2)
         
@@ -345,7 +361,7 @@ def ltv_customer_ui():
             (df_with_pred["거주 지역"] == selected_region)
         ].sort_values("예측 LTV", ascending=False).head(5)
 
-        # 추천 카드 스타일링
+        # 스타일 선언
         st.markdown("""
         <style>
             .recommend-card {
@@ -354,28 +370,42 @@ def ltv_customer_ui():
                 padding: 15px;
                 margin: 10px 0;
                 background: #ffffff;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            }
+            .recommend-title {
+                font-size: 18px;
+                color: #2A7FFF;
+                margin-bottom: 10px;
+            }
+            table td {
+                padding: 4px 10px;
             }
         </style>
         """, unsafe_allow_html=True)
 
         st.markdown("####  맞춤형 추천 리스트")
 
-        cols = st.columns(2)  # 두 개의 열 생성
+        if "memo_dict" not in st.session_state:
+            st.session_state.memo_dict = {}
 
         for i, (idx, row) in enumerate(recommended.iterrows()):
-            rec = get_recommendations(row['예측 LTV'])
-            col = cols[i % 2]  # 왼쪽/오른쪽 열 번갈아 사용
+            rec = get_recommendations(row['예측 LTV'], row['고객 등급'])
+            memo_key = f"memo_{i}"
+            default_memo = st.session_state.memo_dict.get(memo_key, "")
 
-            with col:
+            # 카드 전체 2열 구성
+            col_card, col_memo = st.columns([1.5, 1.3])
+
+            with col_card:
                 st.markdown(f"""
                 <div class="recommend-card">
-                    <div style="font-size:18px; color:#2A7FFF; margin-bottom:8px;">🏅 고객 {i+1}</div>
+                    <div class="recommend-title">🏅 고객 {i+1}</div>
                     <table>
                         <tr><td>연령대</td><td><strong>{row['연령대']}</strong></td></tr>
                         <tr><td>거주지</td><td><strong>{row['거주 지역']}</strong></td></tr>
                         <tr><td>예측 LTV</td><td><strong>{row['예측 LTV']:,.0f}원</strong></td></tr>
-                        <tr><td> 고객 등급</td><td><strong>{row['고객 등급']}</strong></td></tr>
+                        <tr><td>고객 등급</td><td><strong>{row['고객 등급']}</strong></td></tr>   
+                        <tr><td>최근 거래 금액</td><td><strong>{row['최근 거래 금액']:,.0f}원</strong></td></tr>
                     </table>
                     <hr style="margin:10px 0;">
                     🚗 <strong>추천 차량:</strong> {rec['차량']}<br>
@@ -383,6 +413,34 @@ def ltv_customer_ui():
                     🛠️ <strong>서비스 패키지:</strong> {rec['서비스']}
                 </div>
                 """, unsafe_allow_html=True)
+
+            with col_memo:
+                st.markdown("#####  메모")
+                memo_text = st.text_area(
+                    label="",
+                    key=memo_key,
+                    value=default_memo,
+                    placeholder="예: 고객 요청사항, 통화 기록, 다음 상담 일정 등",
+                    height=200
+                )
+                st.session_state.memo_dict[memo_key] = memo_text
+
+
+        # 스타일은 루프 바깥에서 한 번만
+        st.markdown("""
+        <style>
+        .recommend-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+
 
     #  🗂 원본 데이터 확인
     with st.expander(" 🗂 원본 데이터 확인"):
