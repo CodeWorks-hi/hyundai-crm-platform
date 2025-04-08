@@ -344,6 +344,7 @@ def inventory_ui():
                     "성별": customer_data.iloc[0]["성별"][0],
                     "현재 나이": datetime.today().year - pd.to_datetime(customer_data.iloc[0]["생년월일"]).year,
                     "구매연도": sale_date.year,
+                    "구매월": sale_date.month,
                     "연령대": customer_data.iloc[0]["연령대"],
                     "거주 지역": customer_data.iloc[0]["거주지역"],
                     "차량 구매 횟수": purchase_count,
