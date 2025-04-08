@@ -50,8 +50,9 @@ def load_restriction_data():
 
 def eco_ui():
     st.markdown("""
-               ##### 블록체인 기반 IGIS 탄소 배출량 모니터링 시스템을 통한 ESG 경영 강화  
-                차량의 연료 종류, 실시간 CO₂ 배출량, 연비 데이터를 블록체인에 기록하여 투명한 환경 성과 관리를 지원합니다.  """)
+                    ##### [블록체인 × IGIS]  실시간 탄소 모니터링 시스템  
+
+                    """)
 
     df = load_data()
     expected_cols = ["연료구분", "CO2배출량", "연비", "공장명", "재고량"]
@@ -74,18 +75,50 @@ def eco_ui():
     fig_eco = px.bar(eco_summary, x='공장명', y='재고량', color='전기차 여부', barmode='group',
                      title='공장별 친환경차 vs 내연기관차 생산량 비교')
     st.plotly_chart(fig_eco, use_container_width=True)
+    st.markdown("""
+            ** 공장별 친환경 생산량 분석**
+
+            이 그래프는 각 공장에서 생산된 차량 중 **친환경차(전기·하이브리드)**와 **내연기관차**의 비중을 비교한 것입니다.  
+            - **친환경차 비중이 높은 공장**은 ESG 목표 달성에 유리하며,  
+            - **내연기관 생산 비중이 높은 공장**은 탄소 저감 노력이 필요한 구간입니다.
+
+             이 데이터를 바탕으로 **공장별 탄소 저감 목표 설정** 및 **생산전환 전략 수립**이 가능합니다.
+            """)
+
 
     # 연도별 생산 추이
     trend_summary = df.groupby(['연도', '전기차 여부'])['재고량'].sum().reset_index()
     fig_trend = px.line(trend_summary, x='연도', y='재고량', color='전기차 여부', markers=True,
                         title='연도별 친환경차 vs 내연기관차 생산 추이')
     st.plotly_chart(fig_trend, use_container_width=True)
+    st.markdown("""
+        ** 연도별 친환경 전환 추이 분석**
+
+        이 그래프는 **2020~2024년까지 연도별 친환경차 생산량 변화**를 보여줍니다.  
+        - **상승 추세**: 친환경차의 연간 생산 비중이 꾸준히 증가한 공장은 전환 전략이 성공적  
+        - **정체 혹은 감소 추세**: 정책/인프라 개선이 필요한 신호로 해석 가능
+
+         **중장기 ESG 전략** 수립과 **지속가능경영지표(KPI)** 측정에 활용할 수 있습니다.
+        """)
+
 
     # 공장별 친환경 점수 평균
     score_summary = df.groupby('공장명')['친환경점수'].mean().reset_index()
     fig_score = px.bar(score_summary, x='공장명', y='친환경점수', color='친환경점수', color_continuous_scale='Greens',
                        title='공장별 평균 친환경 점수')
     st.plotly_chart(fig_score, use_container_width=True)
+    st.markdown("""
+        ** 공장별 친환경 점수 비교**
+
+        이 지표는 차량의 **연비와 CO₂ 배출량을 반영하여 산정된 친환경점수 평균값**입니다.  
+        - 점수가 높을수록 **연비 효율이 우수하고 배출량이 적은 차량을 주로 생산**하고 있음을 의미  
+        - ESG 등급 평가 시, 해당 공장은 **탄소 저감 성과가 우수한 생산 거점**으로 평가될 수 있음
+
+        **환경 리워드 배분**, **친환경 캠페인 대상 공장 선별**, **보조금 정책 연계** 등에 유용하게 활용됩니다.
+        """)
+    st.markdown("---")
+    # 블록체인 연동 시스템 아키텍처
+
 
     st.markdown("---")
     st.subheader("🚫 계절관리제 운행제외 대상 정보")
