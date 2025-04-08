@@ -19,7 +19,7 @@ def render_campaign_register():
         strategy_type = st.selectbox("전략 분류", ["유류비", "시승", "라이프스타일", "장기보상", "제휴마케팅", "방문상담"])
         is_active = st.checkbox("활성화 여부", value=True)
 
-        st.markdown("📎 이미지는 **png 파일만 업로드 가능**하며, `images/event/` 경로에 저장됩니다.")
+        st.markdown("이미지는 **png 파일만 업로드 가능**하며, `images/event/` 경로에 저장됩니다.")
         uploaded_file = st.file_uploader("이벤트배너 이미지 업로드 (PNG)", type=["png"])
 
         submitted = st.form_submit_button("이벤트 등록")
