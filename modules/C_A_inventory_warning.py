@@ -169,7 +169,7 @@ def warning_ui():
                 title='<b>월별 입출고 추이 비교</b>'
             )
             fig.update_layout(xaxis=dict(title=None, tickangle=-45, type='category'), yaxis=dict(gridcolor='#F0F2F6'), legend=dict(title='물동량 구분', orientation="h", yanchor="bottom", y=1.02), plot_bgcolor='white')
-            fig.update_traces(texttemplate='%{y}개', textposition='outside', textfont_size=10)
+            fig.update_traces(texttemplate='%{y}개', textposition='inside', textfont_size=10)
             st.plotly_chart(fig, use_container_width=True)
     else:
         st.success("✅ 모든 부품 재고가 안전 수준입니다.")

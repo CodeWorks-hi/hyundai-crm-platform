@@ -182,6 +182,7 @@ def eco_ui():
                     st.markdown(f"<div style='padding: 10px; background-color: #f5f5f5; border-radius: 8px; text-align: center;'><h4 style='margin:0;'>{elec_data.iloc[0]['보조금/초소형(만원)']}만원</h4></div>", unsafe_allow_html=True)
         else:
             st.info("보조금 데이터가 없습니다.")
+        st.markdown("###### ")
         view_option = st.radio("📂 원본 데이터 보기", ["전기차 보조금", "수소차 보조금", "충전소 현황"],horizontal=True )
 
         # 선택에 따라 해당 데이터프레임 표시

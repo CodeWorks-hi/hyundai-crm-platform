@@ -77,5 +77,5 @@ def event_ui():
     st.markdown("###### ")
     
     with st.expander("🗂 원본 데이터 확인", expanded=False):
-        df = pd.read_csv("data/event.csv") 
+        df = pd.read_csv("data/campaign_list.csv") 
         st.dataframe(df, hide_index=True, use_container_width=True)
