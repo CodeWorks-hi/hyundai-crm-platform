@@ -49,7 +49,7 @@ def load_restriction_data():
     return pd.DataFrame(data)
 
 def eco_ui():
-    st.markdown("블록체인 연계 IGIS 탄소 배출량 모니터링")
+    st.markdown("블록체인 연계 IGIS 탄소 배출량 : 차량의 연료 구분, CO₂ 배출량, 연비를 기준으로 친환경 수준을 모니터링합니다.")
 
     df = load_data()
     expected_cols = ["연료구분", "CO2배출량", "연비", "공장명", "재고량"]
