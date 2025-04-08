@@ -11,7 +11,6 @@ def leads_ui():
     else:
         dealer_name = st.session_state["직원이름"]
         dealer_id = st.session_state["사번"]
-        
 
     col1, col2, col3 = st.columns([1, 1, 4])
 
