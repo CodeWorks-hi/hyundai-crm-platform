@@ -283,10 +283,10 @@ def inventory_ui():
         st.caption("필요한 차량을 선택해 발주를 등록하세요.")
 
         vehicle_models = sorted(inv_df["모델명"].unique())
-        selected_model = st.selectbox("🚗 차종 선택", vehicle_models, key='inven_car')
+        selected_model = st.selectbox("🚗 차종 선택", vehicle_models, key='inven_car', index=vehicle_models.index(selected_model))
 
         available_trims = inv_df[inv_df["모델명"] == selected_model]["트림명"].unique()
-        selected_trim = st.selectbox("🔧 트림 선택", sorted(available_trims), key='inven_trim')
+        selected_trim = st.selectbox("🔧 트림 선택", sorted(available_trims), key='inven_trim', index=sorted(available_trims).index(selected_trim))
         available_factories = inv_df[
             (inv_df["모델명"] == selected_model) &
             (inv_df["트림명"] == selected_trim)
