@@ -25,11 +25,11 @@ except Exception as e:
     st.error(f"LTV 모델 로드 오류: {e}")
 
 
-np.random.seed(42) 
+
 
 @st.cache_data
 def load_data():
-    df_customer = pd.read_csv("data/customer_data.csv")
+    df_customer = pd.read_csv("data/customer_data_ready.csv")
     df_export = pd.read_csv("data/export_customer_data.csv")
     df_domestic = pd.read_csv("data/domestic_customer_data.csv")
     df_list = pd.read_csv("data/customers.csv") 
@@ -38,48 +38,59 @@ def load_data():
 
 
 
-# 데이터 전처리 및 모델 학습 함수 수정
-def preprocess_and_train_model(df):
-    df = df.drop(columns=["이름", "연락처", "브랜드", "모델명", "공장명"], errors="ignore")
-    df = df.drop(columns=["트림명"], errors="ignore")
+def classify_customer_grade(ltv):
+    if ltv >= 60_000_000:
+        return "VIP"
+    elif ltv >= 40_000_000:
+        return "일반"
+    else:
+        return "신규"
 
-    # 재현성 보장을 위한 시드 설정
+def preprocess_and_train_model(df):
+    df = df.drop(columns=["이름", "연락처", "브랜드", "모델명", "공장명", "트림명"], errors="ignore")
+
     np.random.seed(42)
 
-    df["고객 등급"] = np.random.choice(["VIP", "일반", "신규"], size=len(df),p=[0.1, 0.7, 0.2])
+    # 거래/충성도 관련 칼럼 생성
     df["차량 유형"] = np.random.choice(["세단", "SUV", "해치백"], size=len(df))
     df["할부 여부"] = np.random.choice([0, 1], size=len(df))
     df["구매 경로"] = np.random.choice([0, 1], size=len(df))
-    df["최근 거래 금액"] = np.random.randint(10000000, 40000000, size=len(df))
-    df["누적 구매 금액"] = df["최근 거래 금액"] + np.random.randint(10000000, 30000000, size=len(df))
+    df["최근 거래 금액"] = np.random.randint(10_000_000, 40_000_000, size=len(df))
+    df["누적 구매 금액"] = df["최근 거래 금액"] + np.random.randint(10_000_000, 30_000_000, size=len(df))
     df["평균 구매 금액"] = (df["최근 거래 금액"] + df["누적 구매 금액"]) // 2
     df["고객 충성도 지수"] = np.round(np.random.uniform(0.5, 1.0, size=len(df)), 2)
     df["고객 평생 가치"] = df["누적 구매 금액"] * df["고객 충성도 지수"]
 
+    # 예측 모델 학습 대상
     features = [
-        "성별", "연령대", "거주 지역", "고객 등급", "차량 유형",
+        "성별", "연령대", "거주 지역", "차량 유형",
         "차량 구매 횟수", "할부 여부", "구매 경로",
         "최근 거래 금액", "누적 구매 금액", "평균 구매 금액", "고객 충성도 지수"
     ]
     target = "고객 평생 가치"
-    categorical_cols = ["성별", "연령대", "거주 지역", "고객 등급", "차량 유형"]
+    categorical_cols = ["성별", "연령대", "거주 지역", "차량 유형"]
 
+    # One-hot 인코딩
     encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
     encoded = encoder.fit_transform(df[categorical_cols])
     encoded_df = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(categorical_cols))
 
+    # 입력 데이터 구성
     X = pd.concat([df.drop(columns=categorical_cols + [target]), encoded_df], axis=1)
     y = df[target]
 
+    # 학습
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    model = XGBRegressor(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42,deterministic_histogram=True  # 결정적 히스토그램 활성화
-    )
-
+    model = XGBRegressor(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42, deterministic_histogram=True)
     model.fit(X_train, y_train)
 
+    # 예측 및 고객 등급 재정의
+    df["예측 LTV"] = model.predict(X)
+    df["고객 등급"] = df["예측 LTV"].apply(classify_customer_grade)
+
+    # 모델 저장
     os.makedirs("model", exist_ok=True)
-    model_version = datetime.now().strftime("%Y%m%d%H%M") 
+    model_version = datetime.now().strftime("%Y%m%d%H%M")
     joblib.dump(model, f"model/xgb_model_v{model_version}.pkl")
 
     return model, df, X
@@ -241,7 +252,7 @@ def ltv_customer_ui():
             grade_error = df_with_pred.groupby("고객 등급")["잔차"].mean().reset_index()
             fig_grade, ax_grade = plt.subplots()
             ax_grade.bar(grade_error["고객 등급"], grade_error["잔차"], color='skyblue')
-            ax_grade.set_ylabel("평균 잔차")
+            ax_grade.set_ylabel("평균 잔차(천원)")
             ax_grade.set_title("고객 등급별 평균 예측 오차")
             st.pyplot(fig_grade)
         else:
@@ -299,13 +310,13 @@ def ltv_customer_ui():
         고객 LTV와 등급 정보를 바탕으로 맞춤형 마케팅 패키지 추천.
         """
         # 등급 우선, 없으면 LTV 기반 분류
-        if grade == "VIP" or (grade is None and ltv >= 80000000):
+        if grade == "VIP" or (grade is None and ltv >= 60000000):
             return {
                 "차량": "제네시스 GV90 프레스티지",
                 "금융": "할부 금리 2.9% (7년)",
                 "서비스": "5년 무상 정비 + 전용 충전소 설치 + 컨시어지 서비스"
             }
-        elif grade == "일반" or (grade is None and 40000000 <= ltv < 80000000):
+        elif grade == "일반" or (grade is None and 40000000 <= ltv < 60000000):
             return {
                 "차량": "현대 아이오닉6 디럭스",
                 "금융": "리스료 3.5% (3년)",
@@ -364,6 +375,7 @@ def ltv_customer_ui():
                         <tr><td>연령대</td><td><strong>{row['연령대']}</strong></td></tr>
                         <tr><td>거주지</td><td><strong>{row['거주 지역']}</strong></td></tr>
                         <tr><td>예측 LTV</td><td><strong>{row['예측 LTV']:,.0f}원</strong></td></tr>
+                        <tr><td> 고객 등급</td><td><strong>{row['고객 등급']}</strong></td></tr>
                     </table>
                     <hr style="margin:10px 0;">
                     🚗 <strong>추천 차량:</strong> {rec['차량']}<br>
