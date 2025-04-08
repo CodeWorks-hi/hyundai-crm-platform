@@ -5,7 +5,7 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 import numpy as np
-
+from datetime import datetime
 
 
 # 차량리스트 데이터 불러오기
@@ -13,6 +13,14 @@ df_inv = pd.read_csv("data/inventory_data.csv")
 df_list = pd.read_csv("data/hyundae_car_list.csv")
 
 np.random.seed(42) 
+
+# IGIS 블록체인 데이터 생성 (추가)
+def generate_blockchain_log():
+    return pd.DataFrame({
+        'Timestamp': pd.date_range('2024-01-01', periods=50, freq='H'),
+        'Transaction Hash': [f'0x{np.random.bytes(4).hex()}' for _ in range(50)],
+        'CO2_Data': np.random.uniform(50, 300, 50).round(2)
+    })
 
 def load_data():
     for col in ['모델명', '트림명']:
@@ -75,11 +83,11 @@ def eco_ui():
     fig_eco = px.bar(eco_summary, x='공장명', y='재고량', color='전기차 여부', barmode='group',
                      title='공장별 친환경차 vs 내연기관차 생산량 비교')
     st.plotly_chart(fig_eco, use_container_width=True)
-    st.markdown("""
-            ** 공장별 친환경 생산량 분석**
+    st.info("""
+            **공장별 친환경 생산량 분석**
 
-            이 그래프는 각 공장에서 생산된 차량 중 **친환경차(전기·하이브리드)**와 **내연기관차**의 비중을 비교한 것입니다.  
-            - **친환경차 비중이 높은 공장**은 ESG 목표 달성에 유리하며,  
+            이 그래프는 각 공장에서 생산된 차량 중 **친환경차(전기·하이브리드)** 와 **내연기관차** 의 비중을 비교한 것입니다.  
+            - **친환경차 비중이 높은 공장** 은 ESG 목표 달성에 유리하며,  
             - **내연기관 생산 비중이 높은 공장**은 탄소 저감 노력이 필요한 구간입니다.
 
              이 데이터를 바탕으로 **공장별 탄소 저감 목표 설정** 및 **생산전환 전략 수립**이 가능합니다.
@@ -91,12 +99,12 @@ def eco_ui():
     fig_trend = px.line(trend_summary, x='연도', y='재고량', color='전기차 여부', markers=True,
                         title='연도별 친환경차 vs 내연기관차 생산 추이')
     st.plotly_chart(fig_trend, use_container_width=True)
-    st.markdown("""
-        ** 연도별 친환경 전환 추이 분석**
+    st.info("""
+        **연도별 친환경 전환 추이 분석**
 
-        이 그래프는 **2020~2024년까지 연도별 친환경차 생산량 변화**를 보여줍니다.  
-        - **상승 추세**: 친환경차의 연간 생산 비중이 꾸준히 증가한 공장은 전환 전략이 성공적  
-        - **정체 혹은 감소 추세**: 정책/인프라 개선이 필요한 신호로 해석 가능
+        이 그래프는 **2020~2024년까지 연도별 친환경차 생산량 변화** 를 보여줍니다.  
+        - **상승 추세** : 친환경차의 연간 생산 비중이 꾸준히 증가한 공장은 전환 전략이 성공적  
+        - **정체 혹은 감소 추세** : 정책/인프라 개선이 필요한 신호로 해석 가능
 
          **중장기 ESG 전략** 수립과 **지속가능경영지표(KPI)** 측정에 활용할 수 있습니다.
         """)
@@ -107,12 +115,12 @@ def eco_ui():
     fig_score = px.bar(score_summary, x='공장명', y='친환경점수', color='친환경점수', color_continuous_scale='Greens',
                        title='공장별 평균 친환경 점수')
     st.plotly_chart(fig_score, use_container_width=True)
-    st.markdown("""
+    st.info("""
         ** 공장별 친환경 점수 비교**
 
-        이 지표는 차량의 **연비와 CO₂ 배출량을 반영하여 산정된 친환경점수 평균값**입니다.  
-        - 점수가 높을수록 **연비 효율이 우수하고 배출량이 적은 차량을 주로 생산**하고 있음을 의미  
-        - ESG 등급 평가 시, 해당 공장은 **탄소 저감 성과가 우수한 생산 거점**으로 평가될 수 있음
+        이 지표는 차량의 **연비와 CO₂ 배출량을 반영하여 산정된 친환경점수 평균값* 입니다.  
+        - 점수가 높을수록 **연비 효율이 우수하고 배출량이 적은 차량을 주로 생산** 하고 있음을 의미  
+        - ESG 등급 평가 시, 해당 공장은 **탄소 저감 성과가 우수한 생산 거점** 으로 평가될 수 있음
 
         **환경 리워드 배분**, **친환경 캠페인 대상 공장 선별**, **보조금 정책 연계** 등에 유용하게 활용됩니다.
         """)

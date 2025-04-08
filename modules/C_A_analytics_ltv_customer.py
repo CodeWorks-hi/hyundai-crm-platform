@@ -46,7 +46,7 @@ def preprocess_and_train_model(df):
     # 재현성 보장을 위한 시드 설정
     np.random.seed(42)
 
-    df["고객 등급"] = np.random.choice(["VIP", "일반", "신규"], size=len(df))
+    df["고객 등급"] = np.random.choice(["VIP", "일반", "신규"], size=len(df),p=[0.1, 0.7, 0.2])
     df["차량 유형"] = np.random.choice(["세단", "SUV", "해치백"], size=len(df))
     df["할부 여부"] = np.random.choice([0, 1], size=len(df))
     df["구매 경로"] = np.random.choice([0, 1], size=len(df))
@@ -114,18 +114,16 @@ def ltv_customer_ui():
 
     # 상단 컬럼 레이아웃 추가
 
-# 상단 컬럼 레이아웃 추가
-    col_top_selector, _ = st.columns([7, 3])
 
-    with col_top_selector:
+
     # 표시할 상위 고객 수 선택
         top_n = st.selectbox(
-    "표시할 상위 고객 수",
-        options=[10, 20, 50, 100],
-        index=0,
-        key="top_n_selector"
+            "표시할 상위 고객 수",
+            options=[10, 20, 50, 100],
+            index=0
         )
     st.markdown("---")
+
 
     # 데이터프레임 인덱스 재설정
     top_n_df = df_with_pred.sort_values(by=["예측 LTV"], ascending=False).head(top_n).reset_index(drop=True)
@@ -234,8 +232,27 @@ def ltv_customer_ui():
         ax_residual.set_title("예측값에 따른 잔차 분포")
         st.pyplot(fig_residual)
 
-        st.markdown("""
-                ##### 🔸 4. 예측값 대비 잔차 분석
+
+        
+    with col2:
+        st.markdown("#####  고객 등급별 평균 오차")
+        if "고객 등급" in df_with_pred.columns:
+            df_with_pred["잔차"] = df_with_pred["고객 평생 가치"] - df_with_pred["예측 LTV"]
+            grade_error = df_with_pred.groupby("고객 등급")["잔차"].mean().reset_index()
+            fig_grade, ax_grade = plt.subplots()
+            ax_grade.bar(grade_error["고객 등급"], grade_error["잔차"], color='skyblue')
+            ax_grade.set_ylabel("평균 잔차")
+            ax_grade.set_title("고객 등급별 평균 예측 오차")
+            st.pyplot(fig_grade)
+        else:
+            st.warning("고객 등급 정보가 없어 등급별 분석을 생략합니다.")
+
+
+    col1, col2 = st.columns(2)
+    with col1:      
+
+            st.markdown("""
+                ##### 🔸 3. 예측값 대비 잔차 분석
                 - **잔차란?**  
                 잔차는 실제값과 모델이 예측한 값의 차이를 의미합니다.  
                 수학적으로는 다음과 같이 표현됩니다:  
@@ -246,22 +263,11 @@ def ltv_customer_ui():
                 - 예측값이 커질수록 오차가 커지는 경향이 있다면 과대 예측 문제가 있을 수 있습니다.
                 - 잔차가 불규칙하게 분포한다면 모델의 일반화 성능이 좋다고 볼 수 있습니다.
                 - 잔차 분포가 특정 방향으로 편향되어 있으면 해당 구간의 재모델링이 필요할 수 있습니다.
-                """)
-        
-    with col2:
-        st.markdown("#####  고객 등급별 평균 오차")
-        if "고객 등급" in df_with_pred.columns:
-            grade_error = df_with_pred.groupby("고객 등급")["잔차"].mean().reset_index()
-            fig_grade, ax_grade = plt.subplots()
-            ax_grade.bar(grade_error["고객 등급"], grade_error["잔차"], color='mediumseagreen')
-            ax_grade.set_ylabel("평균 잔차")
-            ax_grade.set_title("고객 등급별 평균 예측 오차")
-            st.pyplot(fig_grade)
-
-
+                """) 
+    with col2:        
             st.markdown("""
                         
-            ##### 🔸 5. 고객 등급별 오차 분석
+            ##### 🔸 4. 고객 등급별 오차 분석
             - **분석 목적**  
               - VIP 고객군에서 예측 오차가 크다면 고가 상품 및 프리미엄 서비스에 대한 모델 개선이 필요합니다.
               - 일반 고객군은 평균적인 구매 패턴을 반영하여 예측 모델을 최적화할 수 있습니다.
@@ -272,9 +278,6 @@ def ltv_customer_ui():
               - 일반 고객군: 대중적인 프로모션 및 장기 할부 옵션 제안
               - 신규 고객군: 초기 구매 유도 캠페인 및 데이터 확보를 위한 설문조사 진행
             """)
-
-        else:
-            st.warning("고객 등급 정보가 없어 등급별 분석을 생략합니다.")
 
     st.markdown("---")
 
@@ -291,26 +294,30 @@ def ltv_customer_ui():
 
 
     # 추가 추천 항목 생성 함수
-    def get_recommendations(ltv):
-        """검색 결과 [1]의 마케팅 전략 반영"""
-        if ltv >= 80000000:  # 고가치 고객
+    def get_recommendations(ltv, grade=None):
+        """
+        고객 LTV와 등급 정보를 바탕으로 맞춤형 마케팅 패키지 추천.
+        """
+        # 등급 우선, 없으면 LTV 기반 분류
+        if grade == "VIP" or (grade is None and ltv >= 80000000):
             return {
-                "차량": "제네시스-GV90-프레스티지",
-                "금융": "할부 금리 2.9% (7년)", 
-                "서비스": "5년 무상 유지보수 + 개인 전용 충전소 설치"
+                "차량": "제네시스 GV90 프레스티지",
+                "금융": "할부 금리 2.9% (7년)",
+                "서비스": "5년 무상 정비 + 전용 충전소 설치 + 컨시어지 서비스"
             }
-        elif 40000000 <= ltv < 80000000:  # 중간 가치
+        elif grade == "일반" or (grade is None and 40000000 <= ltv < 80000000):
             return {
-                "차량": "현대-아이오닉6-디럭스",
+                "차량": "현대 아이오닉6 디럭스",
                 "금융": "리스료 3.5% (3년)",
-                "서비스": "3년 무상 정비 + 연 2회 차량 디테일링"
+                "서비스": "3년 무상 정비 + 실내 클리닝 연 2회"
             }
-        else:  # 일반 고객
+        else:  # 신규 or LTV 낮음
             return {
-                "차량": "현대-아반떼-스마트",
+                "차량": "현대 아반떼 스마트",
                 "금융": "카드 할부 5.9% (5년)",
                 "서비스": "1년 무상 점검 + 보험료 10% 할인"
             }
+
         
     st.markdown("###  고객 맞춤 추천")
     
@@ -342,27 +349,30 @@ def ltv_customer_ui():
         """, unsafe_allow_html=True)
 
         st.markdown("####  맞춤형 추천 리스트")
-        for idx, row in recommended.iterrows():
+
+        cols = st.columns(2)  # 두 개의 열 생성
+
+        for i, (idx, row) in enumerate(recommended.iterrows()):
             rec = get_recommendations(row['예측 LTV'])
-            st.markdown(f"""
-            <div class="recommend-card">
-                <div style="font-size:18px; color:#2A7FFF; margin-bottom:8px;">🏅 고객 {idx+1}</div>
-                <table>
-                    <tr><td>연령대</td><td><strong>{row['연령대']}</strong></td></tr>
-                    <tr><td>거주지</td><td><strong>{row['거주 지역']}</strong></td></tr>
-                    <tr><td>예측 LTV</td><td><strong>{row['예측 LTV']:,.0f}원</strong></td></tr>
-                </table>
-                <hr style="margin:10px 0;">
-                🚗 <strong>추천 차량:</strong> {rec['차량']}<br>
-                💳 <strong>금융 혜택:</strong> {rec['금융']}<br>
-                🛠️ <strong>서비스 패키지:</strong> {rec['서비스']}
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.warning("⚠️ 연령대 또는 거주 지역 정보가 부족합니다.")
+            col = cols[i % 2]  # 왼쪽/오른쪽 열 번갈아 사용
+
+            with col:
+                st.markdown(f"""
+                <div class="recommend-card">
+                    <div style="font-size:18px; color:#2A7FFF; margin-bottom:8px;">🏅 고객 {i+1}</div>
+                    <table>
+                        <tr><td>연령대</td><td><strong>{row['연령대']}</strong></td></tr>
+                        <tr><td>거주지</td><td><strong>{row['거주 지역']}</strong></td></tr>
+                        <tr><td>예측 LTV</td><td><strong>{row['예측 LTV']:,.0f}원</strong></td></tr>
+                    </table>
+                    <hr style="margin:10px 0;">
+                    🚗 <strong>추천 차량:</strong> {rec['차량']}<br>
+                    💳 <strong>금융 혜택:</strong> {rec['금융']}<br>
+                    🛠️ <strong>서비스 패키지:</strong> {rec['서비스']}
+                </div>
+                """, unsafe_allow_html=True)
 
     #  🗂 원본 데이터 확인
-    st.markdown("###  🗂 원본 데이터 확인")
     with st.expander(" 🗂 원본 데이터 확인"):
         tab1, tab2, tab3 = st.tabs(["딜러 상담 리스트", "국내 판매 고객데이터", "해외 판매 고객데이터"])
 
