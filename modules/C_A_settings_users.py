@@ -31,17 +31,32 @@ os.makedirs(EMPLOYEE_PHOTO_DIR, exist_ok=True)
 def load_employees():
     if os.path.exists(EMPLOYEE_CSV_PATH):
         df = pd.read_csv(EMPLOYEE_CSV_PATH)
-        expected_columns = ["고유ID", "직원이름", "사번", "사진경로", "인코딩"]
+        expected_columns = ["고유ID", "직원이름", "사번", "사진경로"]
         for col in expected_columns:
             if col not in df.columns:
                 df[col] = np.nan
         return df[expected_columns]
     else:
-        return pd.DataFrame(columns=["고유ID", "직원이름", "사번", "사진경로", "인코딩"])
+        return pd.DataFrame(columns=["고유ID", "직원이름", "사번", "사진경로"])
 
 # 직원 데이터 저장
-def save_employees(df):
+def save_employees(df, name=None, emp_number=None):
     df.to_csv(EMPLOYEE_CSV_PATH, index=False)
+    goal_df = pd.read_csv("data/employee_goal.csv")
+    new_goal_df = goal_df[goal_df["사번"] == emp_number]
+    if new_goal_df.empty:
+        new_row = pd.DataFrame([{
+            "사번": emp_number,
+            "직원명": name,
+            "주간목표": 20,
+            "주간실적": 0,
+            "월간목표": 100,
+            "월간실적": 0,
+            "연간목표": 1000,
+            "연간실적": 0
+        }])
+        goal_df = pd.concat([goal_df, new_row], ignore_index=True)
+        goal_df.to_csv("data/employee_goal.csv", index=False)
 
 # # 얼굴 인코딩
 # def encode_face(img_path):
@@ -92,7 +107,7 @@ def users_ui():
                         # "인코딩": encoding.tolist()
                     }])
                     df = pd.concat([df, new_row], ignore_index=True)
-                    save_employees(df)
+                    save_employees(df, name, emp_number)
                     st.success(f"{name} 님이 등록되었습니다.")
                     # else:
                     #     os.remove(save_path)
@@ -123,6 +138,17 @@ def users_ui():
                         os.remove(row["사진경로"])
                     df_employees = df_employees[df_employees["고유ID"] != row["고유ID"]]
                     save_employees(df_employees)
+
+                    # 목표 데이터에서도 해당 사번 삭제 (더 안전하게, 사번 타입/포맷 정규화)
+                    goal_path = "data/employee_goal.csv"
+                    if os.path.exists(goal_path):
+                        goal_df = pd.read_csv(goal_path)
+                        target_emp_number = str(row["사번"]).split(".")[0]  # 소수점 제거
+                        goal_df["사번"] = goal_df["사번"].astype(str).str.split(".").str[0]  # 전체 사번 정규화
+                        goal_df = goal_df[goal_df["사번"] != target_emp_number]
+                        goal_df = goal_df.dropna(subset=["사번", "직원명"])
+                        goal_df.to_csv(goal_path, index=False)
+
                     st.success(f"{row['직원이름']} 님이 삭제되었습니다.")
                     st.rerun()
 

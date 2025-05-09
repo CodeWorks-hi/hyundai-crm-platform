@@ -32,8 +32,6 @@ render_logo_title()
 EMPLOYEE_CSV_PATH = "data/employee.csv"
 os.makedirs("data", exist_ok=True)
 
-# ▶️ 직원 데이터 로드
-@st.cache_data
 def load_employees():
     if os.path.exists(EMPLOYEE_CSV_PATH):
         df = pd.read_csv(EMPLOYEE_CSV_PATH)
@@ -44,8 +42,6 @@ def load_employees():
         return df
     else:
         return pd.DataFrame(columns=["고유ID", "직원이름", "사번", "사진경로", "인코딩"])
-
-df_employees = load_employees()
 
 # ▶️ 테이블 HTML 생성 함수
 def generate_html_table(df: pd.DataFrame) -> str:
@@ -70,6 +66,8 @@ def generate_html_table(df: pd.DataFrame) -> str:
 
 
 def app():
+    df_employees = load_employees()
+
     tabs = st.tabs([
         "대시보드",     # Overview 대체 – 직관적이고 고급스러움
         "고객 설문",   # Surveys – 응답보다 더 부드러운 표현
@@ -119,8 +117,8 @@ def app():
             st.session_state["사번"] = ""
 
         if st.session_state["직원이름"] == "":
-            입력이름 = st.text_input("직원이름", value="홍길동")
-            입력사번 = st.text_input("사번", value="202504010524")
+            입력이름 = st.text_input("직원이름")
+            입력사번 = st.text_input("사번")
             if st.button("매니저 로그인", key="manager_login_button"):
                 입력이름 = 입력이름.strip()
                 입력사번 = 입력사번.strip()
@@ -143,9 +141,14 @@ def app():
                 (df_employees["직원이름"] == st.session_state["직원이름"]) &
                 (df_employees["사번"] == st.session_state["사번"])
             ]
+
+            print(matched)
+
             if not matched.empty:
                 직원정보 = matched.iloc[0]
                 col_center = st.columns([1, 2, 1])[1]
+                print(직원정보)
+                print(직원정보["사진경로"])
                 with col_center:
                     if 직원정보["사진경로"] and os.path.exists(직원정보["사진경로"]):
                         st.image(직원정보["사진경로"], width=150)

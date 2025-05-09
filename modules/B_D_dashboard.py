@@ -205,8 +205,8 @@ def dashboard_ui():
     with col_left:
         st.subheader("🎯 개인 목표 달성률")
 
-        goal_df = pd.read_csv("data/employee_goal.csv")
-        goal_df = goal_df.loc[goal_df["직원명"] == st.session_state["직원이름"], :]
+        goal_df = pd.read_csv("data/employee_goal.csv", dtype={"사번": str})
+        goal_df = goal_df.loc[goal_df["사번"] == st.session_state["사번"], :]
 
         view_option = st.selectbox("기간 선택", ["주간", "월간", "연간"])
         target_sales = {
