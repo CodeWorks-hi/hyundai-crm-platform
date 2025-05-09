@@ -25,6 +25,10 @@ except Exception as e:
     st.error(f"LTV 모델 로드 오류: {e}")
 
 
+# 모델 학습 캐시 함수 추가
+@st.cache_data(ttl=86400)  # Cache for 24 hours
+def train_ltv_model(df_domestic):
+    return preprocess_and_train_model(df_domestic)
 
 
 @st.cache_data
@@ -136,8 +140,7 @@ def ltv_customer_ui():
     df_customer, df_export, df_domestic, df_list = load_data()
 
     with st.spinner("모델 학습 및 예측 중..."):
-        model, df_with_pred, X = preprocess_and_train_model(df_domestic)
-        df_with_pred["예측 LTV"] = model.predict(X)
+        model, df_with_pred, X = train_ltv_model(df_domestic)
 
     # 상단 컬럼 레이아웃 추가
 
