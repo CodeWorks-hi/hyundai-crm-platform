@@ -11,7 +11,7 @@ from huggingface_hub import InferenceClient
 from bs4 import BeautifulSoup
 
 
-TEXT_MODEL_ID = "google/gemma-2-9b-it"
+TEXT_MODEL_ID = "google/gemma-3-27b-it"
 
 def get_huggingface_token(model_type):
     tokens = {"gemma": st.secrets.get("gemma_token")}
@@ -56,7 +56,8 @@ def generate_answer(request: str, keywords: str, model_name: str = TEXT_MODEL_ID
             max_new_tokens=1000,
             temperature=0.2
         )
-        return response
+        response_cleaned = re.sub(r'현장 상담 유도', '', response)
+        return response_cleaned
     except Exception as e:
         st.error(f"텍스트 생성 오류: {e}")
         return ""
@@ -281,7 +282,7 @@ def dashboard_ui():
             st.success("🎉 훌륭합니다! 이미 목표치에 근접했어요. 멋진 마무리 기대할게요.")
 
     with col_mid:
-        st.markdown("### 상담 요청 답변")
+        st.markdown("### 문의 사항 답변")
 
         colL, colR = st.columns(2)
         with colL:
@@ -336,7 +337,7 @@ def dashboard_ui():
         st.markdown("### ✅ 최근 완료 상담")
         st.write("")
 
-        completed_df = df[(df["담당직원"] == st.session_state["직원이름"]) & (df["완료여부"] == 1)]
+        completed_df = df[(df["담당직원"] == st.session_state["직원이름"]) & (df["완료여부"] == 1) & (df["목적"] == "상담")]
         recent_done = completed_df.sort_values(by=["상담날짜", "상담시간"], ascending=False).head(2)
 
         if recent_done.empty:

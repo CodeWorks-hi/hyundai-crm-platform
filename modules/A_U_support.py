@@ -9,7 +9,7 @@ from modules.A_U_kakao_channel import render_kakao_channel_add_button
 
 
 # Hugging Face 모델 설정
-TEXT_MODEL_ID = "google/gemma-2-9b-it"
+TEXT_MODEL_ID = "google/gemma-3-27b-it"
 API_TOKEN = st.secrets.get("gemma_token")
 
 if not API_TOKEN:
@@ -219,7 +219,9 @@ def generate_gemma_response(user_input: str) -> str:
             max_new_tokens=800,
             temperature=0.2
         )
-        return clean_response(response)
+        response_cleaned = clean_response(response)
+        response_cleaned = re.sub(r'^q":\s*".*?",\s*a":\s*', '', response_cleaned)
+        return response_cleaned.strip()
     except Exception as e:
         if "401" in str(e):
             return "⚠️ 인증 오류: API 토큰을 재발급해주세요"
