@@ -193,7 +193,7 @@ def dashboard_ui():
                     if st.button("완료", key=f"complete_{i}"):
                         # Find the matching event in the original df
                         match_condition = (
-                            (df["이름"] == event['title'].replace(" 고객님", "")) &
+                            (df["이름"] == event['title'].split(" ")[0]) &
                             (df["상담날짜"] + " " + df["상담시간"] == pd.to_datetime(event["start"]).strftime("%Y-%m-%d %H:%M"))
                         )
                         df.loc[match_condition, "완료여부"] = 1
