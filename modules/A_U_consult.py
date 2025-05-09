@@ -341,8 +341,8 @@ def consult_ui():
                     """, unsafe_allow_html=True)
                     with st.expander("만족도 조사", expanded=False):
                         with st.form(f"satis_{idx}"):
-                            input_name = st.text_input("이름 확인", key=f"done_name_{idx}")
-                            input_phone = st.text_input("전화번호 확인", key=f"done_phone_{idx}")
+                            input_name = st.text_input("이름 확인", key=f"confirm_name_{idx}")
+                            input_phone = st.text_input("전화번호 확인", key=f"confirm_phone_{idx}")
                             rating = st.slider("⭐ 상담 만족도 (1~5점)", 1, 5, 3, key=f"rating_{idx}")
                             if st.form_submit_button("고객 피드백 제출"):
                                 if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
