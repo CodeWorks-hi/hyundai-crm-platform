@@ -255,7 +255,7 @@ def eco_ui():
             support_type = "초소형 보조금" if result_info['차량구분'] == '소형' else "승용 보조금"
 
             # 예시 보조금 (향후 실제 값 연동 예정)
-            subsidy = 4000000 if support_type == "승용 보조금" else 7000000
+            subsidy = elec_data.iloc[0]['보조금/승용(만원)']*10000 if support_type == "승용 보조금" else elec_data.iloc[0]['보조금/초소형(만원)']*10000
             final_price = price - subsidy
 
             # 카드 형태 정보 출력
@@ -267,7 +267,6 @@ def eco_ui():
                     <p><b>차량 가격 (세제혜택 후):</b> {price:,} 원</p>
                     <p><b>보조금 유형:</b> {support_type}</p>
                     <p><b>금 액 :</b> {subsidy:,} 원</p>
-                    <p><b>지자체 보조금:</b> 표시 예정</p>
                     <p><b>최종금액:</b> {price:,} 원 - {subsidy:,} 원 = <b>{final_price:,} 원</b></p>
                 </div>
             """, unsafe_allow_html=True)
