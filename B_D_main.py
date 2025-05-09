@@ -168,7 +168,8 @@ def app():
                     st.session_state["직원이름"] = ""
                     st.session_state["사번"] = ""
                     st.rerun()
-        st.markdown("### 로그인 해주세요 ")
+        if st.session_state["직원이름"] == "":
+            st.markdown("### 로그인 해주세요 ")
 
 
 
