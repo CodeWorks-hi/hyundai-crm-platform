@@ -212,7 +212,7 @@ def generate_gemma_response(user_input: str) -> str:
         return "❌ 시스템 오류: 관리자에게 문의해주세요"
     
     try:
-        client = InferenceClient(model=TEXT_MODEL_ID, token=API_TOKEN, timeout=30)
+        client = InferenceClient(token=API_TOKEN, timeout=30)
         response = client.text_generation(
             prompt=f"{build_system_prompt()}\n\n[질문]\n{user_input}\n[답변]",
             max_new_tokens=800,
