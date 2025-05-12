@@ -17,6 +17,9 @@ def get_huggingface_token(model_type):
     tokens = {"gemma": st.secrets.get("gemma_token")}
     return tokens.get(model_type)
 
+def strip_html(text):
+    return BeautifulSoup(text, "html.parser").get_text()
+
 def generate_answer(request: str, keywords: str, model_name: str = TEXT_MODEL_ID) -> str:
     token = get_huggingface_token("gemma")
     if not token:
@@ -30,13 +33,16 @@ def generate_answer(request: str, keywords: str, model_name: str = TEXT_MODEL_ID
         request,
         flags=re.DOTALL
     )
-
     keywords = re.sub(
         r'["“]?[qQ]["”]?\s*:\s*["“]?(.*?)["”]?\s*,?\s*["“]?[aA]["”]?\s*:\s*',
         '',
         keywords,
         flags=re.DOTALL
     )
+
+    # HTML 태그 제거
+    request = strip_html(request)
+    keywords = strip_html(keywords)
 
     system_prompt = """
     [시스템 지시 사항]
