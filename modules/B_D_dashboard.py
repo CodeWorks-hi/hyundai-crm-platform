@@ -23,17 +23,17 @@ def generate_answer(request: str, keywords: str, model_name: str = TEXT_MODEL_ID
         st.error("Hugging Face API 토큰이 없습니다.")
         return ""
 
-    # "q": "...", "a": ... 형식 제거
+    # "q: ...", "a: ..." 형식 제거 (더 강력한 정규식)
     request = re.sub(
-        r'^\s*["“]?[qQ]["”]?\s*:\s*["“]?[^"”\n]+["”]?\s*,?\s*["“]?[aA]["”]?\s*:\s*',
+        r'["“]?[qQ]["”]?\s*:\s*["“]?(.*?)["”]?\s*,?\s*["“]?[aA]["”]?\s*:\s*',
         '',
-        request.strip(),
+        request,
         flags=re.DOTALL
     )
     keywords = re.sub(
-        r'^\s*["“]?[qQ]["”]?\s*:\s*["“]?[^"”\n]+["”]?\s*,?\s*["“]?[aA]["”]?\s*:\s*',
+        r'["“]?[qQ]["”]?\s*:\s*["“]?(.*?)["”]?\s*,?\s*["“]?[aA]["”]?\s*:\s*',
         '',
-        keywords.strip(),
+        keywords,
         flags=re.DOTALL
     )
 
