@@ -315,7 +315,7 @@ def dashboard_ui():
                 if mask.any():
                     result_txt = generate_answer(matched_requests[0], memo, model_name=TEXT_MODEL_ID) 
                     result_txt = result_txt.replace("[최종 답변]", "")
-                    result_txt = result_txt.strip(" ").strip(",").strip(" ").replace("\n", "").replace("\r", "").replace("  ", " ")
+                    result_txt = result_txt.strip(" ").strip(",").strip(" ").replace("\n", "").replace("\r", "").replace("  ", " ").replace("```", "")
 
                     cr_df.loc[mask & (cr_df["완료여부"] == 0), "답변내용"] = result_txt
                     cr_df.loc[mask & (cr_df["완료여부"] == 0), "완료여부"] = 1
