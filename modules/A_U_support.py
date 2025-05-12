@@ -9,7 +9,7 @@ from modules.A_U_kakao_channel import render_kakao_channel_add_button
 
 
 # Hugging Face 모델 설정
-TEXT_MODEL_ID = "google/gemma-3-27b-it"
+TEXT_MODEL_ID = "mistralai/Mistral-Small-24B-Instruct-2501"
 API_TOKEN = st.secrets.get("gemma_token")
 
 if not API_TOKEN:
