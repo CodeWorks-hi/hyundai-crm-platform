@@ -30,6 +30,7 @@ def generate_answer(request: str, keywords: str, model_name: str = TEXT_MODEL_ID
         request,
         flags=re.DOTALL
     )
+
     keywords = re.sub(
         r'["“]?[qQ]["”]?\s*:\s*["“]?(.*?)["”]?\s*,?\s*["“]?[aA]["”]?\s*:\s*',
         '',
