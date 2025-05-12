@@ -220,7 +220,13 @@ def generate_gemma_response(user_input: str) -> str:
             temperature=0.2
         )
         response_cleaned = clean_response(response)
-        response_cleaned = re.sub(r'^q":\s*".*?",\s*a":\s*', '', response_cleaned)
+        # "q": "질문", "a": 답변 형식의 앞부분을 줄바꿈 포함, 다양한 따옴표/대소문자 조합까지 모두 제거
+        response_cleaned = re.sub(
+            r'^\s*["“]?[qQ]["”]?\s*:\s*["“]?.+?["”]?\s*,?\s*["“]?[aA]["”]?\s*:\s*',
+            '',
+            response_cleaned,
+            flags=re.DOTALL
+        )
         return response_cleaned.strip()
     except Exception as e:
         if "401" in str(e):
@@ -281,12 +287,18 @@ def support_ui():
     
     user_input = st.text_area("질문을 입력해 주세요 ", placeholder="예: 대리점 방문 및 방문 상담 절차가 궁금해요?", height=100)
 
-#  질문하기 버튼 (실제 작동)
+    # 질문 결과 출력 (디자인 개선 및 q/a 제거 포함)
     if st.button("질문하기"):
         if user_input.strip():
             with st.spinner("AI 분석 중..."):
                 response = generate_gemma_response(user_input)
-            st.markdown(f"**답변:**\n{response}")
+            
+            # 시각적으로 정리된 박스 형태로 출력
+            st.markdown(f"""
+            <div style='border:1px solid #ccc; padding:20px; border-radius:10px; background-color:#f9f9f9; margin-top:20px; line-height:1.6; font-size:15px;'>
+                {response}
+            </div>
+            """, unsafe_allow_html=True)
         else:
             st.warning("질문을 입력해주세요.")
 
