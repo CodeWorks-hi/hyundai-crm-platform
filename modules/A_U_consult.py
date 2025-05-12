@@ -211,37 +211,35 @@ def consult_ui():
                 with st.form(f"view_done_{idx}"):
                     input_name = st.text_input("이름 확인", key=f"done_name_{idx}")
                     input_phone = st.text_input("전화번호 확인", key=f"done_phone_{idx}")
-                    col_open, col_delete = st.columns([1, 1])
+                    rating = st.slider("⭐ 상담 만족도 (1~5점)", 1, 5, 3, key=f"feedback_rating_{idx}")
+                    col_open, col_feedback, col_delete = st.columns([1, 1, 1])
                     with col_open:
                         open_clicked = st.form_submit_button("열기")
+                    with col_feedback:
+                        feedback_clicked = st.form_submit_button("피드백 제출")
                     with col_delete:
                         delete_clicked = st.form_submit_button("삭제")
 
                     # 폼 제출 후 처리
-                    if open_clicked or delete_clicked:
-                        if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
-                            if open_clicked:
-                                st.info(f"**상담내용:** {row['요청사항']}")
-                                답변 = row['답변내용']
-                                if pd.isna(답변) or str(답변).strip() == "":
-                                    답변 = "답변대기중"
-                                st.info(f"**답변내용:** {답변}")
-
-                                # 👍 만족도 슬라이더 추가
-                                with st.form(f"feedback_done_{idx}"):
-                                    rating = st.slider("⭐ 상담 만족도 (1~5점)", 1, 5, 3, key=f"feedback_rating_{idx}")
-                                    if st.form_submit_button("고객 피드백 제출"):
-                                        df.at[idx, "고객피드백"] = rating
-                                        df.to_csv("data/consult_log.csv", index=False)
-                                        st.success("피드백이 제출되었습니다.")
-                                        st.rerun()
-
-                            elif delete_clicked:
-                                df.drop(index=idx, inplace=True)
-                                df.to_csv("data/consult_log.csv", index=False)
-                                st.success("삭제되었습니다.")
-                                st.rerun()
-                        else:
+                    if input_name.strip() == str(row.get("이름", "")).strip() and input_phone.strip() == str(row.get("전화번호", "")).strip():
+                        if open_clicked:
+                            st.info(f"**상담내용:** {row['요청사항']}")
+                            답변 = row['답변내용']
+                            if pd.isna(답변) or str(답변).strip() == "":
+                                답변 = "답변대기중"
+                            st.info(f"**답변내용:** {답변}")
+                        if feedback_clicked:
+                            df.at[idx, "고객피드백"] = rating
+                            df.to_csv("data/consult_log.csv", index=False)
+                            st.success("피드백이 제출되었습니다.")
+                            st.rerun()
+                        if delete_clicked:
+                            df.drop(index=idx, inplace=True)
+                            df.to_csv("data/consult_log.csv", index=False)
+                            st.success("삭제되었습니다.")
+                            st.rerun()
+                    else:
+                        if open_clicked or delete_clicked or feedback_clicked:
                             st.warning("정보가 일치하지 않습니다.")
 
         # 페이지네이션 하단 버튼
