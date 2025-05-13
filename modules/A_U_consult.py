@@ -17,6 +17,11 @@ def consult_ui():
             return name[0] + "*" + name[-1]
         return name
 
+    def mask_phone(phone):
+        if len(phone) >= 7:
+            return phone[:3] + "-****-" + phone[-4:]
+        return phone
+
     df_path = "data/consult_log.csv"
     os.makedirs("data", exist_ok=True)
     if os.path.exists(df_path):
@@ -127,6 +132,11 @@ def consult_ui():
         with consult_list:
             st.markdown("##### 답변 대기")
             wait_df = df[df["완료여부"] == False]
+            # Sort wait_df by 상담날짜, 상담시간 descending
+            if not wait_df.empty:
+                wait_df["상담날짜"] = pd.to_datetime(wait_df["상담날짜"])
+                wait_df["상담시간"] = pd.to_datetime(wait_df["상담시간"], format="%H:%M").dt.time
+                wait_df = wait_df.sort_values(by=["상담날짜", "상담시간"], ascending=False)
             per_page = 5
             total_wait_pages = (len(wait_df) - 1) // per_page + 1
             start = st.session_state["wait_page"] * per_page
@@ -136,6 +146,7 @@ def consult_ui():
                 st.markdown(f"""
                 <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
                 <b>성명:</b> {mask_name(row['이름'])}<br>
+                <b>전화번호:</b> {mask_phone(str(row['전화번호']))}<br>
                 <b>요청사항:</b> {row['요청사항']}<br>
                 <b>진행상태:</b> 상담대기중
                 </div>
@@ -193,6 +204,11 @@ def consult_ui():
     with consult_true:
         st.markdown("##### 답변 완료 ")
         done_df = df[df["완료여부"] == True]
+        # Sort done_df by 상담날짜, 상담시간 descending
+        if not done_df.empty:
+            done_df["상담날짜"] = pd.to_datetime(done_df["상담날짜"])
+            done_df["상담시간"] = pd.to_datetime(done_df["상담시간"], format="%H:%M").dt.time
+            done_df = done_df.sort_values(by=["상담날짜", "상담시간"], ascending=False)
         total_done_pages = (len(done_df) - 1) // per_page + 1
         start = st.session_state["done_page"] * per_page
         end = start + per_page
@@ -202,6 +218,7 @@ def consult_ui():
             st.markdown(f"""
             <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
             <b>성명:</b> {mask_name(row['이름'])}<br>
+            <b>전화번호:</b> {mask_phone(str(row['전화번호']))}<br>
             <b>요청사항:</b> {row['요청사항']}<br>
             <b>진행상태:</b> 답변 완료
             </div>
@@ -270,6 +287,11 @@ def consult_ui():
         with consult_visit:
             st.markdown("##### 방문 신청")
             visit_df = df[(df["완료여부"] == False) & (df["목적"] == "방문")]
+            # Sort visit_df by 상담날짜, 상담시간 descending
+            if not visit_df.empty:
+                visit_df["상담날짜"] = pd.to_datetime(visit_df["상담날짜"])
+                visit_df["상담시간"] = pd.to_datetime(visit_df["상담시간"], format="%H:%M").dt.time
+                visit_df = visit_df.sort_values(by=["상담날짜", "상담시간"], ascending=False)
             total_visit_pages = (len(visit_df) - 1) // per_page + 1
             start = st.session_state["visit_page"] * per_page
             end = start + per_page
@@ -279,7 +301,8 @@ def consult_ui():
                     st.markdown(f"""
                     <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
                     <b>성명:</b> {mask_name(row['이름'])}<br>
-                    <b>방문예정일:</b> {row['상담날짜']}
+                    <b>전화번호:</b> {mask_phone(str(row['전화번호']))}<br>
+                    <b>방문예정일:</b> {pd.to_datetime(row['상담날짜']).strftime('%Y-%m-%d')} {row['상담시간']}
                     </div>
                     """, unsafe_allow_html=True)
                     with st.expander("예약 취소", expanded=False):
@@ -320,6 +343,11 @@ def consult_ui():
         with consult_visit_True:
             st.markdown("##### 방문 완료")
             visit_df = df[(df["완료여부"] == True) & (df["목적"] == "방문")]
+            # Sort visit_df by 상담날짜, 상담시간 descending
+            if not visit_df.empty:
+                visit_df["상담날짜"] = pd.to_datetime(visit_df["상담날짜"])
+                visit_df["상담시간"] = pd.to_datetime(visit_df["상담시간"], format="%H:%M").dt.time
+                visit_df = visit_df.sort_values(by=["상담날짜", "상담시간"], ascending=False)
             per_page = 5
             if "visit_done_page" not in st.session_state:
                 st.session_state["visit_done_page"] = 0
@@ -334,7 +362,8 @@ def consult_ui():
                     st.markdown(f"""
                     <div style='padding:6px 10px; border-bottom:1px solid #ddd;'>
                     <b>성명:</b> {mask_name(row['이름'])}<br>
-                    <b>방문일:</b> {row['상담날짜']}
+                    <b>전화번호:</b> {mask_phone(str(row['전화번호']))}<br>
+                    <b>방문일:</b> {pd.to_datetime(row['상담날짜']).strftime('%Y-%m-%d')} {row['상담시간']}
                     </div>
                     """, unsafe_allow_html=True)
                     with st.expander("만족도 조사", expanded=False):
