@@ -63,14 +63,14 @@ def consult_ui():
                         "전화번호": phone,
                         "상담날짜": date.strftime("%Y-%m-%d"),
                         "상담시간": time.strftime("%H:%M"),
-                        "요청사항": content,
+                        "목적": "방문",
                         "담당직원": "홍길동",
                         "완료여부": 0,
+                        "요청사항": content,
                         "답변내용": "-",
                         "상담내용": "-",
                         "상담태그": "-",
-                        "고객피드백": "-",
-                        "목적": "방문"
+                        "고객피드백": "-"
                     }
                     df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
                     df.to_csv(df_path, index=False)
@@ -97,14 +97,15 @@ def consult_ui():
                         "전화번호": phone,
                         "상담날짜": datetime.today().strftime("%Y-%m-%d"),
                         "상담시간": datetime.today().strftime("%H:%M"),
-                        "요청사항": content,
+                        "목적": "문의",
                         "담당직원": "홍길동",
                         "완료여부": 0,
+                        "요청사항": content,
                         "답변내용": "-",
                         "상담내용": "-",
                         "상담태그": "-",
-                        "고객피드백": "-",
-                        "목적": "문의"
+                        "고객피드백": "-"
+                        
                     }
                     df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
                     df.to_csv(df_path, index=False)
@@ -124,14 +125,14 @@ def consult_ui():
     df_path = "data/consult_log.csv"
     if os.path.exists(df_path):
         df = pd.read_csv(df_path)
-        if "만족도" not in df.columns:
-            df["만족도"] = ""
+        if "고객피드백" not in df.columns:
+            df["고객피드백"] = ""
         if "답변내용" not in df.columns:
             df["답변내용"] = ""
 
         with consult_list:
             st.markdown("##### 답변 대기")
-            wait_df = df[df["완료여부"] == False]
+            wait_df = df[(df["완료여부"] == False) & (df["목적"] == "문의")]
             # Sort wait_df by 상담날짜, 상담시간 descending
             if not wait_df.empty:
                 wait_df["상담날짜"] = pd.to_datetime(wait_df["상담날짜"])
