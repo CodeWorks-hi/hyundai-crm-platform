@@ -23,41 +23,24 @@ def generate_answer(request: str, keywords: str, model_name: str = TEXT_MODEL_ID
         st.error("Hugging Face API 토큰이 없습니다.")
         return ""
 
-    system_prompt = """
-    [시스템 지시 사항]
-    ### 1. 질문 분석
-    - 사용자 질문의 핵심 키워드 추출
-    - 키워드 기반으로 필요로 하는 정보 유형 파악
-    - 답변에 필요한 키워드 유형 파악
-
-    ### 2. 답변 키워드 분석
-    - 응답자가 제공한 문구에서 핵심 키워드 추출
-    - 1단계에서 파악한 필요 정보 유형과 비교하여 분석
-    - 필요 정보와 일치하는 내용만 답변 생성에 활용
-    
-    ### 3. 최종 답변 생성
-    - 응답자가 제공한 핵심 키워드 기반 답변 생성
-    - 친절하고 전문적인 어조로 100자 이내로 작성
-    - 고객의 요청에 매우 부합하는 정보만 제공
-    - 답변이 어려운 경우 현장 상담 유도
-    """
-
-    full_prompt = f"{system_prompt}\n\n[사용자 질문]\n\n{request}\n\n[답변 키워드]\n\n{keywords}"
-    
     try:
-        client = InferenceClient(model=model_name, token=token)
-        response = client.text_generation(
-            prompt=f"""
-            다음 사용자 질문에 대한 답변을 현대자동차 전문가 입장에서 100자 이내로 답변해줘.
-            사용자의 질문은 순전히 필요 정보 파악하기 위한 참고용이야. 너무 얽매이지 마.
-            매우 중요한 점. 줄 바꿈은 절대로 하지마. 한 줄로 이루어진 답변이어야 해.
-            근거를 토대로 답변해야 해. 애매한 경우 현장 상담을 유도해.
-            \n{full_prompt}""",
-            max_new_tokens=1000,
-            temperature=0.2
+        client = InferenceClient(
+            provider="hf-inference",
+            api_key=token,
         )
-        response_cleaned = re.sub(r'현장 상담 유도', '', response)
-        return response_cleaned
+        completion = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": f"{request}"},
+                        {"type": "text", "text": f"{keywords}"}
+                    ]
+                }
+            ],
+        )
+        return completion.choices[0].message["content"]
     except Exception as e:
         st.error(f"텍스트 생성 오류: {e}")
         return ""
