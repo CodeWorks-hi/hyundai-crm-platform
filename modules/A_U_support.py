@@ -211,7 +211,7 @@ def generate_gemma_response(user_input: str) -> str:
     if not API_TOKEN:
         return "❌ 시스템 오류: 관리자에게 문의해주세요"
     try:
-        client = InferenceClient(provider="hf-inference", api_key=API_TOKEN)
+        client = InferenceClient(provider="auto", api_key=API_TOKEN)
         completion = client.chat.completions.create(
             model="mistralai/Mistral-Small-3.1-24B-Instruct-2503",
             messages=[
