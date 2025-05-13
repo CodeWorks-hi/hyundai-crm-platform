@@ -11,7 +11,7 @@ from huggingface_hub import InferenceClient
 from bs4 import BeautifulSoup
 
 
-TEXT_MODEL_ID = "mistralai/Mistral-Small-24B-Instruct-2501"
+TEXT_MODEL_ID = "google/gemma-3-27b-it"
 
 def get_huggingface_token(model_type):
     tokens = {"gemma": st.secrets.get("gemma_token")}

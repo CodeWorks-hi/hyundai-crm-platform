@@ -9,7 +9,7 @@ from modules.A_U_kakao_channel import render_kakao_channel_add_button
 
 
 # Hugging Face 모델 설정
-TEXT_MODEL_ID = "mistralai/Mistral-Small-24B-Instruct-2501"
+TEXT_MODEL_ID = "google/gemma-3-27b-it"
 API_TOKEN = st.secrets.get("gemma_token")
 
 if not API_TOKEN:
@@ -210,23 +210,24 @@ def build_system_prompt():
 def generate_gemma_response(user_input: str) -> str:
     if not API_TOKEN:
         return "❌ 시스템 오류: 관리자에게 문의해주세요"
+    
     try:
-        client = InferenceClient(provider="auto", api_key=API_TOKEN)
-        completion = client.chat.completions.create(
-            model="mistralai/Mistral-Small-3.1-24B-Instruct-2503",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": f"{build_system_prompt()}\n\n[질문]\n{user_input}\n[답변]"
-                        }
-                    ]
-                }
-            ],
+        client = InferenceClient(model=TEXT_MODEL_ID, token=API_TOKEN,timeout=30)
+        response = client.text_generation(
+            model=TEXT_MODEL_ID,
+            prompt=f"{build_system_prompt()}\n\n[질문]\n{user_input}\n[답변]",
+            max_new_tokens=800,
+            temperature=0.2
         )
-        return completion.choices[0].message["content"].strip()
+        response_cleaned = clean_response(response)
+        # "q": "질문", "a": 답변 형식의 앞부분을 줄바꿈 포함, 다양한 따옴표/대소문자 조합까지 모두 제거
+        response_cleaned = re.sub(
+            r'^\s*["“]?[qQ]["”]?\s*:\s*["“]?.+?["”]?\s*,?\s*["“]?[aA]["”]?\s*:\s*',
+            '',
+            response_cleaned,
+            flags=re.DOTALL
+        )
+        return response_cleaned.strip()
     except Exception as e:
         if "401" in str(e):
             return "⚠️ 인증 오류: API 토큰을 재발급해주세요"
