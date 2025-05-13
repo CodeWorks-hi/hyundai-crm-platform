@@ -23,24 +23,51 @@ def generate_answer(request: str, keywords: str, model_name: str = TEXT_MODEL_ID
         st.error("Hugging Face API 토큰이 없습니다.")
         return ""
 
+    system_prompt = """
+    [시스템 지시 사항]
+    ### 1. 질문 분석
+    - 사용자 질문의 핵심 키워드 추출
+    - 키워드 기반으로 필요로 하는 정보 유형 파악
+    - 답변에 필요한 키워드 유형 파악
+
+    ### 2. 답변 키워드 분석
+    - 응답자가 제공한 문구에서 핵심 키워드 추출
+    - 1단계에서 파악한 필요 정보 유형과 비교하여 분석
+    - 필요 정보와 일치하는 내용만 답변 생성에 활용
+
+    ### 3. 최종 답변 생성
+    - 응답자가 제공한 핵심 키워드 기반 답변 생성
+    - 친절하고 전문적인 어조로 100자 이내로 작성
+    - 고객의 요청에 매우 부합하는 정보만 제공
+    - 답변이 어려운 경우 현장 상담 유도
+    """
+
     try:
-        client = InferenceClient(
-            provider="hf-inference",
-            api_key=token,
-        )
+        client = InferenceClient(provider="hf-inference", api_key=token)
         completion = client.chat.completions.create(
             model=model_name,
             messages=[
                 {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"{request}"},
-                        {"type": "text", "text": f"{keywords}"}
+                        {
+                            "type": "text",
+                            "text": f"{request}"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"{keywords}"
+                        }
                     ]
                 }
-            ],
+            ]
         )
-        return completion.choices[0].message["content"]
+        result = completion.choices[0].message.content.strip()
+        return result
     except Exception as e:
         st.error(f"텍스트 생성 오류: {e}")
         return ""
@@ -296,9 +323,8 @@ def dashboard_ui():
  
             if not cr_df.loc[mask & (cr_df["완료여부"] == 0), :].empty:
                 if mask.any():
-                    result_txt = generate_answer(matched_requests[0], memo, model_name=TEXT_MODEL_ID) 
-                    result_txt = result_txt.replace("[최종 답변]", "")
-                    result_txt = result_txt.strip(" ").strip(",").strip(" ").replace("\n", "").replace("\r", "").replace("  ", " ").replace("```", "")
+                    result_txt = generate_answer(matched_requests[0], memo, model_name=TEXT_MODEL_ID)
+                    result_txt = result_txt.strip().replace("```", "").split("\n")[-1].strip()
 
                     cr_df.loc[mask & (cr_df["완료여부"] == 0), "답변내용"] = result_txt
                     cr_df.loc[mask & (cr_df["완료여부"] == 0), "완료여부"] = 1
