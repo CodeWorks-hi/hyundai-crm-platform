@@ -106,13 +106,13 @@ def strategies_ui():
     st.markdown("---")
 
     # GDP 실질 성장률 시각화
-    st.markdown(" #### 국내총생산(GDP) 실질 추이")
+    st.markdown(" #### 실질 국내총생산(GDP) 추이")
     df_gdp = df_real[df_real["계정항목"] == "국내총생산(시장가격, GDP)"].copy()
     df_gdp = df_gdp.set_index("계정항목").T
     df_gdp.columns = ["GDP"]
     df_gdp = df_gdp.applymap(lambda x: float(str(x).replace(",", "")))
     df_gdp["분기"] = df_gdp.index
-    fig_gdp = px.line(df_gdp, x="분기", y="GDP", title="국내총생산(GDP) 실질 추이", markers=True)
+    fig_gdp = px.line(df_gdp, x="분기", y="GDP", title="실질 국내총생산(GDP) 추이", markers=True)
     st.plotly_chart(fig_gdp, use_container_width=True)
 
     # 📌 분석 내용 추가
@@ -177,7 +177,7 @@ def strategies_ui():
     """)
     # 원본 데이터 보기
     st.subheader("🗂 원본 데이터 확인")
-    with st.expander("GDP 실질 데이터"):
+    with st.expander("실질 GDP 데이터"):
         st.dataframe(df_real.head(), hide_index=True)
     with st.expander("경제심리지수"):
         st.dataframe(df_sen.head(), hide_index=True)
