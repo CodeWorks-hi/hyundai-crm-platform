@@ -77,7 +77,7 @@ def inventory_ui():
                 bottom10,
                 x="차종",
                 y="최근 3개월 판매량",
-                title="판매 저조 Top 3 (최근 3개월, 판매량 0 제외)"
+                title="판매 저조 Top 3 (최근 3개월)"
             )
             st.plotly_chart(fig_bottom10, use_container_width=True)
             st.markdown(f"""
