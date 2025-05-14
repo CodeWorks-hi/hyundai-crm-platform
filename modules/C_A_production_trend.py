@@ -117,7 +117,7 @@ def trend_ui():
 
     st.subheader(" 공장별 생산상태 현황")
     plant_status = df_plant.groupby(['공장명', '생산상태']).size().unstack(fill_value=0)
-    st.dataframe(plant_status.style.background_gradient(cmap='YlGnBu'), use_container_width=True, hide_index=True)
+    st.dataframe(plant_status.style.background_gradient(cmap='YlGnBu'), use_container_width=True)
 
     with st.expander(" 🗂 원본 데이터 확인"):
         tab1, tab2, tab3 = st.tabs(["차량정보", "재고데이터", "공장데이터"])
