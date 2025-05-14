@@ -110,6 +110,10 @@ def preprocess_and_train_model(df):
 
     # 모델 저장
     os.makedirs("model", exist_ok=True)
+    # 이전 xgb_model_v 모델 삭제
+    for file in os.listdir("model"):
+        if file.startswith("xgb_model_v") and file.endswith(".pkl"):
+            os.remove(os.path.join("model", file))
     model_version = datetime.now().strftime("%Y%m%d%H%M")
     joblib.dump(model, f"model/xgb_model_v{model_version}.pkl")
 
