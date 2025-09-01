@@ -163,7 +163,7 @@ def strategies_ui():
     # 고객 인사이트 시각화
     st.markdown(" #### 고객 성향 분석")
     df_list = df_list.dropna(subset=['예상예산_만원'])
-    df_list['예상예산_만원'] = df_list['예상예산_만원'].astype(float)
+    df_list['예상예산_만원'] = df_list['예상예산_만원'].replace(" 이상").astype(float)
     fig = px.histogram(df_list, x="예상예산_만원", nbins=30, color_discrete_sequence=["#4B8BBE"])
     fig.update_layout(title="예상예산 분포", xaxis_title="예상예산 (만원)", yaxis_title="고객 수")
     st.plotly_chart(fig, use_container_width=True)
