@@ -2,7 +2,7 @@
 
 현대자동차 고객 관계 관리 및 딜러 지원 통합 플랫폼
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://main-project-codeworks.streamlit.app/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://hyundai-crm-platform-codeworks.streamlit.app)
 
 ## 📋 목차
 
