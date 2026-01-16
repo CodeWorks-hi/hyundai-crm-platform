@@ -416,7 +416,7 @@ logging.info("로그 메시지")
 3. **환경 변수 설정** (필요시)
 4. **배포**
 
-**배포 URL**: https://main-project-codeworks.streamlit.app/
+**배포 URL**: https://hyundai-crm-platform-codeworks.streamlit.app/
 
 ### 로컬 배포
 
@@ -432,13 +432,13 @@ streamlit run Home.py --server.runOnSave=true
 
 ## 📝 라이선스
 
-이 프로젝트는 현대자동차 그룹의 내부 프로젝트입니다.
+이 프로젝트는 현대자동차 그룹의 공개 데이터를 활용한 프로젝트입니다.
 
 ---
 
 ## 👥 기여
 
-프로젝트 기여는 내부 개발팀을 통해 관리됩니다.
+프로젝트 기여는 개발팀을 통해 관리됩니다.
 
 ---
 
@@ -457,5 +457,3 @@ streamlit run Home.py --server.runOnSave=true
   - Prophet 수요 예측 시스템
 
 ---
-
-**Last Updated**: 2026-01-16
