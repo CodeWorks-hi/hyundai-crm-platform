@@ -1,459 +1,520 @@
-# 🚗 Hyundai CRM System
+# 🚗 현대자동차 CRM 통합 플랫폼
 
-현대자동차 고객 관계 관리 및 딜러 지원 통합 플랫폼
+### 고객·딜러·관리자를 연결하는 데이터 기반 고객 관계 관리 및 영업 지원 시스템
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://hyundai-crm-platform-codeworks.streamlit.app)
+<div align="center">
 
-## 📋 목차
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://hyundai-crm-platform-codeworks.streamlit.app/)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Cloud-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Kafka](https://img.shields.io/badge/Apache%20Kafka-Streaming-231F20?style=flat-square&logo=apachekafka&logoColor=white)](https://kafka.apache.org/)
 
-- [프로젝트 개요](#-프로젝트-개요)
-- [주요 기능](#-주요-기능)
-- [시스템 아키텍처](#-시스템-아키텍처)
-- [설치 및 실행](#-설치-및-실행)
-- [프로젝트 구조](#-프로젝트-구조)
-- [기술 스택](#-기술-스택)
-- [데이터 구조](#-데이터-구조)
-- [머신러닝 모델](#-머신러닝-모델)
-- [개발 가이드](#-개발-가이드)
-- [배포](#-배포)
+</div>
 
 ---
 
-## 🎯 프로젝트 개요
+## 📖 프로젝트 개요
 
-Hyundai CRM System은 현대자동차 그룹의 고객 관계 관리, 딜러 지원, 재고 관리 및 판매 분석을 통합한 웹 기반 플랫폼입니다.
+현대자동차 고객 관계 관리, 딜러 업무 지원, 판매·생산·재고 분석 기능을 하나의 서비스로 통합한 CRM 플랫폼입니다.
 
-### 주요 목표
-- **고객 경험 향상**: AI 기반 차량 추천 및 맞춤형 서비스 제공
-- **딜러 업무 효율화**: 재고 관리, 수요 예측, 상담 관리 등 통합 대시보드 제공
-- **데이터 기반 의사결정**: 판매 분석, 경제 지표 연동, LTV 예측을 통한 전략 수립
+고객에게는 차량 추천, 차량 비교, 상담 신청, 이벤트 및 보조금 조회 기능을 제공하고, 딜러에게는 고객 상담 이력, 차량 재고, 판매 실적, 수요 예측 기능을 제공합니다. 관리자는 고객 생애 가치 분석, 마케팅 성과, 생산·재고 현황과 주요 경제 지표를 종합적으로 확인할 수 있습니다.
+
+앞서 개발한 고객 분석 시스템과 ERP 차량 관리 시스템의 데이터와 기능을 확장하여, 고객·딜러·관리자가 각자의 목적에 맞는 서비스를 하나의 Streamlit 애플리케이션에서 이용하도록 구성했습니다.
+
+> 본 프로젝트는 교육 및 포트폴리오 목적으로 제작된 비공식 프로젝트이며, 현대자동차의 공식 서비스나 내부 시스템과는 관련이 없습니다.
+
+---
+
+## 💡 핵심 목표
+
+- 고객 데이터 기반 맞춤형 차량 및 서비스 추천
+- 상담·판매·재고 정보를 연결한 딜러 업무 지원
+- 고객 생애 가치와 마케팅 성과 분석
+- 생산·재고·판매 데이터의 통합 모니터링
+- 경제 지표 스트리밍을 활용한 시장 환경 분석
+- 사용자 유형별로 분리된 통합 서비스 제공
+
+---
+
+## 🏗️ 시스템 구성
+
+```text
+                         Hyundai CRM Platform
+                                  │
+                     ┌────────────┼────────────┐
+                     ▼            ▼            ▼
+                일반 고객      딜러 허브     관리자 콘솔
+                     │            │            │
+          ┌──────────┘            │            └──────────┐
+          ▼                       ▼                       ▼
+  차량 추천·비교·상담      상담·재고·판매 관리      LTV·마케팅·생산 분석
+          │                       │                       │
+          └───────────────┬───────┴───────────────┬───────┘
+                          ▼                       ▼
+                  데이터 처리 계층          머신러닝 계층
+                  Pandas · NumPy      XGBoost · LightGBM
+                          │            CatBoost · Prophet
+                          └───────────┬───────────┘
+                                      ▼
+                           CSV · 모델 · 외부 데이터
+                                      │
+                                      ▼
+                         Kafka 기반 경제 지표 스트리밍
+```
+
+---
+
+## 👥 사용자 구성
+
+### 👤 일반 고객
+
+차량 탐색과 상담을 중심으로 한 고객용 서비스를 제공합니다.
+
+- AI 기반 맞춤형 차량 추천
+- 차량별 사양 및 가격 비교
+- 온라인 상담 신청
+- 프로모션 및 이벤트 확인
+- 지도 기반 딜러 검색
+- 전기차·수소차 보조금 조회
+- 카카오 로그인 및 채널 연동
+
+---
+
+### 🏪 딜러
+
+고객 상담과 영업 활동을 지원하는 통합 업무 화면을 제공합니다.
+
+- 판매 현황 및 KPI 대시보드
+- 차량 재고 조회 및 입출고 관리
+- 고객 상담 이력과 리드 관리
+- 계약 및 판매 데이터 등록
+- Prophet 기반 차량 수요 예측
+- 고객 세분화와 판매 추세 분석
+- 고객 만족도 설문 및 피드백 수집
+
+---
+
+### 🔧 관리자
+
+고객·판매·생산·마케팅 정보를 종합적으로 관리합니다.
+
+- 국내 및 해외 판매 실적 분석
+- 지역별·차종별 성과 비교
+- 목표 대비 판매 달성률 확인
+- 고객 생애 가치 분석
+- 마케팅 캠페인 성과 및 ROI 분석
+- 공장별 생산량과 생산 추세 분석
+- 전체 재고와 재고 회전율 모니터링
+- 사용자 및 데이터 동기화 관리
+- 주요 경제 지표와 시장 흐름 분석
 
 ---
 
 ## ✨ 주요 기능
 
-### 👤 일반 회원 (User Portal)
-- **차량 추천**: AI 기반 개인 맞춤형 차량 추천 시스템
-- **차량 비교**: 다양한 모델 간 스펙 및 가격 비교
-- **카카오 연동**: 카카오 로그인 및 채널 통합
-- **상담 신청**: 온라인 상담 예약 및 문의
-- **이벤트**: 프로모션 및 이벤트 정보 제공
-- **딜러 찾기**: 지도 기반 인근 딜러 검색
-- **보조금 조회**: EV 및 수소차 보조금 정보
+### 🚘 AI 기반 차량 추천
 
-### 🏪 딜러 허브 (Dealer Hub)
-- **대시보드**: 실시간 판매 현황 및 KPI 모니터링
-- **재고 관리**: 차량 재고 현황 및 입출고 관리
-- **수요 예측**: Prophet 기반 차량 수요 예측
-- **상담 관리**: 고객 상담 이력 및 리드 관리
-- **판매 등록**: 계약 및 판매 데이터 입력
-- **데이터 분석**: 고객 세분화 및 판매 트렌드 분석
-- **설문 조사**: 고객 만족도 조사 및 피드백 수집
+고객의 특성과 구매 조건을 분석하여 적합한 차량을 추천합니다.
 
-### 🔧 관리자 콘솔 (Admin Console)
-- **판매 분석**
-  - 국내/수출 판매 실적 분석
-  - 지역별/차종별 성과 분석
-  - 목표 대비 달성률 모니터링
-  
-- **LTV 분석**
-  - 고객 생애 가치(LTV) 예측
-  - 고객 세그먼트별 분석
-  - 시장 트렌드 분석
-  
-- **마케팅 관리**
-  - 캠페인 성과 분석
-  - 마케팅 전략 수립
-  - ROI 분석
-  
-- **생산 관리**
-  - 공장별 생산량 분석
-  - 생산 트렌드 모니터링
-  - 생산 보고서 생성
-  
-- **재고 관리**
-  - 전체 재고 현황
-  - 재고 회전율 분석
-  - 재고 경고 시스템
-  
-- **경제 지표**
-  - Kafka 기반 실시간 경제 데이터 스트리밍
-  - GDP, 환율, 금리 등 주요 지표 모니터링
-  - 경제 트렌드 분석
+주요 입력 정보:
 
-- **설정 관리**
-  - 사용자 관리
-  - 데이터 동기화
+- 연령대
+- 지역
+- 소득 및 예산
+- 선호 차종
+- 연료 유형
+- 과거 구매 및 상담 정보
+
+추천 결과:
+
+- 적합 차량 목록
+- 차량별 주요 사양과 가격
+- 유사 고객군의 선호 정보
+- 관련 이벤트 및 프로모션
 
 ---
 
-## 🏗️ 시스템 아키텍처
+### 📞 상담 및 고객 관리
 
-```
-┌─────────────────┐
-│   Home.py       │  ← Entry Point
-│   (Routing)     │
-└────────┬────────┘
-         │
-    ┌────┴────────────────────┐
-    │                         │
-┌───▼────┐  ┌────▼────┐  ┌───▼────┐
-│ A_U_   │  │  B_D_   │  │  C_A_  │
-│ main   │  │  main   │  │  main  │
-│ (User) │  │(Dealer) │  │(Admin) │
-└───┬────┘  └────┬────┘  └───┬────┘
-    │            │            │
-┌───▼────────────▼────────────▼───┐
-│       modules/                  │
-│  ├─ A_U_*.py (User modules)     │
-│  ├─ B_D_*.py (Dealer modules)   │
-│  └─ C_A_*.py (Admin modules)    │
-└────────────────┬────────────────┘
-                 │
-    ┌────────────┼────────────┐
-    │            │            │
-┌───▼───┐   ┌───▼───┐   ┌───▼───┐
-│ data/ │   │model/ │   │Kafka  │
-│ (CSV) │   │ (ML)  │   │Stream │
-└───────┘   └───────┘   └───────┘
-```
+고객 상담의 신청부터 이력 관리까지 연결합니다.
 
-### 데이터 흐름
-1. **User Input** → Streamlit UI
-2. **Data Processing** → Pandas, NumPy
-3. **ML Prediction** → XGBoost, LightGBM, Prophet
-4. **Visualization** → Plotly, Altair, Matplotlib
-5. **Real-time Streaming** → Kafka (경제 지표)
+- 온라인 상담 신청
+- 고객별 상담 이력 조회
+- 상담 상태 및 후속 조치 관리
+- 관심 차량과 문의 내용 기록
+- 고객 리드 관리
+- 고객 만족도 및 피드백 수집
 
 ---
 
-## 🚀 설치 및 실행
+### 📦 재고 관리
 
-### 필수 요구사항
-- Python 3.8 이상
-- pip 패키지 매니저
+딜러와 관리자가 차량 재고 상태를 확인할 수 있습니다.
 
-### 설치 단계
-
-1. **저장소 클론**
-```bash
-git clone https://github.com/your-repo/main-project.git
-cd main-project
-```
-
-2. **가상 환경 생성 (권장)**
-```bash
-python -m venv venv
-source venv/bin/activate  # MacOS/Linux
-# 또는
-venv\Scripts\activate  # Windows
-```
-
-3. **패키지 설치**
-```bash
-pip install -r requirements.txt
-```
-
-4. **시스템 종속성 설치 (필요시)**
-
-**MacOS**:
-```bash
-brew install cmake
-brew install font-nanum  # 한글 폰트
-```
-
-**Ubuntu/Debian**:
-```bash
-sudo apt-get install -y python3-dev build-essential cmake
-sudo apt-get install -y fonts-nanum*  # 한글 폰트
-```
-
-5. **애플리케이션 실행**
-```bash
-streamlit run Home.py
-```
-
-6. **브라우저 접속**
-```
-http://localhost:8501
-```
-
-### 선택적 설치 (얼굴 인식 기능)
-
-```bash
-# dlib 설치
-pip install cmake==3.26.4
-pip install dlib==19.24.2
-pip install face_recognition==1.3.0
-```
+- 딜러별 재고 현황
+- 차종별 재고 수량
+- 차량 입출고 기록
+- 재고 회전율 분석
+- 부족 및 과잉 재고 탐지
+- 재고 경고 표시
 
 ---
 
-## 📁 프로젝트 구조
+### 📈 판매 및 생산 분석
 
-```
-main-project/
-│
-├── Home.py                    # 메인 진입점 및 라우팅
-├── A_U_main.py               # 일반 회원 메인
-├── B_D_main.py               # 딜러 메인
-├── C_A_main.py               # 관리자 메인
-│
-├── modules/                   # 모듈 디렉토리
-│   ├── A_U_*.py              # 일반 회원 모듈 (12개)
-│   ├── B_D_*.py              # 딜러 모듈 (11개)
-│   └── C_A_*.py              # 관리자 모듈 (37개)
-│
-├── data/                      # 데이터 디렉토리
-│   ├── customers.csv         # 고객 데이터
-│   ├── employee.csv          # 직원 데이터
-│   ├── inventory_data.csv    # 재고 데이터
-│   ├── car_production.csv    # 생산 데이터
-│   ├── car_type.csv          # 차량 정보
-│   ├── consult_log.csv       # 상담 이력
-│   ├── event.csv             # 이벤트 정보
-│   └── processed/            # 전처리된 데이터
-│       ├── total/            # 통합 데이터
-│       ├── 생산 중/          # 생산 중 차량
-│       ├── 생산 종료/        # 단종 차량
-│       └── 보조금/           # EV/수소차 보조금
-│
-├── extra_data/               # 외부 경제 데이터
-│   ├── processed/            # 전처리된 경제 지표
-│   │   ├── 경제 성장 관련/
-│   │   ├── 금융 환경 관련/
-│   │   ├── 소비 심리 관련/
-│   │   └── 재고 관련/
-│   └── raw/                  # 원본 데이터 (XLSX)
-│
-├── model/                    # 머신러닝 모델
-│   ├── xgb_model_*.pkl       # XGBoost 모델들
-│   ├── lgb_ltv_model.pkl     # LightGBM 모델
-│   ├── cat_ltv_model.pkl     # CatBoost 모델
-│   └── *.pkl                 # 기타 학습된 모델
-│
-├── images/                   # 이미지 리소스
-│   ├── hyundai_logo.png
-│   ├── user_icon.png
-│   ├── shop_icon.png
-│   ├── admin_icon.png
-│   └── event/                # 이벤트 이미지
-│
-├── fonts/                    # 한글 폰트
-│   └── NanumGothic*          # 나눔고딕 폰트 파일
-│
-├── jupyter/                  # Jupyter 노트북
-│   ├── customer.ipynb        # 고객 분석
-│   ├── preprocessing.ipynb   # 데이터 전처리
-│   └── *.ipynb              # 기타 분석 노트북
-│
-├── requirements.txt          # Python 패키지 목록
-├── README.md                # 프로젝트 문서 (현재 파일)
-└── error_log.txt            # 에러 로그
-```
+판매·생산 데이터를 다각도로 분석합니다.
+
+- 국내 및 해외 판매 비교
+- 지역별 판매 실적
+- 차종별 판매 비중
+- 목표 대비 달성률
+- 공장별 생산량
+- 생산 및 판매 추세
+- 기간별 성과 분석
 
 ---
 
-## 🛠️ 기술 스택
+### 🔮 수요 예측
 
-### Frontend & UI
-- **Streamlit** 1.43.0 - 웹 애플리케이션 프레임워크
-- **Streamlit JavaScript** - JavaScript 통합
-- **Plotly** 5.18.0 - 인터랙티브 차트
-- **Altair** - 선언적 시각화
-- **Folium** - 지도 시각화
-- **Streamlit AgGrid** - 테이블 컴포넌트
+과거 판매 흐름을 바탕으로 미래 차량 수요를 예측합니다.
 
-### Backend & Data Processing
-- **Pandas** 1.5+ - 데이터 처리
-- **NumPy** - 수치 연산
-- **Python-dateutil** - 날짜 처리
-- **Pillow** - 이미지 처리
-- **Requests** - HTTP 통신
-- **Beautiful Soup 4** - 웹 스크래핑
-
-### Machine Learning
-- **Scikit-learn** - ML 알고리즘
-- **XGBoost** - Gradient Boosting
-- **LightGBM** - 경량 Gradient Boosting
-- **CatBoost** - Categorical Boosting
-- **Prophet** - 시계열 예측
-- **SHAP** - 모델 해석
-
-### Streaming & Real-time
-- **Kafka-Python** 2.0.2 - Kafka 클라이언트
-- **Confluent-Kafka** 2.2.0 - Kafka 통합
-
-### Visualization & Reporting
-- **Matplotlib** - 정적 그래프
-- **Seaborn** - 통계 시각화
-- **Kaleido** - Plotly 이미지 export
-- **ReportLab** - PDF 리포트 생성
-
-### Utilities
-- **Geopy** - 지리정보 처리
-- **OpenPyXL** - Excel 읽기/쓰기
-- **XlsxWriter** - Excel 파일 생성
+- Prophet 기반 시계열 분석
+- 차종별 수요 예측
+- 트렌드와 계절성 반영
+- 예측값과 기존 실적 비교
+- 딜러 재고 및 판매 전략 지원
 
 ---
 
-## 📊 데이터 구조
+### 💰 고객 생애 가치 분석
 
-### 주요 데이터셋
+고객의 장기적인 가치를 예측하고 세그먼트별 특성을 분석합니다.
 
-| 데이터셋 | 파일명 | 설명 |
-|---------|--------|------|
-| 고객 정보 | `customers.csv` | 고객 기본 정보 및 프로필 |
-| 상담 이력 | `consult_log.csv` | 고객 상담 및 문의 이력 |
-| 차량 정보 | `car_type.csv` | 차종별 스펙 및 가격 정보 |
-| 재고 데이터 | `inventory_data.csv` | 딜러별 재고 현황 |
-| 생산 데이터 | `car_production.csv` | 공장별 생산량 데이터 |
-| 직원 정보 | `employee.csv` | 딜러 및 직원 정보 |
-| 이벤트 | `event.csv` | 프로모션 및 이벤트 정보 |
-| 보조금 | `ev-car.csv`, `hydro-car.csv` | 전기차/수소차 보조금 |
+- 국내 고객 LTV 예측
+- 해외 고객 LTV 예측
+- 딜러 대상 고객 가치 분석
+- 고객군별 가치 분포
+- 고가치 고객 탐색
+- LTV 기반 마케팅 전략 지원
 
-### 외부 경제 데이터
-- **GDP/GNI**: 명목/실질 GDP 및 국민총소득
-- **환율**: 주요국 통화 대원화 환율
-- **금리**: 한국은행 기준금리 및 여수신금리
-- **수출입**: 국가별 수출입 데이터
-- **소비 심리**: 소비자 심리지수 등 18개 지표
+---
+
+### 📢 마케팅 분석
+
+고객과 캠페인 데이터를 기반으로 마케팅 성과를 분석합니다.
+
+- 캠페인별 성과 비교
+- 고객군별 반응 분석
+- 마케팅 ROI 분석
+- 고객 세그먼트별 전략
+- 이벤트와 프로모션 관리
+- 고객 이탈 방지 전략 지원
+
+---
+
+### 🌐 경제 지표 스트리밍
+
+외부 경제 데이터를 실시간 또는 주기적으로 전달받아 시장 상황을 확인합니다.
+
+주요 지표:
+
+- GDP 및 GNI
+- 환율
+- 기준금리와 여수신금리
+- 수출입 현황
+- 소비자 심리지수
+- 재고 관련 지표
+
+Kafka 기반 스트리밍 구조를 통해 경제 지표를 수집하고 관리자 대시보드에 반영하도록 구성했습니다.
 
 ---
 
 ## 🤖 머신러닝 모델
 
-### LTV (고객 생애 가치) 예측 모델
+### 고객 생애 가치 예측
 
-| 모델 | 파일명 | 용도 |
-|------|--------|------|
-| XGBoost | `xgb_domestic_ltv_model.pkl` | 국내 고객 LTV 예측 |
-| XGBoost | `xgb_export_ltv_model.pkl` | 수출 고객 LTV 예측 |
-| XGBoost | `xgb_DD_ltv_model.pkl` | 딜러 대상 LTV 예측 |
-| LightGBM | `lgb_ltv_model.pkl` | 경량 LTV 예측 |
-| CatBoost | `cat_ltv_model.pkl` | 범주형 데이터 특화 |
+| 모델 | 적용 목적 |
+|---|---|
+| XGBoost | 국내·해외 및 딜러 고객 LTV 예측 |
+| LightGBM | 빠른 학습과 추론을 고려한 LTV 예측 |
+| CatBoost | 범주형 변수가 많은 고객 데이터 분석 |
 
-### 기타 모델
-- **DecisionTree Model**: 의사결정 트리 기반 분류
-- **GradientBoosting Model**: 앙상블 부스팅
-- **LightGBM Model**: 고속 그래디언트 부스팅
-- **XGBoost Model (v202512111335)**: 최신 버전 통합 모델
+주요 입력 특성:
+
+- 고객 기본 정보
+- 구매 금액
+- 차량 구매 이력
+- 상담 횟수와 상담 내용
+- 고객 등급
+- 재구매 여부
+- 지역 및 시장 구분
+
+---
+
+### 차량 추천 및 고객 분석
+
+적용 모델:
+
+- Decision Tree
+- Random Forest
+- Gradient Boosting
+- LightGBM
+- XGBoost
+
+활용 영역:
+
+- 맞춤형 차량 추천
+- 고객 세분화
+- 구매 가능성 분석
+- 고객군별 차량 선호도 분석
+
+---
 
 ### 수요 예측
-- **Prophet**: 시계열 기반 차량 수요 예측
-- 트렌드, 계절성, 휴일 효과 고려
+
+Prophet을 활용하여 시간에 따른 판매량 변화를 분석합니다.
+
+반영 요소:
+
+- 장기 추세
+- 계절성
+- 기간별 반복 패턴
+- 차종별 판매 이력
+- 시장 변화
 
 ---
 
-## 💻 개발 가이드
+### 모델 해석
+
+SHAP을 활용해 예측에 영향을 준 주요 특성을 확인할 수 있도록 구성했습니다.
+
+- 고객 특성별 영향도 분석
+- LTV 예측 근거 확인
+- 모델 변수 중요도 비교
+- 마케팅 및 상담 전략 수립 지원
+
+---
+
+## 📊 데이터 흐름
+
+```text
+고객·상담·차량·재고·판매 데이터
+                │
+                ▼
+       데이터 정제 및 통합
+                │
+                ▼
+     고객·딜러·관리자 목적별 가공
+                │
+        ┌───────┼────────┐
+        ▼       ▼        ▼
+    고객 분석  재고 분석  판매·생산 분석
+        │       │        │
+        └───────┼────────┘
+                ▼
+       머신러닝 및 시계열 예측
+                │
+                ▼
+     추천·LTV·수요 예측 결과 생성
+                │
+                ▼
+      역할별 Streamlit 화면 제공
+```
+
+---
+
+## 🗂️ 데이터 구성
+
+| 데이터 | 파일 | 주요 내용 |
+|---|---|---|
+| 고객 데이터 | `customers.csv` | 고객 기본 정보와 구매 이력 |
+| 상담 데이터 | `consult_log.csv` | 상담 내용, 상태 및 이력 |
+| 차량 데이터 | `car_type.csv` | 차량 사양, 가격 및 연료 유형 |
+| 재고 데이터 | `inventory_data.csv` | 딜러별·차종별 재고 현황 |
+| 생산 데이터 | `car_production.csv` | 공장 및 차종별 생산량 |
+| 직원 데이터 | `employee.csv` | 딜러와 관리자 정보 |
+| 이벤트 데이터 | `event.csv` | 프로모션 및 이벤트 정보 |
+| 보조금 데이터 | `ev-car.csv`, `hydro-car.csv` | 친환경 차량 보조금 정보 |
+
+### 외부 경제 데이터
+
+- 경제 성장 지표
+- 금융 환경 지표
+- 소비 심리 지표
+- 환율 및 금리
+- 수출입 데이터
+- 재고 및 판매 관련 지표
+
+---
+
+## ⚙️ 기술 스택
+
+### Application & UI
+
+<p>
+  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Altair-FD4B4B?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Folium-77B829?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/AgGrid-0088CC?style=for-the-badge"/>
+</p>
+
+### Data Processing
+
+<p>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white"/>
+  <img src="https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white"/>
+  <img src="https://img.shields.io/badge/BeautifulSoup-59666C?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/OpenPyXL-217346?style=for-the-badge"/>
+</p>
+
+### Machine Learning
+
+<p>
+  <img src="https://img.shields.io/badge/Scikit--Learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white"/>
+  <img src="https://img.shields.io/badge/XGBoost-EC6B23?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/LightGBM-017CEE?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/CatBoost-FFCC00?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Prophet-0072B5?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/SHAP-5A45FF?style=for-the-badge"/>
+</p>
+
+### Streaming & Integration
+
+<p>
+  <img src="https://img.shields.io/badge/Apache%20Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Kafka--Python-231F20?style=for-the-badge&logo=apachekafka&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Confluent%20Kafka-17365D?style=for-the-badge&logo=confluent&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Kakao-FFCD00?style=for-the-badge&logo=kakao&logoColor=black"/>
+</p>
+
+### Reporting & Deployment
+
+<p>
+  <img src="https://img.shields.io/badge/Streamlit%20Cloud-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"/>
+  <img src="https://img.shields.io/badge/ReportLab-CC0000?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Excel-217346?style=for-the-badge&logo=microsoftexcel&logoColor=white"/>
+</p>
+
+---
+
+## 📂 프로젝트 구조
+
+```text
+hyundai-crm-platform/
+├── Home.py
+├── A_U_main.py
+├── B_D_main.py
+├── C_A_main.py
+├── modules/
+│   ├── A_U_*.py
+│   ├── B_D_*.py
+│   └── C_A_*.py
+├── data/
+│   ├── customers.csv
+│   ├── employee.csv
+│   ├── inventory_data.csv
+│   ├── car_production.csv
+│   ├── car_type.csv
+│   ├── consult_log.csv
+│   ├── event.csv
+│   └── processed/
+├── extra_data/
+│   ├── raw/
+│   └── processed/
+├── model/
+│   ├── xgb_model_*.pkl
+│   ├── xgb_domestic_ltv_model.pkl
+│   ├── xgb_export_ltv_model.pkl
+│   ├── xgb_DD_ltv_model.pkl
+│   ├── lgb_ltv_model.pkl
+│   └── cat_ltv_model.pkl
+├── images/
+├── fonts/
+├── jupyter/
+├── requirements.txt
+└── README.md
+```
 
 ### 모듈 명명 규칙
-- `A_U_*.py`: 일반 회원 (User) 모듈
-- `B_D_*.py`: 딜러 (Dealer) 모듈  
-- `C_A_*.py`: 관리자 (Admin) 모듈
 
-### 페이지 추가 방법
-
-1. **모듈 파일 생성**
-```python
-# modules/A_U_new_feature.py
-import streamlit as st
-
-def app():
-    st.title("새로운 기능")
-    # 기능 구현
-```
-
-2. **메인 파일에 라우팅 추가**
-```python
-# A_U_main.py
-elif page == "new_feature":
-    import modules.A_U_new_feature as new_feature
-    new_feature.app()
-```
-
-### 데이터 로드 패턴
-```python
-import pandas as pd
-
-# CSV 파일 로드
-@st.cache_data
-def load_data():
-    df = pd.read_csv("data/customers.csv")
-    return df
-
-# 사용
-df = load_data()
-```
-
-### 스타일링 가이드
-- **색상**: 현대자동차 브랜드 컬러 사용
-- **레이아웃**: `st.columns()` 활용
-- **폰트**: 나눔고딕 (한글 지원)
-- **아이콘**: `images/` 디렉토리의 PNG 파일
-
-### 로깅
-```python
-import logging
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logging.info("로그 메시지")
-```
+| 접두어 | 사용자 영역 |
+|---|---|
+| `A_U_` | 일반 고객 |
+| `B_D_` | 딜러 |
+| `C_A_` | 관리자 |
 
 ---
 
-## 🌐 배포
+## 🚀 설치 및 실행
 
-### Streamlit Cloud 배포
-
-1. **GitHub 저장소 연결**
-2. **Streamlit Cloud 설정**
-   - Main file: `Home.py`
-   - Python version: 3.8+
-3. **환경 변수 설정** (필요시)
-4. **배포**
-
-**배포 URL**: https://hyundai-crm-platform-codeworks.streamlit.app/
-
-### 로컬 배포
+### 1. 저장소 클론
 
 ```bash
-# 프로덕션 모드
-streamlit run Home.py --server.port=8501 --server.address=0.0.0.0
+git clone https://github.com/CodeWorks-hi/hyundai-crm-platform.git
+cd hyundai-crm-platform
+```
 
-# 개발 모드
-streamlit run Home.py --server.runOnSave=true
+### 2. 가상환경 생성
+
+```bash
+python -m venv venv
+```
+
+macOS / Linux:
+
+```bash
+source venv/bin/activate
+```
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+### 3. 라이브러리 설치
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. 애플리케이션 실행
+
+```bash
+streamlit run Home.py
+```
+
+실행 후 브라우저에서 아래 주소로 접속합니다.
+
+```text
+http://localhost:8501
 ```
 
 ---
 
-## 📝 라이선스
+## 🌐 온라인 데모
 
-이 프로젝트는 현대자동차 그룹의 공개 데이터를 활용한 프로젝트입니다.
-
----
-
-## 👥 기여
-
-프로젝트 기여는 개발팀을 통해 관리됩니다.
+[Streamlit 애플리케이션 바로가기](https://hyundai-crm-platform-codeworks.streamlit.app/)
 
 ---
 
-## 📞 문의
+## 📌 프로젝트 특징
 
-프로젝트 관련 문의사항은 개발팀에 연락해주세요.
-
----
-
-## 🔄 버전 히스토리
-
-- **v1.0** (2025-01): 초기 버전 출시
-  - 일반 회원, 딜러, 관리자 포털 구축
-  - LTV 예측 모델 통합
-  - Kafka 기반 실시간 경제 지표 스트리밍
-  - Prophet 수요 예측 시스템
+- 고객·딜러·관리자를 구분한 역할 기반 서비스
+- 고객 분석 시스템과 ERP 플랫폼 기능의 통합
+- 차량 추천, LTV 분석, 수요 예측을 결합한 머신러닝 서비스
+- 상담·판매·재고·생산 데이터를 연결한 CRM 구조
+- Kafka 기반 경제 지표 스트리밍
+- Plotly·Altair·Folium을 활용한 대화형 시각화
+- CSV·Excel·PDF 형태의 데이터 및 리포트 활용
+- Streamlit 기반의 통합 업무·고객 서비스 구현
 
 ---
+
+## 📝 안내
+
+본 프로젝트는 교육 및 포트폴리오 목적으로 제작된 비공식 프로젝트입니다.
+
+현대자동차의 공식 서비스, 내부 CRM, 운영 데이터 또는 실제 딜러 시스템과는 관련이 없습니다.
