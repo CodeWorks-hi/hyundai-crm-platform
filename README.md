@@ -7,7 +7,6 @@
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://hyundai-crm-platform-codeworks.streamlit.app/)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-Cloud-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Kafka](https://img.shields.io/badge/Apache%20Kafka-Streaming-231F20?style=flat-square&logo=apachekafka&logoColor=white)](https://kafka.apache.org/)
 
 </div>
 
@@ -31,7 +30,7 @@
 - 상담·판매·재고 정보를 연결한 딜러 업무 지원
 - 고객 생애 가치와 마케팅 성과 분석
 - 생산·재고·판매 데이터의 통합 모니터링
-- 경제 지표 스트리밍을 활용한 시장 환경 분석
+- 경제 지표를 활용한 시장 환경 분석
 - 사용자 유형별로 분리된 통합 서비스 제공
 
 ---
@@ -59,7 +58,7 @@
                            CSV · 모델 · 외부 데이터
                                       │
                                       ▼
-                         Kafka 기반 경제 지표 스트리밍
+                             경제 지표 데이터 분석
 ```
 
 ---
@@ -214,7 +213,7 @@
 
 ### 🌐 경제 지표 스트리밍
 
-외부 경제 데이터를 실시간 또는 주기적으로 전달받아 시장 상황을 확인합니다.
+외부 경제 데이터를 활용하여 시장 환경과 주요 경제 지표를 분석합니다.
 
 주요 지표:
 
@@ -225,7 +224,7 @@
 - 소비자 심리지수
 - 재고 관련 지표
 
-Kafka 기반 스트리밍 구조를 통해 경제 지표를 수집하고 관리자 대시보드에 반영하도록 구성했습니다.
+수집한 경제 지표를 관리자 대시보드에서 시각화하고 시장 분석에 활용하도록 구성했습니다.
 
 ---
 
@@ -352,11 +351,13 @@ SHAP을 활용해 예측에 영향을 준 주요 특성을 확인할 수 있도�
 ### Application & UI
 
 <p>
+
   <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"/>
   <img src="https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white"/>
   <img src="https://img.shields.io/badge/Altair-FD4B4B?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/Folium-77B829?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/AgGrid-0088CC?style=for-the-badge"/>
+
 </p>
 
 ### Data Processing
@@ -380,12 +381,9 @@ SHAP을 활용해 예측에 영향을 준 주요 특성을 확인할 수 있도�
   <img src="https://img.shields.io/badge/SHAP-5A45FF?style=for-the-badge"/>
 </p>
 
-### Streaming & Integration
+### External Services
 
 <p>
-  <img src="https://img.shields.io/badge/Apache%20Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Kafka--Python-231F20?style=for-the-badge&logo=apachekafka&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Confluent%20Kafka-17365D?style=for-the-badge&logo=confluent&logoColor=white"/>
   <img src="https://img.shields.io/badge/Kakao-FFCD00?style=for-the-badge&logo=kakao&logoColor=black"/>
 </p>
 
@@ -506,7 +504,7 @@ http://localhost:8501
 - 고객 분석 시스템과 ERP 플랫폼 기능의 통합
 - 차량 추천, LTV 분석, 수요 예측을 결합한 머신러닝 서비스
 - 상담·판매·재고·생산 데이터를 연결한 CRM 구조
-- Kafka 기반 경제 지표 스트리밍
+- 외부 경제 지표를 활용한 시장 분석
 - Plotly·Altair·Folium을 활용한 대화형 시각화
 - CSV·Excel·PDF 형태의 데이터 및 리포트 활용
 - Streamlit 기반의 통합 업무·고객 서비스 구현
